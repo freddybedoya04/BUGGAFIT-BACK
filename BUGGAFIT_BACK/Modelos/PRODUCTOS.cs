@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BUGGAFIT_BACK.Modelos
 {
@@ -9,9 +10,9 @@ namespace BUGGAFIT_BACK.Modelos
         [Required]
         public string PRO_NOMBRE { get; set; }
         [Required]
-        public string PRO_MARCA { get; set; }
+        public int MAR_CODIGO { get; set; }
         [Required]
-        public string PRO_CATEGORIA { get; set; }
+        public int CAT_CODIGO { get; set; }
         [Required]
         public float PRO_PRECIO_COMPRA { get; set; }
         public float PRO_PRECIOVENTA_DETAL { get; set; }
@@ -21,5 +22,9 @@ namespace BUGGAFIT_BACK.Modelos
         public DateTime PRO_ACTUALIZACION { get; set; }
         public DateTime PRO_FECHACREACION { get; set; }
         public bool PRO_ESTADO { get; set; }
+        [ForeignKey("CAT_CODIGO")]
+        public virtual CATEGORIAS CATEGORIA { get; set; }
+        [ForeignKey("MAR_CODIGO")]
+        public virtual MARCAS MARCA { get; set; }
     }
 }
