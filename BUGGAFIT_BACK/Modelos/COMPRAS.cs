@@ -23,8 +23,8 @@ namespace BUGGAFIT_BACK.Modelos
         public ICollection<DETALLECOMPRAS>DetalleCompras { get; set; }    
         // Propiedades de navegación (relaciones)
         [ForeignKey("TIC_CODIGO")]
-        public virtual TipoCuenta TipoCuenta { get; set; } // Relación con TipoCuenta
+        public virtual TIPOSCUENTAS TipoCuenta { get; set; } // Relación con TipoCuenta
         [ForeignKey("USU_CEDULA")]
-        public virtual Usuario Usuario { get; set; } // Relación con Usuario
+        public virtual USUARIOS Usuario { get; set; } // Relación con Usuario
     }
 }

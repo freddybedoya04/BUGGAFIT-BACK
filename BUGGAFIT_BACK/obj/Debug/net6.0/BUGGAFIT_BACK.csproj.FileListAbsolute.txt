@@ -86,3 +86,6 @@ D:\Proyectos Personales\BUGAFIT\BUGGAFIT_BACK\BUGGAFIT_BACK\obj\Debug\net6.0\ref
 D:\Proyectos Personales\BUGAFIT\BUGGAFIT_BACK\BUGGAFIT_BACK\obj\Debug\net6.0\BUGGAFIT_BACK.pdb
 D:\Proyectos Personales\BUGAFIT\BUGGAFIT_BACK\BUGGAFIT_BACK\obj\Debug\net6.0\BUGGAFIT_BACK.genruntimeconfig.cache
 D:\Proyectos Personales\BUGAFIT\BUGGAFIT_BACK\BUGGAFIT_BACK\obj\Debug\net6.0\ref\BUGGAFIT_BACK.dll
+D:\Proyectos Personales\BUGAFIT\BUGGAFIT_BACK\BUGGAFIT_BACK\bin\Debug\net6.0\System.Net.Http.Formatting.dll
+D:\Proyectos Personales\BUGAFIT\BUGGAFIT_BACK\BUGGAFIT_BACK\bin\Debug\net6.0\System.Web.Http.dll
+D:\Proyectos Personales\BUGAFIT\BUGGAFIT_BACK\BUGGAFIT_BACK\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll

@@ -14,7 +14,6 @@ namespace BUGGAFIT_BACK.Modelos
         public string VEN_TIPOPAGO { get; set; }
         
         public int TIC_CODIGO { get; set; } // Clave foránea a TipoCuenta
-        [ForeignKey("CLIENTES")]
         public int CLI_ID { get; set; } // Clave foránea a Cliente
         public float VEN_PRECIOTOTAL { get; set; }
         public bool? VEN_ESTADOCREDITO { get; set; }
