@@ -10,17 +10,24 @@ namespace BUGGAFIT_BACK.Controllers
     [ApiController]
     public class UsuariosController : ControllerBase
     {
-        private readonly MyDBContext myDBContext;
-        public UsuariosController(MyDBContext context)
+        private readonly ICatalogoUsuarios catalogoUsuarios;
+        public UsuariosController(ICatalogoUsuarios context)
         {
-            myDBContext = context;
+            catalogoUsuarios = context;
         }
 
         [HttpGet]
         public async Task<IActionResult> ListarUsuarios()
         {
-            var usuarios = new CatalogoUsuario(myDBContext).ListarUsuarios();
-            return Ok(usuarios);
+            try
+            {
+                var usuarios = await catalogoUsuarios.ListarUsuariosAsync();
+                return Ok(usuarios);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
       "BUGGAFIT_BACK/1.0.0": {
         "dependencies": {
           "Microsoft.AspNet.WebApi.Core": "5.2.9",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "6.0.10",
           "Microsoft.EntityFrameworkCore": "7.0.10",
           "Microsoft.EntityFrameworkCore.Design": "7.0.10",
           "Microsoft.EntityFrameworkCore.SqlServer": "7.0.10",
@@ -82,6 +83,17 @@
           "lib/net45/System.Web.Http.dll": {
             "assemblyVersion": "5.2.9.0",
             "fileVersion": "5.2.61129.10"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.JwtBearer/6.0.10": {
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.21.0"
+        },
+        "runtime": {
+          "lib/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "assemblyVersion": "6.0.10.0",
+            "fileVersion": "6.0.1022.47617"
           }
         }
       },
@@ -1398,6 +1410,13 @@
       "sha512": "sha512-9C0/gBUeMBjorRFSmR5Z2j5wznf9BP5SddN+OZE7X0BpXgivBZTZ42d0h8tIjJzSLHYVCU4HZBf51+cidCY4fQ==",
       "path": "microsoft.aspnet.webapi.core/5.2.9",
       "hashPath": "microsoft.aspnet.webapi.core.5.2.9.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.JwtBearer/6.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4SBTyAuYHSiFi/AiqlKiKpl2+EkKaS/q1zeDI4L88cMmy5P01pse25gOAyzfWycI8voz+d1FwTIuqhWCH87IJQ==",
+      "path": "microsoft.aspnetcore.authentication.jwtbearer/6.0.10",
+      "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.6.0.10.nupkg.sha512"
     },
     "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
       "type": "package",

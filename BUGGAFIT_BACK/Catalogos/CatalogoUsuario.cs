@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
-    public class CatalogoUsuario
+    public class CatalogoUsuario : ICatalogoUsuarios
     {
 
         private readonly MyDBContext myDbContext;
@@ -13,30 +13,74 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             myDbContext = context;
         }
-        public List<Usuario> ListarUsuarios()
+
+        List<Usuario> ICatalogoUsuarios.ListarUsuarios()
         {
 			try
 			{
-                using (var db=myDbContext)
+                using var db = myDbContext;
+                List<Usuario> usuarios = db.USUARIOS.Select(x => new Usuario
                 {
-                    List<Usuario> usuarios = db.USUARIOS.Select(x => new Usuario
-                    {
-                        USU_CEDULA = x.USU_CEDULA,
-                        USU_FECHAACTUALIZACION = x.USU_FECHAACTUALIZACION,
-                        USU_NOMBRE = x.USU_NOMBRE,
-                        USU_CONTRASEÑA = x.USU_CONTRASEÑA,
-                        USU_ROL = x.USU_ROL,
-                    }).ToList();
-                    return usuarios;
-                }
+                    USU_CEDULA = x.USU_CEDULA,
+                    USU_FECHAACTUALIZACION = x.USU_FECHAACTUALIZACION,
+                    USU_NOMBRE = x.USU_NOMBRE,
+                    USU_CONTRASEÑA = x.USU_CONTRASEÑA,
+                    USU_ROL = x.USU_ROL,
+                }).ToList();
+                return usuarios;
 
 
-			}
+            }
 			catch (Exception)
 			{
 
 				throw;
 			}
+        }
+
+        void ICatalogoUsuarios.ActualizarUsuario(Usuario employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task ICatalogoUsuarios.ActualizarUsuarioAsync(Usuario employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        Usuario ICatalogoUsuarios.AgregarUsuario(Usuario employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Usuario> ICatalogoUsuarios.AgregarUsuarioAsync(Usuario employee)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ICatalogoUsuarios.BorrarUsuario(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task ICatalogoUsuarios.BorrarUsuarioAsync(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Usuario ICatalogoUsuarios.ListarUsuario(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Usuario> ICatalogoUsuarios.ListarUsuarioAsync(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<List<Usuario>> ICatalogoUsuarios.ListarUsuariosAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

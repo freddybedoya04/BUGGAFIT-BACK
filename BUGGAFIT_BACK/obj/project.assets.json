@@ -92,6 +92,25 @@
           }
         }
       },
+      "Microsoft.AspNetCore.Authentication.JwtBearer/6.0.10": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.10.0"
+        },
+        "compile": {
+          "lib/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
         "type": "package",
         "compile": {
@@ -2470,6 +2489,21 @@
         "lib/net45/System.Web.Http.xml",
         "microsoft.aspnet.webapi.core.5.2.9.nupkg.sha512",
         "microsoft.aspnet.webapi.core.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Authentication.JwtBearer/6.0.10": {
+      "sha512": "4SBTyAuYHSiFi/AiqlKiKpl2+EkKaS/q1zeDI4L88cMmy5P01pse25gOAyzfWycI8voz+d1FwTIuqhWCH87IJQ==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.authentication.jwtbearer/6.0.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll",
+        "lib/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.xml",
+        "microsoft.aspnetcore.authentication.jwtbearer.6.0.10.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.jwtbearer.nuspec"
       ]
     },
     "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
@@ -7518,6 +7552,7 @@
   "projectFileDependencyGroups": {
     "net6.0": [
       "Microsoft.AspNet.WebApi.Core >= 5.2.9",
+      "Microsoft.AspNetCore.Authentication.JwtBearer >= 6.0.10",
       "Microsoft.EntityFrameworkCore >= 7.0.10",
       "Microsoft.EntityFrameworkCore.Design >= 7.0.10",
       "Microsoft.EntityFrameworkCore.SqlServer >= 7.0.10",
@@ -7527,28 +7562,27 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\fredd\\.nuget\\packages\\": {}
+    "C:\\Users\\Henry\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
+      "projectUniqueName": "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
       "projectName": "BUGGAFIT_BACK",
-      "projectPath": "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
-      "packagesPath": "C:\\Users\\fredd\\.nuget\\packages\\",
-      "outputPath": "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\obj\\",
+      "projectPath": "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
+      "packagesPath": "C:\\Users\\Henry\\.nuget\\packages\\",
+      "outputPath": "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\fredd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Henry\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\sdk\\7.0.304\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
-        "https://api.nuget.org/v3/index.json": {}
+        "https://nuget.telerik.com/v3/index.json": {},
+        "https://www.nuget.org/api/v2/": {}
       },
       "frameworks": {
         "net6.0": {
@@ -7569,6 +7603,10 @@
           "Microsoft.AspNet.WebApi.Core": {
             "target": "Package",
             "version": "[5.2.9, )"
+          },
+          "Microsoft.AspNetCore.Authentication.JwtBearer": {
+            "target": "Package",
+            "version": "[6.0.10, )"
           },
           "Microsoft.EntityFrameworkCore": {
             "target": "Package",
@@ -7618,7 +7656,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
       }
     }
   },
@@ -7627,7 +7665,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "El paquete \"Microsoft.AspNet.WebApi.Core 5.2.9\" se restauró con \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1\" en lugar de la plataforma de destino del proyecto \"net6.0\". Puede que el paquete no sea totalmente compatible con el proyecto.",
+      "message": "Package 'Microsoft.AspNet.WebApi.Core 5.2.9' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
       "libraryId": "Microsoft.AspNet.WebApi.Core",
       "targetGraphs": [
         "net6.0"

@@ -1,29 +1,28 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj": {}
+    "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj": {}
   },
   "projects": {
-    "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj": {
+    "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
+        "projectUniqueName": "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
         "projectName": "BUGGAFIT_BACK",
-        "projectPath": "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
-        "packagesPath": "C:\\Users\\fredd\\.nuget\\packages\\",
-        "outputPath": "D:\\Proyectos Personales\\BUGAFIT\\BUGGAFIT_BACK\\BUGGAFIT_BACK\\obj\\",
+        "projectPath": "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\BUGGAFIT_BACK.csproj",
+        "packagesPath": "C:\\Users\\Henry\\.nuget\\packages\\",
+        "outputPath": "I:\\henry\\Desktop\\Henry\\proyectos\\BugaFit\\Buggafit_Backend\\BUGGAFIT_BACK\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\fredd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Henry\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\7.0.304\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "https://nuget.telerik.com/v3/index.json": {},
+          "https://www.nuget.org/api/v2/": {}
         },
         "frameworks": {
           "net6.0": {
@@ -44,6 +43,10 @@
             "Microsoft.AspNet.WebApi.Core": {
               "target": "Package",
               "version": "[5.2.9, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[6.0.10, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -93,7 +96,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }
