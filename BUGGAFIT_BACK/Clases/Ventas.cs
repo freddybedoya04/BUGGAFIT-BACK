@@ -14,7 +14,7 @@
         public bool VEN_DOMICILIO { get; set; }
         public string VEN_OBSERVACIONES { get; set; }
         public DateTime VEN_ACTUALIZACION { get; set; }
-        public int USU_CEDULA { get; set; } // Clave foránea a Usuario
+        public string USU_CEDULA { get; set; } // Clave foránea a Usuario
         public bool VEN_ESTADOVENTA { get; set; }
         public bool VEN_ESTADO { get; set; }
         public ICollection<DetalleVenta>? detalleVentas { get; set; }

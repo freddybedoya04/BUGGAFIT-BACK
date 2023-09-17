@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BUGGAFIT_BACK.Migrations
 {
     /// <inheritdoc />
-    public partial class dbinit : Migration
+    public partial class DBInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,8 +30,7 @@ namespace BUGGAFIT_BACK.Migrations
                 name: "CLIENTES",
                 columns: table => new
                 {
-                    CLI_ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CLI_ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CLI_NOMBRE = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CLI_TIPOCLIENTE = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CLI_UBICACION = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -94,8 +93,7 @@ namespace BUGGAFIT_BACK.Migrations
                 name: "USUARIOS",
                 columns: table => new
                 {
-                    USU_CEDULA = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    USU_CEDULA = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     USU_NOMBRE = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     USU_CONTRASEÑA = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     USU_ROL = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -157,7 +155,7 @@ namespace BUGGAFIT_BACK.Migrations
                     COM_ENBODEGA = table.Column<bool>(type: "bit", nullable: false),
                     COM_ESTADO = table.Column<bool>(type: "bit", nullable: false),
                     COM_CREDITO = table.Column<bool>(type: "bit", nullable: false),
-                    USU_CEDULA = table.Column<int>(type: "int", nullable: false)
+                    USU_CEDULA = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -186,14 +184,14 @@ namespace BUGGAFIT_BACK.Migrations
                     VEN_FECHAVENTA = table.Column<DateTime>(type: "datetime2", nullable: false),
                     VEN_TIPOPAGO = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TIC_CODIGO = table.Column<int>(type: "int", nullable: false),
-                    CLI_ID = table.Column<int>(type: "int", nullable: false),
+                    CLI_ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     VEN_PRECIOTOTAL = table.Column<float>(type: "real", nullable: false),
                     VEN_ESTADOCREDITO = table.Column<bool>(type: "bit", nullable: true),
                     VEN_ENVIO = table.Column<bool>(type: "bit", nullable: true),
                     VEN_DOMICILIO = table.Column<bool>(type: "bit", nullable: true),
                     VEN_OBSERVACIONES = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VEN_ACTUALIZACION = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    USU_CEDULA = table.Column<int>(type: "int", nullable: false),
+                    USU_CEDULA = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     VEN_ESTADOVENTA = table.Column<bool>(type: "bit", nullable: false),
                     VEN_ESTADO = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -323,7 +321,7 @@ namespace BUGGAFIT_BACK.Migrations
                     GAS_VALOR = table.Column<float>(type: "real", nullable: false),
                     TIC_CODIGO = table.Column<int>(type: "int", nullable: false),
                     GAS_ESTADO = table.Column<bool>(type: "bit", nullable: false),
-                    USU_CEDULA = table.Column<int>(type: "int", nullable: false),
+                    USU_CEDULA = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     GAS_PENDIENTE = table.Column<bool>(type: "bit", nullable: false),
                     VEN_CODIGO = table.Column<int>(type: "int", nullable: true)
                 },

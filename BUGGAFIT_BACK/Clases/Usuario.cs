@@ -2,7 +2,7 @@
 {
     public class Usuario
     {
-        public int USU_CEDULA { get; set; }
+        public string USU_CEDULA { get; set; }
         public string USU_NOMBRE { get; set; }
         public string USU_CONTRASEÑA { get; set; }
         public string USU_ROL { get; set; }

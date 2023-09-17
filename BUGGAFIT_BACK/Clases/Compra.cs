@@ -12,7 +12,7 @@
         public bool COM_ENBODEGA { get; set; }
         public bool COM_ESTADO { get; set; }
         public bool COM_CREDITO { get; set; }
-        public int USU_CEDULA { get; set; } // Clave foránea a Usuario
+        public string USU_CEDULA { get; set; } // Clave foránea a Usuario
 
     }
 }

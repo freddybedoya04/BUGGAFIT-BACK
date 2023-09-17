@@ -90,11 +90,8 @@ namespace BUGGAFIT_BACK.Migrations
 
             modelBuilder.Entity("BUGGAFIT_BACK.Modelos.CLIENTES", b =>
                 {
-                    b.Property<int>("CLI_ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CLI_ID"));
+                    b.Property<string>("CLI_ID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CLI_DIRECCION")
                         .IsRequired()
@@ -159,8 +156,9 @@ namespace BUGGAFIT_BACK.Migrations
                     b.Property<int>("TIC_CODIGO")
                         .HasColumnType("int");
 
-                    b.Property<int>("USU_CEDULA")
-                        .HasColumnType("int");
+                    b.Property<string>("USU_CEDULA")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("COM_CODIGO");
 
@@ -284,8 +282,9 @@ namespace BUGGAFIT_BACK.Migrations
                     b.Property<int>("TIC_CODIGO")
                         .HasColumnType("int");
 
-                    b.Property<int>("USU_CEDULA")
-                        .HasColumnType("int");
+                    b.Property<string>("USU_CEDULA")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("VEN_CODIGO")
                         .HasColumnType("int");
@@ -425,11 +424,8 @@ namespace BUGGAFIT_BACK.Migrations
 
             modelBuilder.Entity("BUGGAFIT_BACK.Modelos.USUARIOS", b =>
                 {
-                    b.Property<int>("USU_CEDULA")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("USU_CEDULA"));
+                    b.Property<string>("USU_CEDULA")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("USU_CONTRASEÑA")
                         .IsRequired()
@@ -465,14 +461,16 @@ namespace BUGGAFIT_BACK.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VEN_CODIGO"));
 
-                    b.Property<int>("CLI_ID")
-                        .HasColumnType("int");
+                    b.Property<string>("CLI_ID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("TIC_CODIGO")
                         .HasColumnType("int");
 
-                    b.Property<int>("USU_CEDULA")
-                        .HasColumnType("int");
+                    b.Property<string>("USU_CEDULA")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("VEN_ACTUALIZACION")
                         .HasColumnType("datetime2");
