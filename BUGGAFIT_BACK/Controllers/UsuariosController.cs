@@ -21,7 +21,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var usuarios = await catalogoUsuarios.ListarUsuariosAsync();
+                var usuarios = catalogoUsuarios.ListarUsuarios();
                 return Ok(usuarios);
             }
             catch (Exception)

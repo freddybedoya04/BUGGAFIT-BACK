@@ -1,4 +1,5 @@
 using BUGGAFIT_BACK.Catalogos;
+using BUGGAFIT_BACK.ConexionBD;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using BUGGAFIT_BACK.Security;
 using BUGGAFIT_BACK.Security.interfaces;
@@ -10,14 +11,22 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 //Conexion bd
+//builder.Services.AddDbContext<MyDBContext>(options =>
+//options.UseSqlServer("name=ConnectionStrings:Connection"));
+var connectionString = builder.Configuration.GetConnectionString("Connection");
 builder.Services.AddDbContext<MyDBContext>(options =>
-options.UseSqlServer("name=ConnectionStrings:Connection"));
+{
+    options.UseSqlServer(connectionString);
+});
+var dbContext = new MyDBContext(builder.Services.BuildServiceProvider().GetService<DbContextOptions<MyDBContext>>());
+ConexionBD.SetDbContext(dbContext);
+
 
 #region Bloque para agregar las DI
 
 // agregamos las interfaces
 builder.Services.AddScoped<ICatalogoUsuarios, CatalogoUsuario>();
-
+builder.Services.AddScoped<ICatalogoCompras, CatalogoCompras>();
 #endregion
 
 #region Configuracion de Json Web Tokens

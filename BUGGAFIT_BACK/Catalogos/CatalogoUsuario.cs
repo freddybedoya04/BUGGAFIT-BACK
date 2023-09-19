@@ -6,29 +6,22 @@ namespace BUGGAFIT_BACK.Catalogos
 {
     public class CatalogoUsuario : ICatalogoUsuarios
     {
-
-        private readonly MyDBContext myDbContext;
-
-        public CatalogoUsuario(MyDBContext context)
-        {
-            myDbContext = context;
-        }
-
         List<Usuario> ICatalogoUsuarios.ListarUsuarios()
         {
 			try
 			{
-                using var db = myDbContext;
-                List<Usuario> usuarios = db.USUARIOS.Select(x => new Usuario
+                using (var db = ConexionBD.ConexionBD.Instance)
                 {
-                    USU_CEDULA = x.USU_CEDULA,
-                    USU_FECHAACTUALIZACION = x.USU_FECHAACTUALIZACION,
-                    USU_NOMBRE = x.USU_NOMBRE,
-                    USU_CONTRASEÑA = x.USU_CONTRASEÑA,
-                    USU_ROL = x.USU_ROL,
-                }).ToList();
-                return usuarios;
-
+                    List<Usuario> usuarios = db.USUARIOS.Select(x => new Usuario
+                    {
+                        USU_CEDULA = x.USU_CEDULA,
+                        USU_FECHAACTUALIZACION = x.USU_FECHAACTUALIZACION,
+                        USU_NOMBRE = x.USU_NOMBRE,
+                        USU_CONTRASEÑA = x.USU_CONTRASEÑA,
+                        USU_ROL = x.USU_ROL,
+                    }).ToList();
+                    return usuarios;
+                }
 
             }
 			catch (Exception)
