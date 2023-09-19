@@ -11,9 +11,9 @@ namespace BUGGAFIT_BACK.Controllers
     public class ComprasController : ControllerBase
     {
         public readonly ICatalogoCompras catalogoCompras;
-        public ComprasController(ICatalogoCompras compras)
+        public ComprasController(ICatalogoCompras context)
         {
-            catalogoCompras = compras;
+            catalogoCompras = context;
         }
         // GET: api/<ValuesController>
         [HttpGet]

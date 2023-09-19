@@ -9,9 +9,9 @@ namespace BUGGAFIT_BACK.Catalogos
     {
         private MyDBContext dbContext;
 
-        public CatalogoCompras(MyDBContext dbContext)
+        public CatalogoCompras(MyDBContext Context)
         {
-            this.dbContext = dbContext;
+            dbContext = Context;
         }
 
         List<Compra> ICatalogoCompras.ListarComprasPorFecha(FiltrosDTO filtro)
@@ -19,10 +19,10 @@ namespace BUGGAFIT_BACK.Catalogos
             try
             {
                 // Accede a la instancia de MyDBContext a través de ConexionBD
-                using (var dbContext = ConexionBD.ConexionBD.Instance)
+                using (var db = dbContext)
                 {
                     // Realiza consultas de Entity Framework aquí
-                    List<Compra> compras = dbContext.COMPRAS.Where(x => x.COM_FECHACOMPRA >= filtro.FechaInicio && x.COM_FECHACOMPRA <= filtro.FechaFin).Select(x => new Compra
+                    List<Compra> compras = db.COMPRAS.Where(x => x.COM_FECHACOMPRA >= filtro.FechaInicio && x.COM_FECHACOMPRA <= filtro.FechaFin).Select(x => new Compra
                     {
                         COM_CODIGO = x.COM_CODIGO,
                         COM_FECHACREACION = x.COM_FECHACREACION,
