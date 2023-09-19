@@ -1,11 +1,18 @@
 ﻿using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.ConexionBD; // Asegúrate de agregar esta línea
+using BUGGAFIT_BACK.Modelos.Entidad;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
     public class CatalogoCompras : ICatalogoCompras
     {
+        private MyDBContext dbContext;
+
+        public CatalogoCompras(MyDBContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
 
         List<Compra> ICatalogoCompras.ListarComprasPorFecha(FiltrosDTO filtro)
         {

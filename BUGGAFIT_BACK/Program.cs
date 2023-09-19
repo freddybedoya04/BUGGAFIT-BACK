@@ -6,6 +6,7 @@ using BUGGAFIT_BACK.Security.interfaces;
 using BUGGAFIT_BACK.Security.Interfaces.Implementations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -14,13 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<MyDBContext>(options =>
 //options.UseSqlServer("name=ConnectionStrings:Connection"));
 var connectionString = builder.Configuration.GetConnectionString("Connection");
+
 builder.Services.AddDbContext<MyDBContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
-var dbContext = new MyDBContext(builder.Services.BuildServiceProvider().GetService<DbContextOptions<MyDBContext>>());
-ConexionBD.SetDbContext(dbContext);
-
 
 #region Bloque para agregar las DI
 

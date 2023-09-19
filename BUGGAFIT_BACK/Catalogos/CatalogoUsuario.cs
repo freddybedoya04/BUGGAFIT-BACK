@@ -6,11 +6,17 @@ namespace BUGGAFIT_BACK.Catalogos
 {
     public class CatalogoUsuario : ICatalogoUsuarios
     {
+        private readonly MyDBContext myDbContext;
+
+        public CatalogoUsuario(MyDBContext context)
+        {
+            myDbContext = context;
+        }
         List<Usuario> ICatalogoUsuarios.ListarUsuarios()
         {
 			try
 			{
-                using (var db = ConexionBD.ConexionBD.Instance)
+                using (var db = myDbContext)
                 {
                     List<Usuario> usuarios = db.USUARIOS.Select(x => new Usuario
                     {

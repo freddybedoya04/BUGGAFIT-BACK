@@ -77,7 +77,6 @@ TestResult/
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-
 # Files built by Visual Studio
 *_i.c
 *_p.c
