@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BUGGAFIT_BACK.Security.interfaces;
+using BUGGAFIT_BACK.Clases;
 
 namespace BUGGAFIT_BACK.Security.Interfaces.Implementations
 {
@@ -45,7 +46,7 @@ namespace BUGGAFIT_BACK.Security.Interfaces.Implementations
         /// <param name="userInfo"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public string GenerateJWTToken(LoginResponseDTO userInfo)
+        public string GenerateJWTToken(Usuario userInfo)
         {
             try
             {
@@ -55,9 +56,8 @@ namespace BUGGAFIT_BACK.Security.Interfaces.Implementations
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var claims = new[]
                 {
-                new Claim(JwtRegisteredClaimNames.Sub, userInfo.IdUser.ToString()),
-                new Claim("client", userInfo.Idclient.ToString()),
-                new Claim(ClaimTypes.Role, userInfo.Role),
+                new Claim(JwtRegisteredClaimNames.Sub, userInfo.USU_CEDULA.ToString()),
+                new Claim(ClaimTypes.Role, userInfo.USU_ROL),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
                 var token = new JwtSecurityToken(

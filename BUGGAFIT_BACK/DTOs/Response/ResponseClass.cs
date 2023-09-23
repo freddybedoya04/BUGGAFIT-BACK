@@ -26,6 +26,26 @@ namespace BUGGAFIT_BACK.DTOs.Response
         }
 
         /// <summary>
+        /// It returns a new instance of the ResponseObject class with the Type property set to "C" (for
+        /// Custom), the StatusCode property set to the statusCode parameter, and the Message property
+        /// set to the message parameter
+        /// </summary>
+        /// <param name="statusCode">The HTTP status code you want to return.</param>
+        /// <param name="data">This is the data that you want to return to the client.</param>
+        /// <returns>
+        /// A new instance of the ResponseObject class.
+        /// </returns>
+        public static ResponseObject Response(int statusCode, object data)
+        {
+            return new ResponseObject()
+            {
+                Type = "C", //Custom
+                StatusCode = statusCode, //HTTP Status Code
+                Data = data
+            };
+        }
+
+        /// <summary>
         /// This function returns a new instance of the ResponseObject class with the Type property set
         /// to "C" (Custom), the StatusCode property set to the statusCode parameter, the Message
         /// property set to the message parameter, and the Token property set to the token parameter

@@ -1,4 +1,5 @@
 ﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs.Response;
 using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.EntityFrameworkCore;
@@ -14,58 +15,230 @@ namespace BUGGAFIT_BACK.Catalogos
             myDbContext = context;
         }
 
-        public void ActualizarVenta(Ventas venta)
+        public ResponseObject ActualizarVenta(Ventas venta)
         {
-            throw new NotImplementedException();
+            try
+            {
+                myDbContext.Entry(venta).State = EntityState.Modified;
+                myDbContext.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!VentasExists(venta.VEN_CODIGO))
+                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {venta.VEN_CODIGO} no existe.");
+
+                throw;
+            }
+            catch (Exception) { throw; }
+            return ResponseClass.Response(statusCode: 204, message: $"Venta Actualizada Exitosamente.");
         }
 
-        public Task ActualizarVentaAsync(Ventas venta)
+        public async Task<ResponseObject> ActualizarVentaAsync(Ventas venta)
         {
-            throw new NotImplementedException();
+            try
+            {
+                VENTAS _ventas = new()
+                {
+                    VEN_CODIGO = venta.VEN_CODIGO,
+                    VEN_FECHAVENTA = venta.VEN_FECHAVENTA,
+                    VEN_TIPOPAGO = venta.VEN_TIPOPAGO,
+                    TIC_CODIGO = venta.TIC_CODIGO,
+                    CLI_ID = venta.CLI_ID,
+                    VEN_PRECIOTOTAL = venta.VEN_PRECIOTOTAL,
+                    VEN_ESTADOCREDITO = venta.VEN_ESTADOCREDITO,
+                    VEN_ENVIO = venta.VEN_ENVIO,
+                    VEN_DOMICILIO = venta.VEN_DOMICILIO,
+                    VEN_OBSERVACIONES = venta.VEN_OBSERVACIONES,
+                    VEN_ACTUALIZACION = venta.VEN_ACTUALIZACION,
+                    USU_CEDULA = venta.USU_CEDULA,
+                    VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
+                    VEN_ESTADO = venta.VEN_ESTADO,
+                };
+                myDbContext.Entry(_ventas).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!VentasExists(venta.VEN_CODIGO))
+                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {venta.VEN_CODIGO} no existe.");
+                throw;
+            }
+            catch (Exception){ throw; }
+
+            return ResponseClass.Response(statusCode: 204, message: $"Venta Actualizada Exitosamente.");
         }
 
-        public void BorrarVenta(int Id)
+        public ResponseObject BorrarVenta(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var venta = myDbContext.VENTAS.Find(Id);
+                if (venta == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {Id} no existe.");
+
+                myDbContext.VENTAS.Remove(venta);
+                myDbContext.SaveChanges();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Venta Eliminada Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task BorrarVentaAsync(int Id)
+        public async Task<ResponseObject> BorrarVentaAsync(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var venta = await myDbContext.VENTAS.FindAsync(Id);
+                if (venta == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {Id} no existe.");
+
+                myDbContext.VENTAS.Remove(venta);
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Venta Eliminada Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Ventas CrearVenta(Ventas venta)
+        public ResponseObject CrearVenta(Ventas venta)
         {
-            throw new NotImplementedException();
+            try
+            {
+                VENTAS _ventas = new()
+                {
+                    VEN_CODIGO = venta.VEN_CODIGO,
+                    VEN_FECHACREACION = venta.VEN_FECHACREACION,
+                    VEN_FECHAVENTA = venta.VEN_FECHAVENTA,
+                    VEN_TIPOPAGO = venta.VEN_TIPOPAGO,
+                    TIC_CODIGO = venta.TIC_CODIGO,
+                    CLI_ID = venta.CLI_ID,
+                    VEN_PRECIOTOTAL = venta.VEN_PRECIOTOTAL,
+                    VEN_ESTADOCREDITO = venta.VEN_ESTADOCREDITO,
+                    VEN_ENVIO = venta.VEN_ENVIO,
+                    VEN_DOMICILIO = venta.VEN_DOMICILIO,
+                    VEN_OBSERVACIONES = venta.VEN_OBSERVACIONES,
+                    VEN_ACTUALIZACION = venta.VEN_ACTUALIZACION,
+                    USU_CEDULA = venta.USU_CEDULA,
+                    VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
+                    VEN_ESTADO = venta.VEN_ESTADO,
+                };
+                myDbContext.VENTAS.Add(_ventas);
+                myDbContext.SaveChanges();
+
+                return ResponseClass.Response(statusCode: 201, message: $"Venta Creada Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task<Ventas> CrearVentaAsync(Ventas venta)
+        public async Task<ResponseObject> CrearVentaAsync(Ventas venta)
         {
-            throw new NotImplementedException();
+            try
+            {
+                VENTAS _ventas = new()
+                {
+                    VEN_CODIGO = venta.VEN_CODIGO,
+                    VEN_FECHACREACION = venta.VEN_FECHACREACION,
+                    VEN_FECHAVENTA = venta.VEN_FECHAVENTA,
+                    VEN_TIPOPAGO = venta.VEN_TIPOPAGO,
+                    TIC_CODIGO = venta.TIC_CODIGO,
+                    CLI_ID = venta.CLI_ID,
+                    VEN_PRECIOTOTAL = venta.VEN_PRECIOTOTAL,
+                    VEN_ESTADOCREDITO = venta.VEN_ESTADOCREDITO,
+                    VEN_ENVIO = venta.VEN_ENVIO,
+                    VEN_DOMICILIO = venta.VEN_DOMICILIO,
+                    VEN_OBSERVACIONES = venta.VEN_OBSERVACIONES,
+                    VEN_ACTUALIZACION = venta.VEN_ACTUALIZACION,
+                    USU_CEDULA = venta.USU_CEDULA,
+                    VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
+                    VEN_ESTADO = venta.VEN_ESTADO,
+                };
+                myDbContext.VENTAS.Add(_ventas);
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 201, message: $"Venta Creada Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Ventas ListarVentaPorID(int Id)
+        public ResponseObject ListarVentaPorID(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ventas = myDbContext.VENTAS.Find(Id);
+
+                if (ventas == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {Id} no existe.");
+
+                return ResponseClass.Response(statusCode: 200, data: ventas);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task<Producto> ListarVentaPorIDAsync(int Id)
+        public async Task<ResponseObject> ListarVentaPorIDAsync(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ventas = await myDbContext.VENTAS.FindAsync(Id);
+                if (ventas == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {Id} no existe.");
+                return ResponseClass.Response(statusCode: 200, data: ventas);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public List<Ventas> ListarVentas()
+        public ResponseObject ListarVentas()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ventas = myDbContext.VENTAS.ToList();
+                if (ventas == null || !ventas.Any())
+                    return ResponseClass.Response(statusCode: 204, message: "No hay ventas");
+
+                return ResponseClass.Response(statusCode: 200, data: ventas);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task<List<Ventas>> ListarVentasAsync()
+        public async Task<ResponseObject> ListarVentasAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var ventas = await myDbContext.VENTAS.ToListAsync();
+                if (ventas == null || !ventas.Any())
+                    return ResponseClass.Response(statusCode: 204, message: "No hay ventas");
+
+                return ResponseClass.Response(statusCode: 200, data: ventas);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
-        private bool VentasExists(int codigo)
+
+        private bool VentasExists(int id)
         {
-            return myDbContext.VENTAS.Any(e => e.VEN_CODIGO == codigo);
+            return myDbContext.VENTAS.Any(e => e.VEN_CODIGO == id);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using BUGGAFIT_BACK.Security.interfaces;
 using Microsoft.IdentityModel.Tokens;
-using ShiftServiceApi.Security.Middleware;
 
 namespace ShiftServiceApi.Security.Middleware
 {

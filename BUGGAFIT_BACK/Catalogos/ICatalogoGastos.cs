@@ -1,20 +1,15 @@
 ﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs.Response;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
     public interface ICatalogoGastos
     {
-        Gasto ListarGastoPorID(int Id);
-        List<Gasto> ListarGastos();
-        Gasto CrearGasto(Gasto gasto);
-        void ActualizarGasto(Gasto gasto);
-        void BorrarGasto(int Id);
-
         // Async Methods
-        Task<Gasto> CrearGastoAsync(Gasto gasto);
-        Task<List<Gasto>> ListarGastosAsync();
-        Task ActualizarGastoAsync(Gasto gasto);
-        Task BorrarGastoAsync(int Id);
-        Task<Gasto> ListarGastoPorIDAsync(int Id);
+        Task<ResponseObject> CrearGastoAsync(Gasto gasto);
+        Task<ResponseObject> ListarGastosAsync();
+        Task<ResponseObject> ActualizarGastoAsync(Gasto gasto);
+        Task<ResponseObject> BorrarGastoAsync(int Id);
+        Task<ResponseObject> ListarGastoPorIDAsync(int Id);
     }
 }

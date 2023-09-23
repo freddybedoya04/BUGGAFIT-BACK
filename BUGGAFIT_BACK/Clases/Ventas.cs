@@ -7,7 +7,7 @@
         public DateTime VEN_FECHAVENTA { get; set; }
         public string VEN_TIPOPAGO { get; set; }
         public int TIC_CODIGO { get; set; } // Clave foránea a TipoCuenta
-        public int CLI_ID { get; set; } // Clave foránea a Cliente
+        public string CLI_ID { get; set; } // Clave foránea a Cliente
         public float VEN_PRECIOTOTAL { get; set; }
         public bool VEN_ESTADOCREDITO { get; set; }
         public bool VEN_ENVIO { get; set; }
@@ -17,7 +17,7 @@
         public string USU_CEDULA { get; set; } // Clave foránea a Usuario
         public bool VEN_ESTADOVENTA { get; set; }
         public bool VEN_ESTADO { get; set; }
-        public ICollection<DetalleVenta>? detalleVentas { get; set; }
+        public ICollection<DetalleVenta> detalleVentas { get; set; }
 
     }
 }
