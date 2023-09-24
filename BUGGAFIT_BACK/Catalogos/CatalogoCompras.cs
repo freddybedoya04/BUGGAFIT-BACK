@@ -19,7 +19,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                // Accede a la instancia de MyDBContext a través de ConexionBD
+                // Accede a la instancia de MyDBContext a través de ConexionBD 
                 using (var db = dbContext)
                 {
                     // Realiza consultas de Entity Framework aquí
