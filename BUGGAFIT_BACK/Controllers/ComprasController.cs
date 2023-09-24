@@ -1,4 +1,5 @@
 ﻿using BUGGAFIT_BACK.Catalogos;
+using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,21 +16,29 @@ namespace BUGGAFIT_BACK.Controllers
         {
             catalogoCompras = context;
         }
-        // GET: api/<ValuesController>
+        // GET: api/<ComprasController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<ValuesController>/5
+        // GET api/<ComprasController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> BuscarCompraPorID(int id)
         {
-            return "value";
+            try
+            {
+                var compras = catalogoCompras.BuscarCompraPorID(id);
+                return Ok(compras);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        // POST api/<ValuesController>
+        // POST api/<ComprasController>
         [HttpPost]
         [Route("ListarComprasPorFecha")]
         public async Task<IActionResult> ListarComprasPorFecha([FromBody] FiltrosDTO filtro)
@@ -45,14 +54,30 @@ namespace BUGGAFIT_BACK.Controllers
                 throw ex;
             }
         }
+        // POST api/<ComprasController>
+        [HttpPost]
+        [Route("CrearCompra")]
+        public async Task<IActionResult> CrearCompra([FromBody] Compra nuevacompra)
+        {
+            try
+            {
+                catalogoCompras.CrearCompra(nuevacompra);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
 
-        // PUT api/<ValuesController>/5
+                throw ex;
+            }
+        }
+
+        // PUT api/<ComprasController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(int id, [FromBody] Compra compra)
         {
         }
 
-        // DELETE api/<ValuesController>/5
+        // DELETE api/<ComprasController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {

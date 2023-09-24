@@ -6,6 +6,8 @@ namespace BUGGAFIT_BACK.Catalogos
     public interface ICatalogoCompras
     {
         List<Compra> ListarComprasPorFecha(FiltrosDTO filtro);
+        Compra BuscarCompraPorID(int id);
+        void CrearCompra(Compra nuevaCompra);
        
     }
 }
