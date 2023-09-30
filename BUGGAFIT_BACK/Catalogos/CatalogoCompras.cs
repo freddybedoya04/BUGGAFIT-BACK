@@ -35,7 +35,15 @@ namespace BUGGAFIT_BACK.Catalogos
                         COM_ENBODEGA = x.COM_ENBODEGA,
                         COM_ESTADO = x.COM_ESTADO,
                         COM_CREDITO = x.COM_CREDITO,
-                        USU_CEDULA = x.USU_CEDULA
+                        USU_CEDULA = x.USU_CEDULA,
+                        DetalleCompras=db.DETALLECOMPRAS.Where(d =>d.COM_CODIGO==x.COM_CODIGO &&d.DEC_ESTADO==false).Select(d=> new DetalleCompra
+                        {
+                            COM_CODIGO=d.COM_CODIGO,
+                            DEC_CODIGO=d.DEC_CODIGO,
+                            DEC_UNIDADES=d.DEC_UNIDADES,
+                            DEC_PRECIOCOMPRA_PRODUCTO=d.DEC_PRECIOCOMPRA_PRODUCTO,
+                            DEC_PRECIOTOTAL=d.DEC_PRECIOTOTAL
+                        }).ToList(),
                     }).ToList();
                     return compras;
                 }
@@ -98,19 +106,19 @@ namespace BUGGAFIT_BACK.Catalogos
                         compras.COM_VALORCOMPRA = nuevaCompra.COM_VALORCOMPRA;
                         compras.COM_PROVEEDOR = nuevaCompra.COM_PROVEEDOR;
                         compras.TIC_CODIGO = nuevaCompra.TIC_CODIGO;
-                        compras.COM_FECHAACTUALIZACION = nuevaCompra.COM_FECHAACTUALIZACION;
+                        compras.COM_FECHAACTUALIZACION = DateTime.Now;
                         compras.COM_ENBODEGA = nuevaCompra.COM_ENBODEGA;
                         compras.COM_ESTADO = nuevaCompra.COM_ESTADO;
                         compras.COM_CREDITO = nuevaCompra.COM_CREDITO;
                         compras.USU_CEDULA = nuevaCompra.USU_CEDULA;
                         
                     db.COMPRAS.Add(compras);
-                    
+                    db.SaveChanges();
+
                     //crear detalles
                     foreach (DetalleCompra item in nuevaCompra.DetalleCompras)
                     {
                         DETALLECOMPRAS Detalle = new DETALLECOMPRAS();
-                        Detalle.DEC_CODIGO = item.DEC_CODIGO;
                         Detalle.COM_CODIGO = compras.COM_CODIGO;
                         Detalle.PRO_CODIGO = item.PRO_CODIGO;
                         Detalle.DEC_UNIDADES = item.DEC_UNIDADES;
@@ -121,6 +129,14 @@ namespace BUGGAFIT_BACK.Catalogos
                         Detalle.DEC_ESTADO = item.DEC_ESTADO;
 
                         db.DETALLECOMPRAS.Add(Detalle);
+
+                        //ACTUALIZAR PRODUCTOS
+                        PRODUCTOS producto = db.PRODUCTOS.Where(x=>x.PRO_CODIGO==item.PRO_CODIGO).FirstOrDefault();
+                        if (producto != null)
+                        {
+                            producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + item.DEC_UNIDADES;
+                            producto.PRO_ACTUALIZACION = DateTime.Now;
+                        }
                     }
                     db.SaveChanges();
                 }
