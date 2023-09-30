@@ -31,6 +31,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         COM_VALORCOMPRA = x.COM_VALORCOMPRA,
                         COM_PROVEEDOR = x.COM_PROVEEDOR,
                         TIC_CODIGO = x.TIC_CODIGO,
+                        TIC_NOMBRE=db.TIPOSCUENTAS.Where(d => d.TIC_CODIGO==x.TIC_CODIGO).Select(d => d.TIC_NOMBRE).FirstOrDefault(),
                         COM_FECHAACTUALIZACION = x.COM_FECHAACTUALIZACION,
                         COM_ENBODEGA = x.COM_ENBODEGA,
                         COM_ESTADO = x.COM_ESTADO,

@@ -8,6 +8,7 @@
         public float COM_VALORCOMPRA { get; set; }
         public string COM_PROVEEDOR { get; set; }
         public int TIC_CODIGO { get; set; } // Clave foránea a TipoCuenta
+        public string TIC_NOMBRE { get; set; }
         public DateTime COM_FECHAACTUALIZACION { get; set; }
         public bool COM_ENBODEGA { get; set; }
         public bool COM_ESTADO { get; set; }
