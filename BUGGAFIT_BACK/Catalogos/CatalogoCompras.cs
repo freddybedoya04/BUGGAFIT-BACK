@@ -23,7 +23,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 using (var db = dbContext)
                 {
                     // Realiza consultas de Entity Framework aquí
-                    List<Compra> compras = db.COMPRAS.Where(x => x.COM_FECHACOMPRA >= filtro.FechaInicio && x.COM_FECHACOMPRA <= filtro.FechaFin && x.COM_ESTADO==true).Select(x => new Compra
+                    List<Compra> compras = db.COMPRAS.Where(x => x.COM_FECHACOMPRA >= filtro.FechaInicio.ToLocalTime() && x.COM_FECHACOMPRA <= filtro.FechaFin.ToLocalTime() && x.COM_ESTADO==true).Select(x => new Compra
                     {
                         COM_CODIGO = x.COM_CODIGO,
                         COM_FECHACREACION = x.COM_FECHACREACION,
