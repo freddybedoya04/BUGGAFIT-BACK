@@ -23,7 +23,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 using (var db = dbContext)
                 {
                     // Realiza consultas de Entity Framework aquí
-                    List<Compra> compras = db.COMPRAS.Where(x => x.COM_FECHACOMPRA >= filtro.FechaInicio && x.COM_FECHACOMPRA <= filtro.FechaFin).Select(x => new Compra
+                    List<Compra> compras = db.COMPRAS.Where(x => x.COM_FECHACOMPRA >= filtro.FechaInicio && x.COM_FECHACOMPRA <= filtro.FechaFin && x.COM_ESTADO==true).Select(x => new Compra
                     {
                         COM_CODIGO = x.COM_CODIGO,
                         COM_FECHACREACION = x.COM_FECHACREACION,
@@ -37,15 +37,18 @@ namespace BUGGAFIT_BACK.Catalogos
                         COM_ESTADO = x.COM_ESTADO,
                         COM_CREDITO = x.COM_CREDITO,
                         USU_CEDULA = x.USU_CEDULA,
-                        DetalleCompras=db.DETALLECOMPRAS.Where(d =>d.COM_CODIGO==x.COM_CODIGO &&d.DEC_ESTADO==false).Select(d=> new DetalleCompra
+                        DetalleCompras=db.DETALLECOMPRAS.Where(d =>d.COM_CODIGO==x.COM_CODIGO &&d.DEC_ESTADO==true).Select(d=> new DetalleCompra
                         {
                             COM_CODIGO=d.COM_CODIGO,
                             DEC_CODIGO=d.DEC_CODIGO,
                             DEC_UNIDADES=d.DEC_UNIDADES,
                             DEC_PRECIOCOMPRA_PRODUCTO=d.DEC_PRECIOCOMPRA_PRODUCTO,
-                            DEC_PRECIOTOTAL=d.DEC_PRECIOTOTAL
+                            DEC_PRECIOTOTAL=d.DEC_PRECIOTOTAL,
+                            DEC_ESTADO=d.DEC_ESTADO,
+                            PRO_CODIGO=d.PRO_CODIGO,
+                            PRO_NOMBRE=db.PRODUCTOS.Where(p =>p.PRO_CODIGO==d.PRO_CODIGO).Select(p =>p.PRO_NOMBRE).FirstOrDefault(),
                         }).ToList(),
-                    }).ToList();
+                    }).OrderByDescending(x =>x.COM_FECHACOMPRA).ToList();
                     return compras;
                 }
             }
@@ -103,13 +106,13 @@ namespace BUGGAFIT_BACK.Catalogos
                     
                         //compras.COM_CODIGO = nuevaCompra.COM_CODIGO;
                         compras.COM_FECHACREACION = DateTime.Now;
-                        compras.COM_FECHACOMPRA = nuevaCompra.COM_FECHACOMPRA;
+                        compras.COM_FECHACOMPRA = nuevaCompra.COM_FECHACOMPRA.ToLocalTime();
                         compras.COM_VALORCOMPRA = nuevaCompra.COM_VALORCOMPRA;
                         compras.COM_PROVEEDOR = nuevaCompra.COM_PROVEEDOR;
                         compras.TIC_CODIGO = nuevaCompra.TIC_CODIGO;
                         compras.COM_FECHAACTUALIZACION = DateTime.Now;
                         compras.COM_ENBODEGA = nuevaCompra.COM_ENBODEGA;
-                        compras.COM_ESTADO = nuevaCompra.COM_ESTADO;
+                        compras.COM_ESTADO = true;
                         compras.COM_CREDITO = nuevaCompra.COM_CREDITO;
                         compras.USU_CEDULA = nuevaCompra.USU_CEDULA;
                         
@@ -126,8 +129,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         Detalle.DEC_PRECIOCOMPRA_PRODUCTO = item.DEC_PRECIOCOMPRA_PRODUCTO;
                         Detalle.DEC_PRECIOTOTAL = item.DEC_PRECIOTOTAL;
                         Detalle.DEC_FECHACREACION = DateTime.Now;
-                        Detalle.DEC_FECHAACTUALIZACION = item.DEC_FECHAACTUALIZACION;
-                        Detalle.DEC_ESTADO = item.DEC_ESTADO;
+                        Detalle.DEC_FECHAACTUALIZACION = DateTime.Now;
+                        Detalle.DEC_ESTADO = true;
 
                         db.DETALLECOMPRAS.Add(Detalle);
 
@@ -136,6 +139,117 @@ namespace BUGGAFIT_BACK.Catalogos
                         if (producto != null)
                         {
                             producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + item.DEC_UNIDADES;
+                            producto.PRO_ACTUALIZACION = DateTime.Now;
+                        }
+                    }
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        void ICatalogoCompras.ActualizarCompra(Compra nuevaCompra)
+        {
+            try
+            {
+
+                using (var db = dbContext)
+                {
+                    COMPRAS CompraAnterior = db.COMPRAS.Where(x => x.COM_CODIGO == nuevaCompra.COM_CODIGO).FirstOrDefault();
+
+                    //compras.COM_CODIGO = nuevaCompra.COM_CODIGO;
+                    CompraAnterior.COM_FECHACOMPRA = nuevaCompra.COM_FECHACOMPRA.ToLocalTime();
+                    CompraAnterior.COM_VALORCOMPRA = nuevaCompra.COM_VALORCOMPRA;
+                    CompraAnterior.COM_PROVEEDOR = nuevaCompra.COM_PROVEEDOR;
+                    CompraAnterior.TIC_CODIGO = nuevaCompra.TIC_CODIGO;
+                    CompraAnterior.COM_FECHAACTUALIZACION = DateTime.Now;
+                    CompraAnterior.COM_ENBODEGA = nuevaCompra.COM_ENBODEGA;
+                    CompraAnterior.COM_ESTADO = nuevaCompra.COM_ESTADO;
+                    CompraAnterior.COM_CREDITO = nuevaCompra.COM_CREDITO;
+                    CompraAnterior.USU_CEDULA = nuevaCompra.USU_CEDULA;
+                    db.SaveChanges();
+
+                    foreach (DetalleCompra item in nuevaCompra.DetalleCompras)
+                    {
+                        DETALLECOMPRAS Detalle = db.DETALLECOMPRAS.Where(x => x.DEC_CODIGO == item.DEC_CODIGO).FirstOrDefault();
+                        int diferencia = 0;
+                        if (Detalle != null)
+                        {
+                            Detalle.PRO_CODIGO = item.PRO_CODIGO;
+                            diferencia = item.DEC_UNIDADES - Detalle.DEC_UNIDADES;
+                            Detalle.DEC_UNIDADES = item.DEC_UNIDADES;
+                            Detalle.DEC_PRECIOCOMPRA_PRODUCTO = item.DEC_PRECIOCOMPRA_PRODUCTO;
+                            Detalle.DEC_PRECIOTOTAL = item.DEC_PRECIOTOTAL;
+                            Detalle.DEC_FECHACREACION = DateTime.Now;
+                            Detalle.DEC_FECHAACTUALIZACION = DateTime.Now;
+                            Detalle.DEC_ESTADO = item.DEC_ESTADO;
+                        }
+                        else
+                        {
+                            Detalle = new DETALLECOMPRAS();
+                            Detalle.COM_CODIGO = nuevaCompra.COM_CODIGO;
+                            Detalle.PRO_CODIGO = item.PRO_CODIGO;
+                            Detalle.DEC_UNIDADES = item.DEC_UNIDADES;
+                            Detalle.DEC_PRECIOCOMPRA_PRODUCTO = item.DEC_PRECIOCOMPRA_PRODUCTO;
+                            Detalle.DEC_PRECIOTOTAL = item.DEC_PRECIOTOTAL;
+                            Detalle.DEC_FECHACREACION = DateTime.Now;
+                            Detalle.DEC_FECHAACTUALIZACION = DateTime.Now;
+                            Detalle.DEC_ESTADO =true;
+                            diferencia = item.DEC_UNIDADES;
+                            db.DETALLECOMPRAS.Add(Detalle);
+                        }
+
+
+
+
+                        //ACTUALIZAR PRODUCTOS
+                        PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
+                        if (producto != null)
+                        {
+                            producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
+                            producto.PRO_ACTUALIZACION = DateTime.Now;
+                        }
+                    }
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        void ICatalogoCompras.EliminarCompra(int com_codigo)
+        {
+            try
+            {
+
+                using (var db = dbContext)
+                {
+                    COMPRAS Compra = db.COMPRAS.Where(x => x.COM_CODIGO == com_codigo).FirstOrDefault();
+                    Compra.COM_ESTADO = false;
+                    Compra.COM_FECHAACTUALIZACION = DateTime.Now;
+                    db.SaveChanges();
+                    List< DETALLECOMPRAS> detalles = db.DETALLECOMPRAS.Where(x =>x.COM_CODIGO==com_codigo && x.DEC_ESTADO==true).ToList(); 
+
+                    foreach (DETALLECOMPRAS item in detalles)
+                    {
+                            int diferencia = - item.DEC_UNIDADES;
+                            item.DEC_ESTADO = false;
+                            item.DEC_FECHAACTUALIZACION=DateTime.Now;
+
+                        //ACTUALIZAR PRODUCTOS
+                        PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
+                        if (producto != null)
+                        {
+                            producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
                             producto.PRO_ACTUALIZACION = DateTime.Now;
                         }
                     }

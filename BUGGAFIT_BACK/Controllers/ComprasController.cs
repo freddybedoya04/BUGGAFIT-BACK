@@ -70,7 +70,21 @@ namespace BUGGAFIT_BACK.Controllers
                 throw ex;
             }
         }
+        [HttpPut]
+        [Route("ActualizarCompra")]
+        public async Task<IActionResult> ActualizarCompra([FromBody] Compra nuevacompra)
+        {
+            try
+            {
+                catalogoCompras.ActualizarCompra(nuevacompra);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
 
+                throw ex;
+            }
+        }
         // PUT api/<ComprasController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] Compra compra)
@@ -79,8 +93,18 @@ namespace BUGGAFIT_BACK.Controllers
 
         // DELETE api/<ComprasController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            try
+            {
+                catalogoCompras.EliminarCompra(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
     }
 }

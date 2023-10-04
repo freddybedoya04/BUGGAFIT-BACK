@@ -8,6 +8,7 @@ namespace BUGGAFIT_BACK.Catalogos
         List<Compra> ListarComprasPorFecha(FiltrosDTO filtro);
         Compra BuscarCompraPorID(int id);
         void CrearCompra(Compra nuevaCompra);
-       
+        void ActualizarCompra(Compra nuevaCompra);
+        void EliminarCompra(int com_codigo);
     }
 }
