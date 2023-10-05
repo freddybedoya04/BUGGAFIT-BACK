@@ -1,6 +1,5 @@
 ﻿using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.DTOs;
-using BUGGAFIT_BACK.DTOs.Response;
 
 namespace BUGGAFIT_BACK.Security.interfaces
 {

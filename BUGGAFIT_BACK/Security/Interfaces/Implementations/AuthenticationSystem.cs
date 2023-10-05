@@ -1,6 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using BUGGAFIT_BACK.DTOs;
-using BUGGAFIT_BACK.DTOs.Response;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

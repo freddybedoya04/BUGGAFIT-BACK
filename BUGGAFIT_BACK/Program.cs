@@ -1,12 +1,10 @@
 using BUGGAFIT_BACK.Catalogos;
-using BUGGAFIT_BACK.ConexionBD;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using BUGGAFIT_BACK.Security;
 using BUGGAFIT_BACK.Security.interfaces;
 using BUGGAFIT_BACK.Security.Interfaces.Implementations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
@@ -28,6 +26,7 @@ builder.Services.AddDbContext<MyDBContext>(options =>
 builder.Services.AddScoped<ICatalogoUsuarios, CatalogoUsuario>();
 builder.Services.AddScoped<ICatalogoCompras, CatalogoCompras>();
 builder.Services.AddScoped<ICatalogoVentas, CatalogoVentas>();
+builder.Services.AddScoped<ICatalogoGastos, CatalogoGastos>();
 
 #endregion
 
