@@ -5,8 +5,7 @@ namespace BUGGAFIT_BACK.Modelos
 {
     public class CLIENTES
     {
-        [Key]
-        
+        [Key]       
         public string CLI_ID { get; set; }
         public string CLI_NOMBRE { get; set; }
         public string CLI_TIPOCLIENTE { get; set; }
