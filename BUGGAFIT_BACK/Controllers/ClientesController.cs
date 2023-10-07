@@ -70,7 +70,7 @@ namespace BUGGAFIT_BACK.Controllers
         }
 
         // PUT: api/Clientes/5
-        [HttpPut("PutClientes/{id}")]
+        [HttpPut("PutCliente/{id}")]
         public async Task<ActionResult<ResponseObject>> PutClientes(string id, Cliente cliente)
         {
             if (id != cliente.CLI_ID)
@@ -90,7 +90,7 @@ namespace BUGGAFIT_BACK.Controllers
         }
 
         // DELETE: api/Clientes/5
-        [HttpDelete("DeleteClientes/{id}")]
+        [HttpDelete("DeleteCliente/{id}")]
         public async Task<ActionResult<ResponseObject>> DeleteClientes(string id)
         {
             try

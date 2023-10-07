@@ -1,10 +1,7 @@
 ﻿using BUGGAFIT_BACK.Catalogos;
 using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.DTOs.Response;
-using BUGGAFIT_BACK.Modelos;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BUGGAFIT_BACK.Controllers
 {

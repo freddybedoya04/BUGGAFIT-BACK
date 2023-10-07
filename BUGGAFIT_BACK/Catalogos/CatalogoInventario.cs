@@ -98,7 +98,7 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-        public async Task<ResponseObject> ListarProductoPorIDAsync(int Id)
+        public async Task<ResponseObject> ListarProductoPorIDAsync(string Id)
         {
             try
             {

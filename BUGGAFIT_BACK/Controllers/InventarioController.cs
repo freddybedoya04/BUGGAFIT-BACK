@@ -18,8 +18,8 @@ namespace BUGGAFIT_BACK.Controllers
 
         #region Metodos API
         // GET: api/GetProducto
-        [HttpGet("GetProducto")]
-        public async Task<ActionResult<ResponseObject>> GetProducto()
+        [HttpGet("GetProductos")]
+        public async Task<ActionResult<ResponseObject>> GetProductos()
         {
             try
             {
@@ -38,7 +38,7 @@ namespace BUGGAFIT_BACK.Controllers
 
         // GET: api/GetProducto/5
         [HttpGet("GetProducto/{id}")]
-        public async Task<ActionResult<ResponseObject>> GetProducto(int id)
+        public async Task<ActionResult<ResponseObject>> GetProducto(string id)
         {
             try
             {

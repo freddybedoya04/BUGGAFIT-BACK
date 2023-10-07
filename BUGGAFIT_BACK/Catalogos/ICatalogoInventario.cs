@@ -10,6 +10,6 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> ListarProductosAsync();
         Task<ResponseObject> ActualizarProductoAsync(Producto producto);
         Task<ResponseObject> BorrarProductoAsync(int Id);
-        Task<ResponseObject> ListarProductoPorIDAsync(int Id);
+        Task<ResponseObject> ListarProductoPorIDAsync(string Id);
     }
 }
