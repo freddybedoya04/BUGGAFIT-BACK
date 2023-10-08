@@ -106,6 +106,35 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
+        public async Task<ResponseObject> CrearDetalleVentaAsync(List<DetalleVenta> detalleVentas)
+        {
+            try
+            {
+                foreach(DetalleVenta detalle in detalleVentas)
+                {
+                    DETALLEVENTAS _detalleVentas = new()
+                    {
+                        VED_CODIGO = detalle.VED_CODIGO,
+                        VEN_CODIGO = detalle.VEN_CODIGO,
+                        PRO_CODIGO = detalle.PRO_CODIGO ?? "",
+                        VED_UNIDADES = detalle.VED_UNIDADES,
+                        VED_PRECIOVENTA_UND = detalle.VED_PRECIOVENTA_UND,
+                        VED_VALORDESCUENTO_UND = detalle.VED_VALORDESCUENTO_UND,
+                        VED_PRECIOVENTA_TOTAL = detalle.VED_PRECIOVENTA_TOTAL,
+                        VED_ACTUALIZACION = DateTime.Now,
+                        VED_ESTADO = true,
+                    };
+                    myDbContext.DETALLEVENTAS.Add(_detalleVentas);
+                }
+                await myDbContext.SaveChangesAsync();
+                return ResponseClass.Response(statusCode: 201, message: $"Detalles de venta Creados Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public ResponseObject CrearVenta(Ventas venta)
         {
             try
@@ -163,6 +192,11 @@ namespace BUGGAFIT_BACK.Catalogos
                 };
                 myDbContext.VENTAS.Add(_ventas);
                 await myDbContext.SaveChangesAsync();
+                if (venta.DetalleVentas != null)
+                {
+                    venta.DetalleVentas.ToList().ForEach(a => a.VEN_CODIGO = _ventas.VEN_CODIGO);
+                    await CrearDetalleVentaAsync((List<DetalleVenta>)venta.DetalleVentas);
+                }
 
                 return ResponseClass.Response(statusCode: 201, message: $"Venta Creada Exitosamente.");
             }

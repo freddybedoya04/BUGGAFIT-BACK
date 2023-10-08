@@ -7,7 +7,7 @@ namespace BUGGAFIT_BACK.Clases
         public int VED_CODIGO { get; set; }
         public int VEN_CODIGO { get; set; } // Clave foránea a Ventas
         public string? PRO_CODIGO { get; set; } // Clave foránea a Producto
-        public string? VED_UNIDADES { get; set; }
+        public int VED_UNIDADES { get; set; }
         public float VED_PRECIOVENTA_UND { get; set; }
         public float VED_VALORDESCUENTO_UND { get; set; }
         public float VED_PRECIOVENTA_TOTAL { get; set; }

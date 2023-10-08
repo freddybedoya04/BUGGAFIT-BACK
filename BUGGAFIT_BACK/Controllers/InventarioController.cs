@@ -35,6 +35,42 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+        // GET: api/GetProducto
+        [HttpGet("GetMarcas")]
+        public async Task<ActionResult<ResponseObject>> GetMarcas()
+        {
+            try
+            {
+                var result = await catalgo.ListarMarcasAsync();
+
+                if (result.StatusCode == 204)
+                    return NoContent();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
+        // GET: api/GetProducto
+        [HttpGet("GetCategorias")]
+        public async Task<ActionResult<ResponseObject>> GetCategorias()
+        {
+            try
+            {
+                var result = await catalgo.ListarCategoriasAsync();
+
+                if (result.StatusCode == 204)
+                    return NoContent();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
 
         // GET: api/GetProducto/5
         [HttpGet("GetProducto/{id}")]

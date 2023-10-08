@@ -69,6 +69,20 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
 
+        // POST: api/Ventas
+        [HttpPost("PostDetalleVenta")]
+        public async Task<ActionResult<ResponseObject>> PostDetalleVenta(List<DetalleVenta> detallesVentas)
+        {
+            try
+            {
+                return Ok(await catalgo.CrearDetalleVentaAsync(detallesVentas));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
+
         // PUT: api/Ventas/5
         [HttpPut("PutVentas/{id}")]
         public async Task<ActionResult<ResponseObject>> PutVentas(int id, Ventas ventas)

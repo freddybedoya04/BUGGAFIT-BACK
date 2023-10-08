@@ -47,7 +47,7 @@ namespace BUGGAFIT_BACK.Controllers
                     return NotFound(ResponseClass.Response(404, "User not Found. "));
 
                 var user = query.FirstOrDefault();
-                if (user.USU_CONTRASEÑA == null)
+                if (user == null || user.USU_CONTRASEÑA == null)
                     return StatusCode(500, ResponseClass.ErrorResponse(500, "Error en validar el usuario.", new Exception()));
                 if (loginDTO.Contraseña != user.USU_CONTRASEÑA)
                     return NotFound(ResponseClass.Response(404, "User not Found. "));
