@@ -121,7 +121,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var clientes = await myDbContext.CLIENTES.ToListAsync();
+                var clientes = await myDbContext.CLIENTES.Where(x => x.CLI_ESTADO == true).ToListAsync();
                 if (clientes == null || !clientes.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay clientes");
 

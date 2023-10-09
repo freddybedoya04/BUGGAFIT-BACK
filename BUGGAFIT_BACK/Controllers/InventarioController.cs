@@ -9,11 +9,11 @@ namespace BUGGAFIT_BACK.Controllers
     [ApiController]
     public class InventarioController : ControllerBase
     {
-        private readonly ICatalogoInventario catalgo;
+        private readonly ICatalogoInventario catalogo;
 
         public InventarioController(ICatalogoInventario catalgo)
         {
-            this.catalgo = catalgo;
+            this.catalogo = catalgo;
         }
 
         #region Metodos API
@@ -23,7 +23,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ListarProductosAsync();
+                var result = await catalogo.ListarProductosAsync();
 
                 if (result.StatusCode == 204)
                     return NoContent();
@@ -41,7 +41,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ListarMarcasAsync();
+                var result = await catalogo.ListarMarcasAsync();
 
                 if (result.StatusCode == 204)
                     return NoContent();
@@ -59,7 +59,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ListarCategoriasAsync();
+                var result = await catalogo.ListarCategoriasAsync();
 
                 if (result.StatusCode == 204)
                     return NoContent();
@@ -78,7 +78,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ListarProductoPorIDAsync(id);
+                var result = await catalogo.ListarProductoPorIDAsync(id);
 
                 if (result.StatusCode == 204)
                     return NoContent();
@@ -97,7 +97,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalgo.CrearProductoAsync(producto));
+                return Ok(await catalogo.CrearProductoAsync(producto));
             }
             catch (Exception ex)
             {
@@ -113,7 +113,7 @@ namespace BUGGAFIT_BACK.Controllers
                 return BadRequest(ResponseClass.Response(statusCode: 400, message: "El id no coincide."));
             try
             {
-                var result = await catalgo.ActualizarProductoAsync(producto);
+                var result = await catalogo.ActualizarProductoAsync(producto);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -131,7 +131,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.BorrarProductoAsync(id);
+                var result = await catalogo.BorrarProductoAsync(id);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 

@@ -242,7 +242,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var ventas = myDbContext.VENTAS.ToList();
+                var ventas = myDbContext.VENTAS.Where(x => x.VEN_ESTADO == true).ToList();
                 if (ventas == null || !ventas.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay ventas");
 

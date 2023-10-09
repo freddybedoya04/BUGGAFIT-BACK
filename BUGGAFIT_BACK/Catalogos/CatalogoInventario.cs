@@ -98,11 +98,11 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-        public async Task<ResponseObject> ListarCategoriasAsync()
+        public async Task<ResponseObject> ListarMarcasAsync() 
         {
             try
             {
-                var _marcas = await myDbContext.MARCAS.ToListAsync();
+                var _marcas = await myDbContext.MARCAS.Where(x => x.MAR_ESTADO == true).ToListAsync();
                 if (_marcas == null || !_marcas.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay categorias.");
 
@@ -114,11 +114,11 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-        public async Task<ResponseObject> ListarMarcasAsync()
+        public async Task<ResponseObject> ListarCategoriasAsync()
         {
             try
             {
-                var _categorias = await myDbContext.CATEGORIAS.ToListAsync();
+                var _categorias = await myDbContext.CATEGORIAS.Where(x => x.CAT_ESTADO == true).ToListAsync();
                 if (_categorias == null || !_categorias.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay Marcas.");
 
@@ -149,7 +149,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var _productos = await myDbContext.PRODUCTOS.ToListAsync();
+                var _productos = await myDbContext.PRODUCTOS.Where(x => x.PRO_ESTADO == true).ToListAsync();
                 if (_productos == null || !_productos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay Productos.");
 

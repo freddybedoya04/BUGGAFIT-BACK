@@ -111,7 +111,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var _gastos = await myDbContext.GASTOS.ToListAsync();
+                var _gastos = await myDbContext.GASTOS.Where(x => x.GAS_ESTADO == true).ToListAsync();
                 if (_gastos == null || !_gastos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay gastos.");
 

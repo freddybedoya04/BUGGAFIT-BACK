@@ -29,6 +29,7 @@ builder.Services.AddScoped<ICatalogoVentas, CatalogoVentas>();
 builder.Services.AddScoped<ICatalogoGastos, CatalogoGastos>();
 builder.Services.AddScoped<ICatalogoInventario, CatalogoInventario>();
 builder.Services.AddScoped<ICatalogoClientes, CatalogoClientes>();
+builder.Services.AddScoped<ICatalogoTipoCuenta, CatalogoTipoCuenta>();
 #endregion
 
 #region Configuracion de Json Web Tokens
