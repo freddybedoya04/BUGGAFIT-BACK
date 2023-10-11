@@ -7,7 +7,11 @@
         public DateTime VEN_FECHAVENTA { get; set; }
         public string VEN_TIPOPAGO { get; set; }
         public int TIC_CODIGO { get; set; } // Clave foránea a TipoCuenta
+        public string? TIC_NOMBRE { get; set; }
         public string CLI_ID { get; set; } // Clave foránea a Cliente
+        public string? CLI_NOMBRE { get; set; }
+        public string? CLI_DIRECCION { get; set; }
+        public string? CLI_TIPOCLIENTE { get; set; }
         public float VEN_PRECIOTOTAL { get; set; }
         public bool VEN_ESTADOCREDITO { get; set; }
         public bool VEN_ENVIO { get; set; }

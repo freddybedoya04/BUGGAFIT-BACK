@@ -1,4 +1,5 @@
 ﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.DTOs.Response;
 
 namespace BUGGAFIT_BACK.Catalogos
@@ -12,5 +13,6 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> ActualizarVentaAsync(Ventas venta);
         Task<ResponseObject> BorrarVentaAsync(int Id);
         Task<ResponseObject> ListarVentaPorIDAsync(int Id);
+        Task<ResponseObject> ListarVentasPorFechaAsync(FiltrosDTO filtro);
     }
 }

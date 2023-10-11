@@ -1,4 +1,5 @@
 ﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.DTOs.Response;
 using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
@@ -127,8 +128,8 @@ namespace BUGGAFIT_BACK.Catalogos
                 VENTAS _ventas = new()
                 {
                     VEN_CODIGO = venta.VEN_CODIGO,
-                    VEN_FECHACREACION = venta.VEN_FECHACREACION,
-                    VEN_FECHAVENTA = venta.VEN_FECHAVENTA,
+                    VEN_FECHACREACION = DateTime.Now,
+                    VEN_FECHAVENTA = venta.VEN_FECHAVENTA.ToLocalTime(),
                     VEN_TIPOPAGO = venta.VEN_TIPOPAGO,
                     TIC_CODIGO = venta.TIC_CODIGO,
                     CLI_ID = venta.CLI_ID,
@@ -137,7 +138,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     VEN_ENVIO = venta.VEN_ENVIO,
                     VEN_DOMICILIO = venta.VEN_DOMICILIO,
                     VEN_OBSERVACIONES = venta.VEN_OBSERVACIONES,
-                    VEN_ACTUALIZACION = venta.VEN_ACTUALIZACION,
+                    VEN_ACTUALIZACION = DateTime.Now,
                     USU_CEDULA = venta.USU_CEDULA,
                     VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
                     VEN_ESTADO = venta.VEN_ESTADO,
@@ -181,6 +182,60 @@ namespace BUGGAFIT_BACK.Catalogos
                 var ventas = await myDbContext.VENTAS.ToListAsync();
                 if (ventas == null || !ventas.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay ventas");
+
+                return ResponseClass.Response(statusCode: 200, data: ventas);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<ResponseObject> ListarVentasPorFechaAsync(FiltrosDTO filtro)
+        {
+            try
+            {
+                List<Ventas> ventas = await myDbContext.VENTAS
+                    .Where(x => x.VEN_FECHAVENTA >= filtro.FechaInicio.ToLocalTime()
+                                && x.VEN_FECHAVENTA <= filtro.FechaFin.ToLocalTime()
+                                && x.VEN_ESTADO == true)
+                    .Join(
+                        myDbContext.CLIENTES,
+                        venta => venta.CLI_ID,
+                        cliente => cliente.CLI_ID,
+                        (venta, cliente) => new
+                        {
+                            Venta = venta,
+                            Cliente = cliente
+                        })
+                    .Join(
+                        myDbContext.TIPOSCUENTAS,
+                        data => data.Venta.TIC_CODIGO,
+                        tipoCuenta => tipoCuenta.TIC_CODIGO,
+                        (data, tipoCuenta) => new Ventas
+                        {
+                            VEN_CODIGO = data.Venta.VEN_CODIGO,
+                            VEN_FECHACREACION = data.Venta.VEN_FECHACREACION,
+                            VEN_FECHAVENTA = data.Venta.VEN_FECHAVENTA,
+                            VEN_TIPOPAGO = data.Venta.VEN_TIPOPAGO,
+                            TIC_CODIGO = data.Venta.TIC_CODIGO,
+                            CLI_ID = data.Venta.CLI_ID,
+                            VEN_PRECIOTOTAL = data.Venta.VEN_PRECIOTOTAL,
+                            VEN_ESTADOCREDITO =(bool) data.Venta.VEN_ESTADOCREDITO,
+                            VEN_ENVIO =(bool) data.Venta.VEN_ENVIO,
+                            VEN_DOMICILIO =(bool) data.Venta.VEN_DOMICILIO,
+                            VEN_OBSERVACIONES = data.Venta.VEN_OBSERVACIONES,
+                            VEN_ACTUALIZACION = (DateTime)data.Venta.VEN_ACTUALIZACION,
+                            USU_CEDULA = data.Venta.USU_CEDULA,
+                            VEN_ESTADOVENTA = data.Venta.VEN_ESTADOVENTA,
+                            VEN_ESTADO = data.Venta.VEN_ESTADO,
+                            CLI_NOMBRE = data.Cliente.CLI_NOMBRE,
+                            CLI_DIRECCION = data.Cliente.CLI_DIRECCION,
+                            CLI_TIPOCLIENTE = data.Cliente.CLI_TIPOCLIENTE,
+                            TIC_NOMBRE = tipoCuenta.TIC_NOMBRE
+                        })
+                    .ToListAsync();
+
+
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
             }

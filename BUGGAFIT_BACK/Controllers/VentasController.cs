@@ -1,5 +1,6 @@
 ﻿using BUGGAFIT_BACK.Catalogos;
 using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.DTOs.Response;
 using Microsoft.AspNetCore.Mvc;
 
@@ -68,7 +69,19 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
-
+        // POST: api/Ventas
+        [HttpPost("PostListadoVenta")]
+        public async Task<ActionResult<ResponseObject>> PostVenta(FiltrosDTO filtro)
+        {
+            try
+            {
+                return Ok(await catalgo.ListarVentasPorFechaAsync(filtro));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
         // POST: api/Ventas
         [HttpPost("PostDetalleVenta")]
         public async Task<ActionResult<ResponseObject>> PostDetalleVenta(List<DetalleVenta> detallesVentas)
