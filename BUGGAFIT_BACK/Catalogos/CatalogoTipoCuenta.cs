@@ -48,6 +48,26 @@ namespace BUGGAFIT_BACK.Catalogos
                 if (_tipoCuenta == null)
                     return ResponseClass.Response(statusCode: 400, message: $"La cuenta con el codigo {Id} no existe.");
 
+                _tipoCuenta.TIC_ESTADO = false;
+                myDbContext.TIPOSCUENTAS.Remove(_tipoCuenta);
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Cuenta Eliminada Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> RemoverTipoCuentaAsync(int Id)
+        {
+            try
+            {
+                var _tipoCuenta = await myDbContext.TIPOSCUENTAS.FindAsync(Id);
+                if (_tipoCuenta == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La cuenta con el codigo {Id} no existe.");
+
                 myDbContext.TIPOSCUENTAS.Remove(_tipoCuenta);
                 await myDbContext.SaveChangesAsync();
 

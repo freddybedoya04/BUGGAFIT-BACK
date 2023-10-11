@@ -11,5 +11,6 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> ActualizarGastoAsync(Gasto gasto);
         Task<ResponseObject> BorrarGastoAsync(int Id);
         Task<ResponseObject> ListarGastoPorIDAsync(int Id);
+        Task<ResponseObject> ListarMotivoGastosDeEnvioAsync();
     }
 }

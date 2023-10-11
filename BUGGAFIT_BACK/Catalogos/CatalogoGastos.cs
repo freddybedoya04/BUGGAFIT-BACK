@@ -53,6 +53,26 @@ namespace BUGGAFIT_BACK.Catalogos
                 if (_gasto == null)
                     return ResponseClass.Response(statusCode: 400, message: $"El gasto con el codigo {Id} no existe.");
 
+                _gasto.GAS_ESTADO = false;
+                myDbContext.Entry(_gasto).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Gasto Eliminado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> RemoverGastoAsync(int id)
+        {
+            try
+            {
+                var _gasto = await myDbContext.GASTOS.FindAsync(id);
+                if (_gasto == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El gasto con el codigo {id} no existe.");
+
                 myDbContext.GASTOS.Remove(_gasto);
                 await myDbContext.SaveChangesAsync();
 
@@ -62,6 +82,7 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 throw;
             }
+
         }
 
         public async Task<ResponseObject> CrearGastoAsync(Gasto gasto)
@@ -122,9 +143,25 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> ListarMotivoGastosDeEnvioAsync()
+        {
+            try
+            {
+                var _gastos = await myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().StartsWith("ENVIO") && x.MOG_ESTADO == true).ToListAsync();
+                if (_gastos == null || !_gastos.Any())
+                    return ResponseClass.Response(statusCode: 204, message: "No hay motivos de envio.");
+
+                return ResponseClass.Response(statusCode: 200, data: _gastos);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         private bool ExisteGasto(int id)
         {
             return myDbContext.GASTOS.Any(e => e.GAS_CODIGO == id);
         }
+
     }
 }

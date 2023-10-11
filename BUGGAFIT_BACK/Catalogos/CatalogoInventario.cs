@@ -3,6 +3,7 @@ using BUGGAFIT_BACK.DTOs.Response;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using BUGGAFIT_BACK.Modelos;
 using Microsoft.EntityFrameworkCore;
+using BUGGAFIT_BACK.Migrations;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -57,6 +58,26 @@ namespace BUGGAFIT_BACK.Catalogos
                 if (_producto == null)
                     return ResponseClass.Response(statusCode: 400, message: $"El producto con el codigo {Id} no existe.");
 
+                _producto.PRO_ESTADO = false;
+                myDbContext.Entry(_producto).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Producto Eliminado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> RemoverProductoAsync(int Id)
+        {
+            try
+            {
+                var _producto = await myDbContext.PRODUCTOS.FindAsync(Id);
+                if (_producto == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El producto con el codigo {Id} no existe.");
+
                 myDbContext.PRODUCTOS.Remove(_producto);
                 await myDbContext.SaveChangesAsync();
 
@@ -98,7 +119,7 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-        public async Task<ResponseObject> ListarMarcasAsync() 
+        public async Task<ResponseObject> ListarMarcasAsync()
         {
             try
             {
@@ -149,7 +170,22 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var _productos = await myDbContext.PRODUCTOS.Where(x => x.PRO_ESTADO == true).ToListAsync();
+                var _productos = await (from p in myDbContext.PRODUCTOS
+                                        select new Producto
+                                        {
+                                            PRO_CODIGO = p.PRO_CODIGO,
+                                            PRO_NOMBRE = p.PRO_NOMBRE,
+                                            PRO_MARCA = p.MARCA.MAR_NOMBRE,
+                                            PRO_CATEGORIA = p.CATEGORIA.CAT_NOMBRE,
+                                            PRO_PRECIO_COMPRA = p.PRO_PRECIO_COMPRA,
+                                            PRO_PRECIOVENTA_DETAL = p.PRO_PRECIOVENTA_DETAL,
+                                            PRO_PRECIOVENTA_MAYORISTA = p.PRO_PRECIOVENTA_MAYORISTA,
+                                            PRO_UNIDADES_DISPONIBLES = p.PRO_UNIDADES_DISPONIBLES,
+                                            PRO_UNIDADES_MINIMAS_ALERTA = p.PRO_UNIDADES_MINIMAS_ALERTA,
+                                            PRO_ACTUALIZACION = p.PRO_ACTUALIZACION,
+                                            PRO_FECHACREACION = p.PRO_FECHACREACION,
+                                            PRO_ESTADO = p.PRO_ESTADO,
+                                        }).ToListAsync();
                 if (_productos == null || !_productos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay Productos.");
 

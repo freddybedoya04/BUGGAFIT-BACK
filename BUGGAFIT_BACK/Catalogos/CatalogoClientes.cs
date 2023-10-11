@@ -58,6 +58,26 @@ namespace BUGGAFIT_BACK.Catalogos
                 if (cliente == null)
                     return ResponseClass.Response(statusCode: 400, message: $"El cliente con el codigo {Id} no existe.");
 
+                cliente.CLI_ESTADO = false;
+                myDbContext.Entry(cliente).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Cliente Eliminado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> RemoverClienteAsync(string Id)
+        {
+            try
+            {
+                var cliente = await myDbContext.CLIENTES.FindAsync(Id);
+                if (cliente == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El cliente con el codigo {Id} no existe.");
+
                 myDbContext.CLIENTES.Remove(cliente);
                 await myDbContext.SaveChangesAsync();
 

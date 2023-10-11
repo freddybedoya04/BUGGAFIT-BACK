@@ -55,6 +55,25 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
 
+        // GET: api/GetGasto/5
+        [HttpGet("GetGasto/MotivoEnvio")]
+        public async Task<ActionResult<ResponseObject>> GetMotivoGastosDeEnvio()
+        {
+            try
+            {
+                var result = await catalgo.ListarMotivoGastosDeEnvioAsync();
+
+                if (result.StatusCode == 204)
+                    return NoContent();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
+
         // POST: api/PostGasto
         [HttpPost("PostGasto")]
         public async Task<ActionResult<ResponseObject>> PostGasto(Gasto gasto)
