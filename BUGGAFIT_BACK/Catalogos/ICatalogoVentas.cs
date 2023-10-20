@@ -14,5 +14,7 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> BorrarVentaAsync(int Id);
         Task<ResponseObject> ListarVentaPorIDAsync(int Id);
         Task<ResponseObject> ListarVentasPorFechaAsync(FiltrosDTO filtro);
+        Task<ResponseObject> ActualizarEstadoVentaAsync(int id);
+        Task<ResponseObject> ListarDetallePorCodigoVentaAsync(int id);
     }
 }

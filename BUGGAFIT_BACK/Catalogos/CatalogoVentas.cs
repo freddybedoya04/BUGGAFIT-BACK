@@ -51,7 +51,24 @@ namespace BUGGAFIT_BACK.Catalogos
 
             return ResponseClass.Response(statusCode: 204, message: $"Venta Actualizada Exitosamente.");
         }
+        public async Task<ResponseObject> ActualizarEstadoVentaAsync(int id)
+        {
+            try
+            {
+                VENTAS venta = myDbContext.VENTAS.Where(x => x.VEN_CODIGO == id).FirstOrDefault();
+                venta.VEN_ESTADOVENTA = true;
+                venta.VEN_ACTUALIZACION = DateTime.Now;
+                myDbContext.Entry(venta).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return ResponseClass.Response(statusCode: 400, message: $"Error al actualizar el estado de la venta");
+                throw;
+            }
 
+            return ResponseClass.Response(statusCode: 204, message: $"Venta Actualizada Exitosamente.");
+        }
         public async Task<ResponseObject> BorrarVentaAsync(int Id)
         {
             try
@@ -247,8 +264,9 @@ namespace BUGGAFIT_BACK.Catalogos
                             CLI_NOMBRE = data.Cliente.CLI_NOMBRE,
                             CLI_DIRECCION = data.Cliente.CLI_DIRECCION,
                             CLI_TIPOCLIENTE = data.Cliente.CLI_TIPOCLIENTE,
+                            CLI_UBICACION=data.Cliente.CLI_UBICACION,
                             TIC_NOMBRE = tipoCuenta.TIC_NOMBRE
-                        })
+                        }).OrderByDescending(x => x.VEN_FECHAVENTA)
                     .ToListAsync();
 
 
@@ -327,6 +345,33 @@ namespace BUGGAFIT_BACK.Catalogos
                 myDbContext.CARTERAS.Add(_cartera);
 
                 await myDbContext.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> ListarDetallePorCodigoVentaAsync(int id)
+        {
+            try
+            {
+                List<DetalleVenta>  Detalle =await myDbContext.DETALLEVENTAS.Where(d => d.VEN_CODIGO == id).Select(x => new DetalleVenta
+                {
+                    VED_CODIGO = x.VED_CODIGO,
+                    VEN_CODIGO = x.VEN_CODIGO,
+                    PRO_CODIGO = x.PRO_CODIGO,
+                    PRO_NOMBRE = myDbContext.PRODUCTOS.Where(p => p.PRO_CODIGO == x.PRO_CODIGO).Select(p => p.PRO_NOMBRE).FirstOrDefault(),
+                    VED_UNIDADES = x.VED_UNIDADES,
+                    VED_PRECIOVENTA_UND = x.VED_PRECIOVENTA_UND,
+                    VED_VALORDESCUENTO_UND = x.VED_VALORDESCUENTO_UND,
+                    VED_PRECIOVENTA_TOTAL = x.VED_PRECIOVENTA_TOTAL,
+                    VED_ACTUALIZACION = x.VED_ACTUALIZACION,
+                    VED_ESTADO = x.VED_ESTADO
+                }).ToListAsync();
+
+
+                return ResponseClass.Response(statusCode: 200, data: Detalle);
             }
             catch (Exception)
             {
