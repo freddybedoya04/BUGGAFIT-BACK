@@ -71,7 +71,7 @@ namespace BUGGAFIT_BACK.Controllers
         }
         // POST: api/Ventas
         [HttpPost("PostListadoVenta")]
-        public async Task<ActionResult<ResponseObject>> PostVenta(FiltrosDTO filtro)
+        public async Task<ActionResult<ResponseObject>> PostListadoVenta(FiltrosDTO filtro)
         {
             try
             {
