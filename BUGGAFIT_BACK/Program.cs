@@ -99,10 +99,10 @@ if (app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 //habilitar los nuevos cors
 app.UseCors("NuevaPolitica");
+
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();

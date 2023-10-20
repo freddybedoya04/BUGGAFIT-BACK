@@ -4,6 +4,7 @@ using BUGGAFIT_BACK.DTOs.Response;
 using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.ExceptionServices;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -148,10 +149,25 @@ namespace BUGGAFIT_BACK.Catalogos
                 if (venta.DetalleVentas != null)
                 {
                     venta.DetalleVentas.ToList().ForEach(x => x.VEN_CODIGO = _ventas.VEN_CODIGO);
-                    await CrearDetalleVentaAsync((List<DetalleVenta>)venta.DetalleVentas);
-                    await RetirarProductosDelInventario(_ventas.VEN_CODIGO);
-                }
 
+                    //creamos las tareas necesarias para la creacion de la venta
+                    var tskCrearDetalleVentaAsync = Task.Run(() =>
+                        CrearDetalleVentaAsync((List<DetalleVenta>)venta.DetalleVentas)
+                    );
+                    var tskRetirarProductosDelInventario = Task.Run(() =>
+                        RetirarProductosDelInventario(_ventas.VEN_CODIGO)
+                    );
+                    List<Task> listTasks = new() { tskCrearDetalleVentaAsync, tskRetirarProductosDelInventario };
+
+                    if (_ventas.VEN_ESTADOVENTA == true)
+                    {
+                        var tskCrearEntradaDeCartera = Task.Run(() =>
+                            CrearEntradaDeCartera(_ventas.VEN_CODIGO, venta)
+                        );
+                        listTasks.Add(tskCrearEntradaDeCartera);
+                    }
+                    await Task.WhenAll(listTasks);
+                }
                 return ResponseClass.Response(statusCode: 201, data: _ventas.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
             }
             catch (Exception)
@@ -220,9 +236,9 @@ namespace BUGGAFIT_BACK.Catalogos
                             TIC_CODIGO = data.Venta.TIC_CODIGO,
                             CLI_ID = data.Venta.CLI_ID,
                             VEN_PRECIOTOTAL = data.Venta.VEN_PRECIOTOTAL,
-                            VEN_ESTADOCREDITO =(bool) data.Venta.VEN_ESTADOCREDITO,
-                            VEN_ENVIO =(bool) data.Venta.VEN_ENVIO,
-                            VEN_DOMICILIO =(bool) data.Venta.VEN_DOMICILIO,
+                            VEN_ESTADOCREDITO = (bool)data.Venta.VEN_ESTADOCREDITO,
+                            VEN_ENVIO = (bool)data.Venta.VEN_ENVIO,
+                            VEN_DOMICILIO = (bool)data.Venta.VEN_DOMICILIO,
                             VEN_OBSERVACIONES = data.Venta.VEN_OBSERVACIONES,
                             VEN_ACTUALIZACION = (DateTime)data.Venta.VEN_ACTUALIZACION,
                             USU_CEDULA = data.Venta.USU_CEDULA,
@@ -270,18 +286,51 @@ namespace BUGGAFIT_BACK.Catalogos
         }
         private async Task RetirarProductosDelInventario(int codigoVenta)
         {
-            //obtenemos todos los detalle ventas relacionados a la venta
-            var detallesDeVenta = await myDbContext.DETALLEVENTAS.Where(x => x.VEN_CODIGO == codigoVenta).ToListAsync();
-            foreach (var detalle in detallesDeVenta)
+            try
             {
-                var _producto = await myDbContext.PRODUCTOS.Where(x => x.PRO_CODIGO == detalle.PRO_CODIGO).FirstOrDefaultAsync();
-                if (_producto == null)
-                    continue;
+                //obtenemos todos los detalle ventas relacionados a la venta
+                var detallesDeVenta = await myDbContext.DETALLEVENTAS.Where(x => x.VEN_CODIGO == codigoVenta).ToListAsync();
+                foreach (var detalle in detallesDeVenta)
+                {
+                    var _producto = await myDbContext.PRODUCTOS.Where(x => x.PRO_CODIGO == detalle.PRO_CODIGO).FirstOrDefaultAsync();
+                    if (_producto == null)
+                        continue;
 
-                _producto.PRO_UNIDADES_DISPONIBLES -= detalle.VED_UNIDADES; //Retiramos las unidades del inventario
-                myDbContext.Entry(_producto).State = EntityState.Modified;
+                    _producto.PRO_UNIDADES_DISPONIBLES -= detalle.VED_UNIDADES; //Retiramos las unidades del inventario
+                    myDbContext.Entry(_producto).State = EntityState.Modified;
+
+                    await myDbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private async Task CrearEntradaDeCartera(int codigoVenta, Ventas venta)
+        {
+            try
+            {
+                CARTERAS _cartera = new()
+                {
+                    CAR_FECHACREACION = DateTime.Now,
+                    CAR_FECHACREDITO = venta.VEN_FECHAVENTA.ToLocalTime(),
+                    CAR_FECHAACTUALIZACION = DateTime.Now,
+                    CAR_MOTIVO = "Credito de venta",
+                    VEN_CODIGO = codigoVenta,
+                    CAR_VALORCREDITO = venta.VEN_PRECIOTOTAL,
+                    CAR_VALORABONADO = 0,
+                    CAR_ESTADOCREDITO = 1,
+                    CAR_ESTADO = true,
+                };
+                myDbContext.CARTERAS.Add(_cartera);
 
                 await myDbContext.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }
