@@ -126,7 +126,7 @@ namespace BUGGAFIT_BACK.Controllers
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
-                return NoContent();
+                return result;
             }
             catch (Exception ex)
             {

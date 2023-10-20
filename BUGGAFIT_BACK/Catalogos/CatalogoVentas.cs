@@ -262,6 +262,8 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 _producto.PRO_UNIDADES_DISPONIBLES += detalle.VED_UNIDADES; //devolvemos las unidades al inventario
                 myDbContext.Entry(_producto).State = EntityState.Modified;
+                detalle.VED_ESTADO = false;
+                myDbContext.Entry(detalle).State = EntityState.Modified;
 
                 await myDbContext.SaveChangesAsync();
             }
