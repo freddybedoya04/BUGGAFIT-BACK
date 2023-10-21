@@ -31,7 +31,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         COM_VALORCOMPRA = x.COM_VALORCOMPRA,
                         COM_PROVEEDOR = x.COM_PROVEEDOR,
                         TIC_CODIGO = x.TIC_CODIGO,
-                        TIC_NOMBRE=db.TIPOSCUENTAS.Where(d => d.TIC_CODIGO==x.TIC_CODIGO).Select(d => d.TIC_NOMBRE).FirstOrDefault(),
+                        TIC_NOMBRE=x.TipoCuenta.TIC_NOMBRE,
                         COM_FECHAACTUALIZACION = x.COM_FECHAACTUALIZACION,
                         COM_ENBODEGA = x.COM_ENBODEGA,
                         COM_ESTADO = x.COM_ESTADO,
@@ -46,7 +46,7 @@ namespace BUGGAFIT_BACK.Catalogos
                             DEC_PRECIOTOTAL=d.DEC_PRECIOTOTAL,
                             DEC_ESTADO=d.DEC_ESTADO,
                             PRO_CODIGO=d.PRO_CODIGO,
-                            PRO_NOMBRE=db.PRODUCTOS.Where(p =>p.PRO_CODIGO==d.PRO_CODIGO).Select(p =>p.PRO_NOMBRE).FirstOrDefault(),
+                            PRO_NOMBRE=d.PRODUCTO.PRO_NOMBRE,
                         }).ToList(),
                     }).OrderByDescending(x =>x.COM_FECHACOMPRA).ToList();
                     return compras;

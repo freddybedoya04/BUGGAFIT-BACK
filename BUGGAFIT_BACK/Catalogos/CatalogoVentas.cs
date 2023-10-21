@@ -227,49 +227,33 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                List<Ventas> ventas = await myDbContext.VENTAS
+               List<Ventas> ventas = await myDbContext.VENTAS
                     .Where(x => x.VEN_FECHAVENTA >= filtro.FechaInicio.ToLocalTime()
                                 && x.VEN_FECHAVENTA <= filtro.FechaFin.ToLocalTime()
                                 && x.VEN_ESTADO == true)
-                    .Join(
-                        myDbContext.CLIENTES,
-                        venta => venta.CLI_ID,
-                        cliente => cliente.CLI_ID,
-                        (venta, cliente) => new
+                    .Select(d => new Ventas
                         {
-                            Venta = venta,
-                            Cliente = cliente
-                        })
-                    .Join(
-                        myDbContext.TIPOSCUENTAS,
-                        data => data.Venta.TIC_CODIGO,
-                        tipoCuenta => tipoCuenta.TIC_CODIGO,
-                        (data, tipoCuenta) => new Ventas
-                        {
-                            VEN_CODIGO = data.Venta.VEN_CODIGO,
-                            VEN_FECHACREACION = data.Venta.VEN_FECHACREACION,
-                            VEN_FECHAVENTA = data.Venta.VEN_FECHAVENTA,
-                            VEN_TIPOPAGO = data.Venta.VEN_TIPOPAGO,
-                            TIC_CODIGO = data.Venta.TIC_CODIGO,
-                            CLI_ID = data.Venta.CLI_ID,
-                            VEN_PRECIOTOTAL = data.Venta.VEN_PRECIOTOTAL,
-                            VEN_ESTADOCREDITO = (bool)data.Venta.VEN_ESTADOCREDITO,
-                            VEN_ENVIO = (bool)data.Venta.VEN_ENVIO,
-                            VEN_DOMICILIO = (bool)data.Venta.VEN_DOMICILIO,
-                            VEN_OBSERVACIONES = data.Venta.VEN_OBSERVACIONES,
-                            VEN_ACTUALIZACION = (DateTime)data.Venta.VEN_ACTUALIZACION,
-                            USU_CEDULA = data.Venta.USU_CEDULA,
-                            VEN_ESTADOVENTA = data.Venta.VEN_ESTADOVENTA,
-                            VEN_ESTADO = data.Venta.VEN_ESTADO,
-                            CLI_NOMBRE = data.Cliente.CLI_NOMBRE,
-                            CLI_DIRECCION = data.Cliente.CLI_DIRECCION,
-                            CLI_TIPOCLIENTE = data.Cliente.CLI_TIPOCLIENTE,
-                            CLI_UBICACION=data.Cliente.CLI_UBICACION,
-                            TIC_NOMBRE = tipoCuenta.TIC_NOMBRE
-                        }).OrderByDescending(x => x.VEN_FECHAVENTA)
-                    .ToListAsync();
-
-
+                            VEN_CODIGO = d.VEN_CODIGO,
+                            VEN_FECHACREACION = d.VEN_FECHACREACION,
+                            VEN_FECHAVENTA = d.VEN_FECHAVENTA,
+                            VEN_TIPOPAGO = d.VEN_TIPOPAGO,
+                            TIC_CODIGO = d.TIC_CODIGO,
+                            CLI_ID = d.CLI_ID,
+                            VEN_PRECIOTOTAL = d.VEN_PRECIOTOTAL,
+                            VEN_ESTADOCREDITO = (bool)d.VEN_ESTADOCREDITO,
+                            VEN_ENVIO = (bool)d.VEN_ENVIO,
+                            VEN_DOMICILIO = (bool)d.VEN_DOMICILIO,
+                            VEN_OBSERVACIONES = d.VEN_OBSERVACIONES,
+                            VEN_ACTUALIZACION = (DateTime)d.VEN_ACTUALIZACION,
+                            USU_CEDULA = d.USU_CEDULA,
+                            VEN_ESTADOVENTA = d.VEN_ESTADOVENTA,
+                            VEN_ESTADO = d.VEN_ESTADO,
+                            CLI_NOMBRE = d.CLIENTES.CLI_NOMBRE,
+                            CLI_DIRECCION = d.CLIENTES.CLI_DIRECCION,
+                            CLI_TIPOCLIENTE = d.CLIENTES.CLI_TIPOCLIENTE,
+                            CLI_UBICACION = d.CLIENTES.CLI_UBICACION,
+                            TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE
+                        }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
             }
@@ -361,7 +345,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     VED_CODIGO = x.VED_CODIGO,
                     VEN_CODIGO = x.VEN_CODIGO,
                     PRO_CODIGO = x.PRO_CODIGO,
-                    PRO_NOMBRE = myDbContext.PRODUCTOS.Where(p => p.PRO_CODIGO == x.PRO_CODIGO).Select(p => p.PRO_NOMBRE).FirstOrDefault(),
+                    PRO_NOMBRE = x.PRODUCTOS.PRO_NOMBRE,
                     VED_UNIDADES = x.VED_UNIDADES,
                     VED_PRECIOVENTA_UND = x.VED_PRECIOVENTA_UND,
                     VED_VALORDESCUENTO_UND = x.VED_VALORDESCUENTO_UND,
@@ -372,6 +356,29 @@ namespace BUGGAFIT_BACK.Catalogos
 
 
                 return ResponseClass.Response(statusCode: 200, data: Detalle);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> ListarAbonosPorCodigoVentaAsync(int id)
+        {
+            try
+            {
+                List<Cartera> carteras = await myDbContext.CARTERAS.Where(d => d.VEN_CODIGO == id).Select(x => new Cartera
+                {
+                    CAR_CODIGO = x.CAR_CODIGO,
+                    VEN_CODIGO = x.VEN_CODIGO,
+                    CAR_FECHACREDITO = x.CAR_FECHACREDITO,
+                    CAR_VALORABONADO = x.CAR_VALORABONADO,
+                    TIC_CODIGO = x.TIC_CODIGO,
+                    TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
+                }).OrderByDescending(x=>x.CAR_CODIGO).ToListAsync();
+
+
+                return ResponseClass.Response(statusCode: 200, data: carteras);
             }
             catch (Exception)
             {
