@@ -115,7 +115,47 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+        [HttpGet("ActualizarEstadoVenta/{id}")]
+        public async Task<ActionResult<ResponseObject>> ActualizarEstadoVenta(int id)
+        {
+            try
+            {
+                var result = await catalgo.ActualizarEstadoVentaAsync(id);
+                if (result.StatusCode == 400)
+                    return NotFound(result);
 
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
+        [HttpGet("ListarDetallePorCodigoVenta/{id}")]
+        public async Task<ActionResult<ResponseObject>> ListarDetallePorCodigoVenta(int id)
+        {
+            try
+            {
+                return Ok(await catalgo.ListarDetallePorCodigoVentaAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
+
+        [HttpGet("ListarAbonosPorCodigoVenta/{id}")]
+        public async Task<ActionResult<ResponseObject>> ListarAbonosPorCodigoVenta(int id)
+        {
+            try
+            {
+                return Ok(await catalgo.ListarAbonosPorCodigoVentaAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
         // DELETE: api/Ventas/5
         [HttpDelete("DeleteVentas/{id}")]
         public async Task<ActionResult<ResponseObject>> DeleteVentas(int id)
@@ -126,7 +166,7 @@ namespace BUGGAFIT_BACK.Controllers
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
-                return NoContent();
+                return result;
             }
             catch (Exception ex)
             {
