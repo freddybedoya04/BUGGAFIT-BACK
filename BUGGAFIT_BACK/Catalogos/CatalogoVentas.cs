@@ -151,22 +151,13 @@ namespace BUGGAFIT_BACK.Catalogos
                     venta.DetalleVentas.ToList().ForEach(x => x.VEN_CODIGO = _ventas.VEN_CODIGO);
 
                     //creamos las tareas necesarias para la creacion de la venta
-                    var tskCrearDetalleVentaAsync = Task.Run(() =>
-                        CrearDetalleVentaAsync((List<DetalleVenta>)venta.DetalleVentas)
-                    );
-                    var tskRetirarProductosDelInventario = Task.Run(() =>
-                        RetirarProductosDelInventario(_ventas.VEN_CODIGO)
-                    );
-                    List<Task> listTasks = new() { tskCrearDetalleVentaAsync, tskRetirarProductosDelInventario };
+                    await CrearDetalleVentaAsync((List<DetalleVenta>)venta.DetalleVentas);
 
-                    if (_ventas.VEN_ESTADOVENTA == true)
+                    await RetirarProductosDelInventario(_ventas.VEN_CODIGO);
+                    if (_ventas.VEN_ESTADOCREDITO == true)
                     {
-                        var tskCrearEntradaDeCartera = Task.Run(() =>
-                            CrearEntradaDeCartera(_ventas.VEN_CODIGO, venta)
-                        );
-                        listTasks.Add(tskCrearEntradaDeCartera);
+                        await CrearEntradaDeCartera(_ventas.VEN_CODIGO, venta);
                     }
-                    await Task.WhenAll(listTasks);
                 }
                 return ResponseClass.Response(statusCode: 201, data: _ventas.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
             }
