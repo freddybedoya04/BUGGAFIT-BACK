@@ -69,6 +69,25 @@ namespace BUGGAFIT_BACK.Catalogos
 
             return ResponseClass.Response(statusCode: 204, message: $"Venta Actualizada Exitosamente.");
         }
+
+        public async Task<ResponseObject> FinalizarCreditoAsync(int id)
+        {
+            try
+            {
+                VENTAS venta = myDbContext.VENTAS.Where(x => x.VEN_CODIGO == id).FirstOrDefault();
+                venta.VEN_ESTADOCREDITO = false;
+                venta.VEN_ACTUALIZACION = DateTime.Now;
+                myDbContext.Entry(venta).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return ResponseClass.Response(statusCode: 400, message: $"Error al actualizar el estado de la venta");
+                throw;
+            }
+
+            return ResponseClass.Response(statusCode: 204, message: $"Venta Actualizada Exitosamente.");
+        }
         public async Task<ResponseObject> BorrarVentaAsync(int Id)
         {
             try
@@ -358,7 +377,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                List<Cartera> carteras = await myDbContext.CARTERAS.Where(d => d.VEN_CODIGO == id).Select(x => new Cartera
+                List<Cartera> carteras = await myDbContext.CARTERAS.Where(d => d.VEN_CODIGO == id && d.CAR_ESTADO==true).Select(x => new Cartera
                 {
                     CAR_CODIGO = x.CAR_CODIGO,
                     VEN_CODIGO = x.VEN_CODIGO,
@@ -370,6 +389,74 @@ namespace BUGGAFIT_BACK.Catalogos
 
 
                 return ResponseClass.Response(statusCode: 200, data: carteras);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> CrearAbonoAsync( Cartera cartera)
+        {
+            try
+            {
+                CARTERAS _cartera = new()
+                {
+                    CAR_FECHACREACION = DateTime.Now,
+                    CAR_FECHACREDITO = cartera.CAR_FECHACREDITO.ToLocalTime(),
+                    CAR_FECHAACTUALIZACION = DateTime.Now,
+                    VEN_CODIGO = cartera.VEN_CODIGO,
+                    CAR_VALORABONADO = cartera.CAR_VALORABONADO,
+                    CAR_ESTADO = true,
+                    CAR_MOTIVO = "",
+                    TIC_CODIGO= cartera.TIC_CODIGO,
+                };
+                myDbContext.CARTERAS.Add(_cartera);
+
+                await myDbContext.SaveChangesAsync();
+                return ResponseClass.Response(statusCode: 200,message:"Abono creado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public async Task<ResponseObject> BorrarAbonoAsync(int car_codigo)
+        {
+            try
+            {
+                var abono = await myDbContext.CARTERAS.FindAsync(car_codigo);
+                if (abono == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {car_codigo} no existe.");
+
+                abono.CAR_ESTADO = false;
+                myDbContext.Entry(abono).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Abono Eliminado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
+        public async Task<ResponseObject> ActualizarAbonoAsync(Cartera cartera)
+        {
+            try
+            {
+                var abono = await myDbContext.CARTERAS.FindAsync(cartera.CAR_CODIGO);
+                if (abono == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {cartera.CAR_CODIGO} no existe.");
+
+                abono.CAR_FECHACREDITO = cartera.CAR_FECHACREDITO.ToLocalTime();
+                abono.TIC_CODIGO = cartera.TIC_CODIGO;
+                abono.CAR_VALORABONADO = cartera.CAR_VALORABONADO;
+                abono.CAR_FECHAACTUALIZACION=DateTime.Now;
+                myDbContext.Entry(abono).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Abono Actualizado Exitosamente.");
             }
             catch (Exception)
             {
