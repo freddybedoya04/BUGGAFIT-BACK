@@ -50,7 +50,7 @@ namespace BUGGAFIT_BACK.Catalogos
             return ResponseClass.Response(statusCode: 204, message: $"Produto Actualizado Exitosamente.");
         }
 
-        public async Task<ResponseObject> BorrarProductoAsync(int Id)
+        public async Task<ResponseObject> BorrarProductoAsync(string Id)
         {
             try
             {
@@ -155,7 +155,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var _producto = await myDbContext.PRODUCTOS.FindAsync(Id);
+                var _producto = await myDbContext.PRODUCTOS.Where(x => x.PRO_CODIGO == Id && x.PRO_ESTADO == true).ToListAsync();
                 if (_producto == null)
                     return ResponseClass.Response(statusCode: 400, message: $"El producto con el codigo {Id} no existe.");
                 return ResponseClass.Response(statusCode: 200, data: _producto);
@@ -171,6 +171,7 @@ namespace BUGGAFIT_BACK.Catalogos
             try
             {
                 var _productos = await (from p in myDbContext.PRODUCTOS
+                                        where p.PRO_ESTADO.Equals(true)
                                         select new Producto
                                         {
                                             PRO_CODIGO = p.PRO_CODIGO,

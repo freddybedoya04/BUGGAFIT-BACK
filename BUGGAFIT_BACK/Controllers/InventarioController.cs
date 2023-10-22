@@ -127,7 +127,7 @@ namespace BUGGAFIT_BACK.Controllers
 
         // DELETE: api/DeleteProducto/5
         [HttpDelete("DeleteProducto/{id}")]
-        public async Task<ActionResult<ResponseObject>> DeleteProducto(int id)
+        public async Task<ActionResult<ResponseObject>> DeleteProducto(string id)
         {
             try
             {
