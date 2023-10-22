@@ -171,10 +171,10 @@ namespace BUGGAFIT_BACK.Catalogos
                     await CrearDetalleVentaAsync((List<DetalleVenta>)venta.DetalleVentas);
 
                     await RetirarProductosDelInventario(_ventas.VEN_CODIGO);
-                    if (_ventas.VEN_ESTADOCREDITO == true)
-                    {
-                        await CrearEntradaDeCartera(_ventas.VEN_CODIGO, venta);
-                    }
+                    //if (_ventas.VEN_ESTADOCREDITO == true)
+                    //{
+                    //    await CrearEntradaDeCartera(_ventas.VEN_CODIGO, venta);
+                    //}
                 }
                 return ResponseClass.Response(statusCode: 201, data: _ventas.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
             }
