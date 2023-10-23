@@ -18,7 +18,7 @@ namespace BUGGAFIT_BACK.Controllers
 
         #region Metodos API
         // GET: api/GetGasto
-        [HttpGet("GetGasto")]
+        [HttpGet("GetGastos")]
         public async Task<ActionResult<ResponseObject>> GetGastos()
         {
             try
