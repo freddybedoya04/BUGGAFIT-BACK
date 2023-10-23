@@ -1,7 +1,8 @@
 ﻿using BUGGAFIT_BACK.Catalogos;
+using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 namespace BUGGAFIT_BACK.Controllers
@@ -11,22 +12,65 @@ namespace BUGGAFIT_BACK.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly ICatalogoUsuarios catalogoUsuarios;
+
         public UsuariosController(ICatalogoUsuarios context)
         {
             catalogoUsuarios = context;
         }
 
-        [HttpGet]
+        [HttpGet("GetUsuarios")]
         public async Task<IActionResult> ListarUsuarios()
         {
             try
             {
-                var usuarios = catalogoUsuarios.ListarUsuarios();
+                var usuarios = await catalogoUsuarios.ListarUsuariosAsync();
                 return Ok(usuarios);
             }
             catch (Exception)
             {
-                throw;
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost("PostUsuario")]
+        public async Task<IActionResult> AgregarUsuario([FromBody] Usuario usuario)
+        {
+            try
+            {
+                var usuarioAgregado = await catalogoUsuarios.AgregarUsuarioAsync(usuario);
+                return CreatedAtAction("ListarUsuarios", usuarioAgregado);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ActualizarUsuario([FromBody] Usuario usuario)
+        {
+            try
+            {
+                await catalogoUsuarios.ActualizarUsuarioAsync(usuario);
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpDelete("{cedula}")]
+        public async Task<IActionResult> BorrarUsuario(string cedula)
+        {
+            try
+            {
+                await catalogoUsuarios.BorrarUsuarioAsync(cedula);
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
             }
         }
     }
