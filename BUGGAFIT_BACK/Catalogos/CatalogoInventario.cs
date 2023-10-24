@@ -119,37 +119,37 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-        public async Task<ResponseObject> ListarMarcasAsync()
-        {
-            try
-            {
-                var _marcas = await myDbContext.MARCAS.Where(x => x.MAR_ESTADO == true).OrderBy(x => x.MAR_NOMBRE).ToListAsync();
-                if (_marcas == null || !_marcas.Any())
-                    return ResponseClass.Response(statusCode: 204, message: "No hay categorias.");
+        //public async Task<ResponseObject> ListarMarcasAsync()
+        //{
+        //    try
+        //    {
+        //        var _marcas = await myDbContext.MARCAS.Where(x => x.MAR_ESTADO == true).OrderBy(x => x.MAR_NOMBRE).ToListAsync();
+        //        if (_marcas == null || !_marcas.Any())
+        //            return ResponseClass.Response(statusCode: 204, message: "No hay categorias.");
 
-                return ResponseClass.Response(statusCode: 200, data: _marcas);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //        return ResponseClass.Response(statusCode: 200, data: _marcas);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
-        public async Task<ResponseObject> ListarCategoriasAsync()
-        {
-            try
-            {
-                var _categorias = await myDbContext.CATEGORIAS.Where(x => x.CAT_ESTADO == true).OrderBy(x => x.CAT_NOMBRE).ToListAsync();
-                if (_categorias == null || !_categorias.Any())
-                    return ResponseClass.Response(statusCode: 204, message: "No hay Marcas.");
+        //public async Task<ResponseObject> ListarCategoriasAsync()
+        //{
+        //    try
+        //    {
+        //        var _categorias = await myDbContext.CATEGORIAS.Where(x => x.CAT_ESTADO == true).OrderBy(x => x.CAT_NOMBRE).ToListAsync();
+        //        if (_categorias == null || !_categorias.Any())
+        //            return ResponseClass.Response(statusCode: 204, message: "No hay Marcas.");
 
-                return ResponseClass.Response(statusCode: 200, data: _categorias);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //        return ResponseClass.Response(statusCode: 200, data: _categorias);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
         public async Task<ResponseObject> ListarProductoPorIDAsync(string Id)
         {
