@@ -14,10 +14,40 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             myDbContext = context;
         }
-        Task ICatalogoUsuarios.ActualizarUsuarioAsync(Usuario employee)
+        public async Task<Usuario> ActualizarUsuarioAsync(Usuario usuario)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var db = myDbContext)
+                {
+                    var usuarioAActualizar = await db.USUARIOS.FirstOrDefaultAsync(x => x.USU_CEDULA == usuario.USU_CEDULA);
+                    if (usuarioAActualizar != null)
+                    {
+                        usuarioAActualizar.USU_NOMBRE = usuario.USU_NOMBRE;
+                        // Encripta la nueva contraseña si se proporciona
+                        if (!string.IsNullOrEmpty(usuario.USU_CONTRASEÑA))
+                        {
+                            usuarioAActualizar.USU_CONTRASEÑA = EncriptarContraseña(usuario.USU_CONTRASEÑA);
+                        }
+                        usuarioAActualizar.USU_ROL = usuario.USU_ROL;
+                        usuarioAActualizar.USU_FECHAACTUALIZACION = DateTime.Now;
+
+                        await db.SaveChangesAsync();
+                        return usuario;
+                    }
+                    else
+                    {
+                      
+                        return null;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
         public async Task<Usuario> AgregarUsuarioAsync(Usuario usuario)
         {
             try

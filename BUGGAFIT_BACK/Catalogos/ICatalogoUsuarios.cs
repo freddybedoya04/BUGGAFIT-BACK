@@ -7,7 +7,8 @@ namespace BUGGAFIT_BACK.Catalogos
     {
         Task<Usuario> AgregarUsuarioAsync(Usuario employee);
         Task<List<Usuario>> ListarUsuariosAsync();
-        Task ActualizarUsuarioAsync(Usuario employee);
+        Task<Usuario> ActualizarUsuarioAsync(Usuario usuario);
+
         Task BorrarUsuarioAsync(string cedula);
         Task<Usuario> ListarUsuarioAsync(int Id);
     }
