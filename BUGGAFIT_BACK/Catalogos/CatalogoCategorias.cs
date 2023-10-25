@@ -1,4 +1,6 @@
-﻿using BUGGAFIT_BACK.DTOs.Response;
+﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs.Response;
+using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +28,48 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 throw;
             }
+        }
+
+        public async Task<ResponseObject> CrearCategoriaAsync(Categoria categoria)
+        {
+            try
+            {
+                CATEGORIAS _categoria = new CATEGORIAS()
+                {
+                    CAT_NOMBRE = categoria.CAT_NOMBRE,
+                    CAT_FECHACREACION = DateTime.Now,
+                    CAT_ESTADO = true,
+                };
+
+                myDbContext.CATEGORIAS.Add(_categoria);
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 201, message: $"Categoria Creado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<ResponseObject> BorrarCategoriaAsync(int id)
+        {
+            try
+            {
+                var categoria = await myDbContext.CATEGORIAS.FindAsync(id);
+                if (categoria == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"la categoria con el codigo {id} no existe.");
+
+                categoria.CAT_ESTADO = false;
+                myDbContext.Entry(categoria).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Categoria Eliminado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
         }
     }
 }

@@ -7,22 +7,22 @@ namespace BUGGAFIT_BACK.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriasController : ControllerBase
+    public class MotivosGastosController : ControllerBase
     {
-        private readonly ICatalogoCategorias catalogo;
+        private readonly ICatalogoMotivosGastos catalogo;
 
-        public CategoriasController(ICatalogoCategorias catalgo)
+        public MotivosGastosController(ICatalogoMotivosGastos catalogo)
         {
-            this.catalogo = catalgo;
+            this.catalogo = catalogo;
         }
         #region API
-        // GET: api/GetCategorias
-        [HttpGet("GetCategorias")]
-        public async Task<ActionResult<ResponseObject>> GetCategorias()
+        // GET: api/GetMarcas
+        [HttpGet("GetMotivoGasto")]
+        public async Task<ActionResult<ResponseObject>> GetMovitosGastos()
         {
             try
             {
-                var result = await catalogo.ListarCategoriasAsync();
+                var result = await catalogo.ListarMotivoGastoAsync();
 
                 if (result.StatusCode == 204)
                     return NoContent();
@@ -34,13 +34,12 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
-
-        [HttpPost("PostCategoria")]
-        public async Task<ActionResult<ResponseObject>> PostCategoria(Categoria categoria)
+        [HttpPost("PostMotivoGasto")]
+        public async Task<ActionResult<ResponseObject>> PostMotivoGasto(MotivoGasto motivo)
         {
             try
             {
-                return Ok(await catalogo.CrearCategoriaAsync(categoria));
+                return Ok(await catalogo.CrearMotivoGastoAsync(motivo));
             }
             catch (Exception ex)
             {
@@ -48,12 +47,12 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
 
-        [HttpDelete("DeleteCategoria/{id}")]
-        public async Task<ActionResult<ResponseObject>> DeleteAbono(int id)
+        [HttpDelete("DeleteMotivoGasto/{id}")]
+        public async Task<ActionResult<ResponseObject>> DeleteMotivoGasto(int id)
         {
             try
             {
-                var result = await catalogo.BorrarCategoriaAsync(id);
+                var result = await catalogo.BorrarMotivoGastoAsync(id);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 

@@ -71,13 +71,13 @@ namespace BUGGAFIT_BACK.Controllers
 
         // PUT: api/PutTipoCuenta/5
         [HttpPut("PutTipoCuenta/{id}")]
-        public async Task<ActionResult<ResponseObject>> PutTipoCuenta(int id, TipoCuenta producto)
+        public async Task<ActionResult<ResponseObject>> PutTipoCuenta(int id, TipoCuenta cuenta)
         {
-            if (id != producto.TIC_CODIGO)
+            if (id != cuenta.TIC_CODIGO)
                 return BadRequest(ResponseClass.Response(statusCode: 400, message: "El id no coincide."));
             try
             {
-                var result = await catalogo.ActualizarTipoCuentaAsync(producto);
+                var result = await catalogo.ActualizarTipoCuentaAsync(cuenta);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -99,7 +99,7 @@ namespace BUGGAFIT_BACK.Controllers
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
-                return NoContent();
+                return result;
             }
             catch (Exception ex)
             {

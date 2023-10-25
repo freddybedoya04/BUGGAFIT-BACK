@@ -43,7 +43,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 myDbContext.MARCAS.Add(_marca);
                 await myDbContext.SaveChangesAsync();
 
-                return ResponseClass.Response(statusCode: 201, message: $"Producto Creado Exitosamente.");
+                return ResponseClass.Response(statusCode: 201, message: $"Marca Creado Exitosamente.");
             }
             catch (Exception)
             {
@@ -56,13 +56,13 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 var marca = await myDbContext.MARCAS.FindAsync(id);
                 if (marca == null)
-                    return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {id} no existe.");
+                    return ResponseClass.Response(statusCode: 400, message: $"la marca con el codigo {id} no existe.");
 
                 marca.MAR_ESTADO = false;
                 myDbContext.Entry(marca).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
 
-                return ResponseClass.Response(statusCode: 204, message: $"Abono Eliminado Exitosamente.");
+                return ResponseClass.Response(statusCode: 204, message: $"Marca Eliminado Exitosamente.");
             }
             catch (Exception)
             {

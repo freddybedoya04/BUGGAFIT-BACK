@@ -212,6 +212,10 @@ namespace BUGGAFIT_BACK.Catalogos
                         if (producto != null)
                         {
                             producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
+                            if (item.DEC_ESTADO == false)
+                            {
+                                producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES - item.DEC_UNIDADES;
+                            }
                             producto.PRO_ACTUALIZACION = DateTime.Now;
                         }
                     }

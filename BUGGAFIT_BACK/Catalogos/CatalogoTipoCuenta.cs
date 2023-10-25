@@ -3,6 +3,7 @@ using BUGGAFIT_BACK.DTOs.Response;
 using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -49,7 +50,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     return ResponseClass.Response(statusCode: 400, message: $"La cuenta con el codigo {Id} no existe.");
 
                 _tipoCuenta.TIC_ESTADO = false;
-                myDbContext.TIPOSCUENTAS.Remove(_tipoCuenta);
+                myDbContext.Entry(_tipoCuenta).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Cuenta Eliminada Exitosamente.");
@@ -87,7 +88,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 {
                     TIC_NOMBRE = tipoCuenta.TIC_NOMBRE,
                     TIC_NUMEROREFERENCIA = tipoCuenta.TIC_NUMEROREFERENCIA,
-                    TIC_ESTADO = tipoCuenta.TIC_ESTADO,
+                    TIC_ESTADO =true,
                     TIC_FECHACREACION = DateTime.Now,
                 };
                 myDbContext.TIPOSCUENTAS.Add(_tipoCuentas);
