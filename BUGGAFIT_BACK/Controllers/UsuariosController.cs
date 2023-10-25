@@ -46,7 +46,7 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("PutUsuario")]
         public async Task<IActionResult> ActualizarUsuario([FromBody] Usuario usuario)
         {
             try
@@ -59,6 +59,28 @@ namespace BUGGAFIT_BACK.Controllers
                 return StatusCode(500);
             }
         }
+        [HttpGet("BuscarUsuarioPorCedula/{cedula}")]
+        public async Task<IActionResult> BuscarUsuarioPorCedula(string cedula)
+        {
+            try
+            {
+                var usuario = await catalogoUsuarios.BuscarUsuarioPorCedulaAsync(cedula);
+
+                if (usuario != null)
+                {
+                    return Ok(usuario);
+                }
+                else
+                {
+                    return NotFound(); // Usuario no encontrado
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
+
 
         [HttpDelete("{cedula}")]
         public async Task<IActionResult> BorrarUsuario(string cedula)

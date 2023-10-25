@@ -6,10 +6,9 @@ namespace BUGGAFIT_BACK.Catalogos
     public interface ICatalogoUsuarios
     {
         Task<Usuario> AgregarUsuarioAsync(Usuario employee);
-        Task<List<Usuario>> ListarUsuariosAsync();
-        Task<Usuario> ActualizarUsuarioAsync(Usuario usuario);
-
+        Task<Usuario> ActualizarUsuarioAsync(Usuario usuario );
+        Task<Usuario> BuscarUsuarioPorCedulaAsync(string cedula);
         Task BorrarUsuarioAsync(string cedula);
-        Task<Usuario> ListarUsuarioAsync(int Id);
+        Task<List<Usuario>> ListarUsuariosAsync();
     }
 }

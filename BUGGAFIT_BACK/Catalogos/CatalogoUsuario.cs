@@ -24,20 +24,20 @@ namespace BUGGAFIT_BACK.Catalogos
                     if (usuarioAActualizar != null)
                     {
                         usuarioAActualizar.USU_NOMBRE = usuario.USU_NOMBRE;
-                        // Encripta la nueva contraseña si se proporciona
-                        if (!string.IsNullOrEmpty(usuario.USU_CONTRASEÑA))
-                        {
-                            usuarioAActualizar.USU_CONTRASEÑA = EncriptarContraseña(usuario.USU_CONTRASEÑA);
-                        }
                         usuarioAActualizar.USU_ROL = usuario.USU_ROL;
                         usuarioAActualizar.USU_FECHAACTUALIZACION = DateTime.Now;
+
+                        if (usuario.USU_CONTRASEÑA != null)  // Comprueba si la contraseña se proporcionó
+                        {
+                            // Encripta la nueva contraseña solo si se proporciona
+                            usuarioAActualizar.USU_CONTRASEÑA = EncriptarContraseña(usuario.USU_CONTRASEÑA);
+                        }
 
                         await db.SaveChangesAsync();
                         return usuario;
                     }
                     else
                     {
-                      
                         return null;
                     }
                 }
@@ -47,6 +47,8 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+
+
 
         public async Task<Usuario> AgregarUsuarioAsync(Usuario usuario)
         {
@@ -111,14 +113,37 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-
-
-
-
-        Task<Usuario> ICatalogoUsuarios.ListarUsuarioAsync(int Id)
+        public async Task<Usuario> BuscarUsuarioPorCedulaAsync(string cedula)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var db = myDbContext)
+                {
+                    var usuario = await db.USUARIOS.FirstOrDefaultAsync(x => x.USU_CEDULA == cedula);
+
+                    if (usuario != null)
+                    {
+                       
+                        return new Usuario
+                        {
+                            USU_CEDULA = usuario.USU_CEDULA,
+                            USU_NOMBRE = usuario.USU_NOMBRE,
+                            USU_CONTRASEÑA = usuario.USU_CONTRASEÑA,
+                            USU_ROL = usuario.USU_ROL,
+                        };
+                    }
+                    else
+                    {
+                        return null; 
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
 
         public async Task<List<Usuario>> ListarUsuariosAsync()
         {
