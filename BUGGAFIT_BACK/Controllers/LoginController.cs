@@ -53,7 +53,7 @@ namespace BUGGAFIT_BACK.Controllers
                 var user = query.FirstOrDefault();
                 if (user == null || user.USU_CONTRASEÑA == null)
                     return NotFound(ResponseClass.ErrorResponse(404, "Error en validar el usuario.", new Exception()));
-                if (EncriptarContraseña(loginDTO.Contraseña) != user.USU_CONTRASEÑA)
+                if (EncriptarContraseña(loginDTO.Password) != user.USU_CONTRASEÑA)
                     return NotFound(ResponseClass.Response(404, "Error en validar el usuario. "));
 
                 string token = _authentication.GenerateJWTToken(user);
@@ -68,7 +68,7 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
 
-        private string EncriptarContraseña(string contraseña)
+        private static string EncriptarContraseña(string contraseña)
         {
             byte[] salt = Convert.FromBase64String("CGYzqeN4plZekNC88Umm1Q=="); // divide by 8 to convert bits to bytes
             Console.WriteLine($"Salt: {Convert.ToBase64String(salt)}");

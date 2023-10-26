@@ -8,7 +8,7 @@ namespace BUGGAFIT_BACK.DTOs
         public string Cedula { get; set; }
 
         [Required(ErrorMessage = "The Password is obligatory")]
-        public string Contraseña { get; set; }
+        public string Password { get; set; }
 
         //[Required(ErrorMessage = "The Key is obligatory")]
         //public string Key { get; set; }

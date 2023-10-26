@@ -1,8 +1,11 @@
 ﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs;
+using BUGGAFIT_BACK.DTOs.Response;
 using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
+using System.Web.Http.ModelBinding;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -68,7 +71,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     };
 
                     db.USUARIOS.Add(nuevoUsuario);
-                    await db.SaveChangesAsync(); 
+                    await db.SaveChangesAsync();
                     return usuario;
                 }
             }
@@ -123,7 +126,7 @@ namespace BUGGAFIT_BACK.Catalogos
 
                     if (usuario != null)
                     {
-                       
+
                         return new Usuario
                         {
                             USU_CEDULA = usuario.USU_CEDULA,
@@ -134,7 +137,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     }
                     else
                     {
-                        return null; 
+                        return null;
                     }
                 }
             }
@@ -168,5 +171,40 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
+        public async Task<bool> ValidadUsuarioConPermisosAdmin(LoginDTO loginDTO)
+        {
+            try
+            {
+
+                // search the user in db.
+                //var query = await _postgresContext.Usercompanies.Where(x => x.Login == loginDTO.Username && x.State == true).ToListAsync();
+                var query = await (from u in myDbContext.USUARIOS
+                                   where u.USU_CEDULA == loginDTO.Cedula && u.USU_ESTADO == true
+                                   select new Usuario
+                                   {
+                                       USU_CEDULA = u.USU_CEDULA,
+                                       USU_NOMBRE = u.USU_NOMBRE,
+                                       USU_CONTRASEÑA = u.USU_CONTRASEÑA,
+                                       USU_ROL = u.USU_ROL,
+                                       USU_ESTADO = u.USU_ESTADO,
+                                   }).ToListAsync();
+
+                if (query.Count <= 0)
+                    return false;
+
+                var user = query.FirstOrDefault();
+                if (user == null || user.USU_CONTRASEÑA == null)
+                    return false;
+                if (EncriptarContraseña(loginDTO.Password) != user.USU_CONTRASEÑA)
+                    return false;
+                if (user.USU_ROL.ToLower() == "admin" || user.USU_ROL.ToLower() == "administrador" || user.USU_ROL.ToLower() == "administrator")
+                    return true;
+                return false;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

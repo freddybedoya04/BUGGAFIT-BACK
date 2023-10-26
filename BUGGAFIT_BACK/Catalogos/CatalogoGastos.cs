@@ -158,6 +158,26 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> CerrarGasto(int id)
+        {
+            try
+            {
+                var _gasto = await myDbContext.GASTOS.FindAsync(id);
+                if (_gasto == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El gasto con el codigo {id} no existe.");
+
+                _gasto.GAS_PENDIENTE = false;
+                myDbContext.Entry(_gasto).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Gasto Eliminado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         private bool ExisteGasto(int id)
         {
             return myDbContext.GASTOS.Any(e => e.GAS_CODIGO == id);

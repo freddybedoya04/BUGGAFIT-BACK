@@ -1,5 +1,6 @@
 ﻿using BUGGAFIT_BACK.Catalogos;
 using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -94,6 +95,20 @@ namespace BUGGAFIT_BACK.Controllers
             {
                 return StatusCode(500);
             }
+        }
+
+        [HttpPost("ValidarUsuarioAdmin")]
+        public async Task<IActionResult> ValidarUsuarioAdmin(LoginDTO loginDTO)
+        {
+            try
+            {
+                return Ok(await catalogoUsuarios.ValidadUsuarioConPermisosAdmin(loginDTO));
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+
         }
     }
 }
