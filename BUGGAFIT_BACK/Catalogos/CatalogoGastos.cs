@@ -116,7 +116,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO")).Select(x => x.MOG_CODIGO).FirstAsync().Result;
+                int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO") && x.MOG_ESTADO==true).Select(x => x.MOG_CODIGO).FirstAsync().Result;
                 float valor =myDbContext.VENTAS.Where(x => x.VEN_CODIGO==gasto.VEN_CODIGO).Select(x => x.TIPOSENVIOS.TIP_VALOR).FirstAsync().Result;
                 int TIC_CODIGO=myDbContext.TIPOSCUENTAS.Where(x => x.TIC_NOMBRE.ToUpper().Contains("EFECTIVO")).Select(x => x.TIC_CODIGO).FirstAsync().Result;
                 GASTOS _gasto = new()
