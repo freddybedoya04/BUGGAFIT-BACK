@@ -17,6 +17,7 @@ namespace BUGGAFIT_BACK.Modelos.Entidad
         public DbSet<CARTERAS> CARTERAS { get; set; }
         public DbSet<MARCAS> MARCAS { get; set; }
         public DbSet<CATEGORIAS> CATEGORIAS { get; set; }
+        public DbSet<TIPOSENVIOS> TIPOSENVIOS { get; set; }
 
 
         public MyDBContext(DbContextOptions <MyDBContext>options):base(options) { }    

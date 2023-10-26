@@ -112,6 +112,36 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> CrearGastoVentaAsync(Gasto gasto)
+        {
+            try
+            {
+                int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO")).Select(x => x.MOG_CODIGO).FirstAsync().Result;
+                float valor =myDbContext.VENTAS.Where(x => x.VEN_CODIGO==gasto.VEN_CODIGO).Select(x => x.TIPOSENVIOS.TIP_VALOR).FirstAsync().Result;
+                int TIC_CODIGO=myDbContext.TIPOSCUENTAS.Where(x => x.TIC_NOMBRE.ToUpper().Contains("EFECTIVO")).Select(x => x.TIC_CODIGO).FirstAsync().Result;
+                GASTOS _gasto = new()
+                {
+                    GAS_CODIGO = gasto.GAS_CODIGO,
+                    GAS_FECHACREACION = gasto.GAS_FECHACREACION,
+                    GAS_FECHAGASTO = gasto.GAS_FECHAGASTO,
+                    MOG_CODIGO = codigoMotivo,
+                    GAS_VALOR = valor,
+                    TIC_CODIGO = TIC_CODIGO,
+                    GAS_ESTADO = gasto.GAS_ESTADO,
+                    USU_CEDULA = gasto.USU_CEDULA,
+                    GAS_PENDIENTE = gasto.GAS_PENDIENTE,
+                    VEN_CODIGO = gasto.VEN_CODIGO,
+                };
+                myDbContext.GASTOS.Add(_gasto);
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 201, message: $"Gasto Creado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                return ResponseClass.Response(statusCode: 500, message: $"Error al crear el gasto");
+            }
+        }
 
         public async Task<ResponseObject> ListarGastoPorIDAsync(int Id)
         {

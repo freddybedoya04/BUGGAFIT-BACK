@@ -179,6 +179,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     USU_CEDULA = venta.USU_CEDULA,
                     VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
                     VEN_ESTADO = venta.VEN_ESTADO,
+                    TIP_CODIGO=(int)venta.TIP_CODIGO
                 };
                 myDbContext.VENTAS.Add(_ventas);
                 await myDbContext.SaveChangesAsync();
@@ -197,9 +198,9 @@ namespace BUGGAFIT_BACK.Catalogos
                 }
                 return ResponseClass.Response(statusCode: 201, data: _ventas.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                return ResponseClass.Response(statusCode: 500, data:ex, message: $"Error al crear venta.");
             }
         }
 

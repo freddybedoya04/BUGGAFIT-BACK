@@ -104,6 +104,19 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+        // POST: api/PostGasto
+        [HttpPost("PostGastoVenta")]
+        public async Task<ActionResult<ResponseObject>> PostGastoVenta(Gasto gasto)
+        {
+            try
+            {
+                return Ok(await catalgo.CrearGastoVentaAsync(gasto));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
 
         // PUT: api/PutGasto/5
         [HttpPut("PutGasto/{id}")]

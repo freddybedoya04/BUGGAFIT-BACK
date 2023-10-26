@@ -24,6 +24,7 @@ namespace BUGGAFIT_BACK.Modelos
         public string USU_CEDULA { get; set; } // Clave foránea a Usuario
         public bool VEN_ESTADOVENTA { get; set; } //Indica si la venta ya ha sido pagada y confirmada.
         public bool VEN_ESTADO { get; set; }
+        public int TIP_CODIGO { get; set; }
         public ICollection<DETALLEVENTAS> DETALLEVENTAS { get; set; }
         // Propiedades de navegación (relaciones)
         [ForeignKey("TIC_CODIGO")]
@@ -32,5 +33,8 @@ namespace BUGGAFIT_BACK.Modelos
         public virtual CLIENTES CLIENTES { get; set; } // Relación con Cliente
         [ForeignKey("USU_CEDULA")]
         public virtual USUARIOS USUARIOS { get; set; } // Relación con Usuario
+
+        [ForeignKey("TIP_CODIGO")]
+        public virtual TIPOSENVIOS TIPOSENVIOS { get; set; } // Relación con TIPOENVIOS
     }
 }

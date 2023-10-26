@@ -7,6 +7,7 @@ namespace BUGGAFIT_BACK.Catalogos
     {
         // Async Methods
         Task<ResponseObject> CrearGastoAsync(Gasto gasto);
+        Task<ResponseObject> CrearGastoVentaAsync(Gasto gasto);
         Task<ResponseObject> ListarGastosAsync();
         Task<ResponseObject> ActualizarGastoAsync(Gasto gasto);
         Task<ResponseObject> BorrarGastoAsync(int Id);
