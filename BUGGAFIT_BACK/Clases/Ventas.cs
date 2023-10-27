@@ -22,7 +22,8 @@
         public string USU_CEDULA { get; set; } // Clave foránea a Usuario
         public bool VEN_ESTADOVENTA { get; set; }
         public bool VEN_ESTADO { get; set; }
-        public int? TIP_CODIGO { get; set; } 
+        public int? TIP_CODIGO { get; set; }
+        public string? TIP_NOMBRE { get; set; }
         public ICollection<DetalleVenta>? DetalleVentas { get; set; }
 
     }

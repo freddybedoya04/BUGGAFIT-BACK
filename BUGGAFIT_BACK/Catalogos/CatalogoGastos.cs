@@ -126,7 +126,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     GAS_FECHAGASTO = gasto.GAS_FECHAGASTO,
                     MOG_CODIGO = codigoMotivo,
                     GAS_VALOR = valor,
-                    TIC_CODIGO = TIC_CODIGO,
+                    TIC_CODIGO = gasto.TIC_CODIGO,
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = gasto.GAS_PENDIENTE,

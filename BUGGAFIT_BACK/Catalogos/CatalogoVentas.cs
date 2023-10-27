@@ -263,7 +263,9 @@ namespace BUGGAFIT_BACK.Catalogos
                             CLI_DIRECCION = d.CLIENTES.CLI_DIRECCION,
                             CLI_TIPOCLIENTE = d.CLIENTES.CLI_TIPOCLIENTE,
                             CLI_UBICACION = d.CLIENTES.CLI_UBICACION,
-                            TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE
+                            TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
+                            TIP_CODIGO=d.TIP_CODIGO,
+                            TIP_NOMBRE=d.TIPOSENVIOS.TIP_NOMBRE,
                         }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
