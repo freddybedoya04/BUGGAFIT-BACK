@@ -208,9 +208,35 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var ventas = await myDbContext.VENTAS.FindAsync(Id);
-                if (ventas == null)
-                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {Id} no existe.");
+                List<Ventas> ventas = await myDbContext.VENTAS
+                     .Where(x => x.VEN_CODIGO ==Id
+                                 && x.VEN_ESTADO == true)
+                     .Select(d => new Ventas
+                     {
+                         VEN_CODIGO = d.VEN_CODIGO,
+                         VEN_FECHACREACION = d.VEN_FECHACREACION,
+                         VEN_FECHAVENTA = d.VEN_FECHAVENTA,
+                         VEN_TIPOPAGO = d.VEN_TIPOPAGO,
+                         TIC_CODIGO = d.TIC_CODIGO,
+                         CLI_ID = d.CLI_ID,
+                         VEN_PRECIOTOTAL = d.VEN_PRECIOTOTAL,
+                         VEN_ESTADOCREDITO = (bool)d.VEN_ESTADOCREDITO,
+                         VEN_ENVIO = (bool)d.VEN_ENVIO,
+                         VEN_DOMICILIO = (bool)d.VEN_DOMICILIO,
+                         VEN_OBSERVACIONES = d.VEN_OBSERVACIONES,
+                         VEN_ACTUALIZACION = (DateTime)d.VEN_ACTUALIZACION,
+                         USU_CEDULA = d.USU_CEDULA,
+                         VEN_ESTADOVENTA = d.VEN_ESTADOVENTA,
+                         VEN_ESTADO = d.VEN_ESTADO,
+                         CLI_NOMBRE = d.CLIENTES.CLI_NOMBRE,
+                         CLI_DIRECCION = d.CLIENTES.CLI_DIRECCION,
+                         CLI_TIPOCLIENTE = d.CLIENTES.CLI_TIPOCLIENTE,
+                         CLI_UBICACION = d.CLIENTES.CLI_UBICACION,
+                         TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
+                         TIP_CODIGO = d.TIP_CODIGO,
+                         TIP_NOMBRE = d.TIPOSENVIOS.TIP_NOMBRE,
+                     }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
+
                 return ResponseClass.Response(statusCode: 200, data: ventas);
             }
             catch (Exception)
