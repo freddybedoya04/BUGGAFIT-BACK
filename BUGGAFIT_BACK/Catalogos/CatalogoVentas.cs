@@ -208,7 +208,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                List<Ventas> ventas = await myDbContext.VENTAS
+                Ventas ventas = await myDbContext.VENTAS
                      .Where(x => x.VEN_CODIGO ==Id
                                  && x.VEN_ESTADO == true)
                      .Select(d => new Ventas
@@ -235,7 +235,7 @@ namespace BUGGAFIT_BACK.Catalogos
                          TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
                          TIP_CODIGO = d.TIP_CODIGO,
                          TIP_NOMBRE = d.TIPOSENVIOS.TIP_NOMBRE,
-                     }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
+                     }).OrderByDescending(x => x.VEN_FECHAVENTA).FirstAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
             }
