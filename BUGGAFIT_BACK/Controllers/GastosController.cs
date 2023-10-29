@@ -99,10 +99,6 @@ namespace BUGGAFIT_BACK.Controllers
             try
             {
                 var result = await catalogo.CerrarGasto(id);
-
-                if (result.StatusCode == 204)
-                    return NoContent();
-
                 return Ok(result);
             }
             catch (Exception ex)
