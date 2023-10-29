@@ -120,12 +120,12 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO") && x.MOG_ESTADO == true).Select(x => x.MOG_CODIGO).FirstAsync().Result;
                 float valor = myDbContext.VENTAS.Where(x => x.VEN_CODIGO == gasto.VEN_CODIGO).Select(x => x.TIPOSENVIOS.TIP_VALOR).FirstAsync().Result;
-                int TIC_CODIGO = myDbContext.TIPOSCUENTAS.Where(x => x.TIC_NOMBRE.ToUpper().Contains("EFECTIVO")).Select(x => x.TIC_CODIGO).FirstAsync().Result;
+                
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
-                    GAS_FECHACREACION = gasto.GAS_FECHACREACION,
-                    GAS_FECHAGASTO = gasto.GAS_FECHAGASTO,
+                    GAS_FECHACREACION = DateTime.Now,
+                    GAS_FECHAGASTO = DateTime.Now,
                     MOG_CODIGO = codigoMotivo,
                     GAS_VALOR = valor,
                     TIC_CODIGO = gasto.TIC_CODIGO,
@@ -139,7 +139,7 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 return ResponseClass.Response(statusCode: 201, message: $"Gasto Creado Exitosamente.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return ResponseClass.Response(statusCode: 500, message: $"Error al crear el gasto");
             }
@@ -238,6 +238,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         VEN_CODIGO = x.VEN_CODIGO,
                         USU_NOMBRE = x.Usuarios.USU_NOMBRE,
                         TIC_NOMBRE = x.TipoCuentas.TIC_NOMBRE,
+                        MOG_NOMBRE=x.MOTIVOSGASTOS.MOG_NOMBRE
                     })
                     .OrderByDescending(x => x.GAS_FECHAGASTO)
                     .ToListAsync();

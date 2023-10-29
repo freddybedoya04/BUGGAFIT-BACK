@@ -226,6 +226,7 @@ namespace BUGGAFIT_BACK.Catalogos
                          VEN_OBSERVACIONES = d.VEN_OBSERVACIONES,
                          VEN_ACTUALIZACION = (DateTime)d.VEN_ACTUALIZACION,
                          USU_CEDULA = d.USU_CEDULA,
+                         USU_NOMBRE = d.USUARIOS.USU_NOMBRE,
                          VEN_ESTADOVENTA = d.VEN_ESTADOVENTA,
                          VEN_ESTADO = d.VEN_ESTADO,
                          CLI_NOMBRE = d.CLIENTES.CLI_NOMBRE,
@@ -235,7 +236,19 @@ namespace BUGGAFIT_BACK.Catalogos
                          TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
                          TIP_CODIGO = d.TIP_CODIGO,
                          TIP_NOMBRE = d.TIPOSENVIOS.TIP_NOMBRE,
-                     }).OrderByDescending(x => x.VEN_FECHAVENTA).FirstAsync();
+                         DetalleVentas=myDbContext.DETALLEVENTAS.Where(detalle =>detalle.VEN_CODIGO==Id && detalle.VED_ESTADO == true).Select(nuevo=> new DetalleVenta{
+                             VED_CODIGO = nuevo.VED_CODIGO,
+                             VEN_CODIGO = nuevo.VEN_CODIGO,
+                             PRO_CODIGO = nuevo.PRO_CODIGO,
+                             PRO_NOMBRE = nuevo.PRODUCTOS.PRO_NOMBRE,
+                             VED_UNIDADES = nuevo.VED_UNIDADES,
+                             VED_PRECIOVENTA_UND = nuevo.VED_PRECIOVENTA_UND,
+                             VED_VALORDESCUENTO_UND = nuevo.VED_VALORDESCUENTO_UND,
+                             VED_PRECIOVENTA_TOTAL = nuevo.VED_PRECIOVENTA_TOTAL,
+                             VED_ACTUALIZACION = nuevo.VED_ACTUALIZACION,
+                             VED_ESTADO = nuevo.VED_ESTADO
+                         }).ToList()
+                     }).FirstAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
             }
@@ -283,6 +296,7 @@ namespace BUGGAFIT_BACK.Catalogos
                             VEN_OBSERVACIONES = d.VEN_OBSERVACIONES,
                             VEN_ACTUALIZACION = (DateTime)d.VEN_ACTUALIZACION,
                             USU_CEDULA = d.USU_CEDULA,
+                            USU_NOMBRE=d.USUARIOS.USU_NOMBRE,
                             VEN_ESTADOVENTA = d.VEN_ESTADOVENTA,
                             VEN_ESTADO = d.VEN_ESTADO,
                             CLI_NOMBRE = d.CLIENTES.CLI_NOMBRE,
