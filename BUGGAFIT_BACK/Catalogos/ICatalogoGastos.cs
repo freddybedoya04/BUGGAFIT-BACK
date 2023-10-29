@@ -1,4 +1,5 @@
 ﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.DTOs.Response;
 
 namespace BUGGAFIT_BACK.Catalogos
@@ -14,7 +15,6 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> ListarGastoPorIDAsync(int Id);
         Task<ResponseObject> ListarMotivoGastosDeEnvioAsync();
         Task<ResponseObject> CerrarGasto(int id);
-
-
+        Task<ResponseObject> ListarGastosPorFecha(FiltrosDTO filtro);
     }
 }

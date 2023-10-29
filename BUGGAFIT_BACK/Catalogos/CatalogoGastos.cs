@@ -1,8 +1,10 @@
 ﻿using BUGGAFIT_BACK.Clases;
+using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.DTOs.Response;
 using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -116,9 +118,9 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO") && x.MOG_ESTADO==true).Select(x => x.MOG_CODIGO).FirstAsync().Result;
-                float valor =myDbContext.VENTAS.Where(x => x.VEN_CODIGO==gasto.VEN_CODIGO).Select(x => x.TIPOSENVIOS.TIP_VALOR).FirstAsync().Result;
-                int TIC_CODIGO=myDbContext.TIPOSCUENTAS.Where(x => x.TIC_NOMBRE.ToUpper().Contains("EFECTIVO")).Select(x => x.TIC_CODIGO).FirstAsync().Result;
+                int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO") && x.MOG_ESTADO == true).Select(x => x.MOG_CODIGO).FirstAsync().Result;
+                float valor = myDbContext.VENTAS.Where(x => x.VEN_CODIGO == gasto.VEN_CODIGO).Select(x => x.TIPOSENVIOS.TIP_VALOR).FirstAsync().Result;
+                int TIC_CODIGO = myDbContext.TIPOSCUENTAS.Where(x => x.TIC_NOMBRE.ToUpper().Contains("EFECTIVO")).Select(x => x.TIC_CODIGO).FirstAsync().Result;
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
@@ -213,5 +215,41 @@ namespace BUGGAFIT_BACK.Catalogos
             return myDbContext.GASTOS.Any(e => e.GAS_CODIGO == id);
         }
 
+        public async Task<ResponseObject> ListarGastosPorFecha(FiltrosDTO filtro)
+        {
+            try
+            {
+                List<Gasto> gastos = new();
+                // Accede a la instancia de MyDBContext a través de ConexionBD 
+
+                // Realiza consultas de Entity Framework aquí
+                gastos = await myDbContext.GASTOS.Where(x => x.GAS_FECHAGASTO >= filtro.FechaInicio.ToLocalTime() && x.GAS_FECHAGASTO <= filtro.FechaFin.ToLocalTime() && x.GAS_ESTADO == true)
+                    .Select(x => new Gasto
+                    {
+                        GAS_CODIGO = x.GAS_CODIGO,
+                        GAS_FECHACREACION = x.GAS_FECHACREACION,
+                        GAS_FECHAGASTO = x.GAS_FECHAGASTO,
+                        MOG_CODIGO = x.MOG_CODIGO,
+                        GAS_VALOR = x.GAS_VALOR,
+                        TIC_CODIGO = x.TIC_CODIGO,
+                        GAS_ESTADO = x.GAS_ESTADO,
+                        USU_CEDULA = x.USU_CEDULA,
+                        GAS_PENDIENTE = x.GAS_PENDIENTE,
+                        VEN_CODIGO = x.VEN_CODIGO,
+                        USU_NOMBRE = x.Usuarios.USU_NOMBRE,
+                        TIC_NOMBRE = x.TipoCuentas.TIC_NOMBRE,
+                    })
+                    .OrderByDescending(x => x.GAS_FECHAGASTO)
+                    .ToListAsync();
+
+                if (!gastos.Any())
+                    return ResponseClass.Response(statusCode: 204, message: "No hay gastos.");
+                return ResponseClass.Response(statusCode: 200, data: gastos);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

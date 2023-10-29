@@ -51,8 +51,6 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-
-
         public async Task<Usuario> AgregarUsuarioAsync(Usuario usuario)
         {
             try
