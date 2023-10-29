@@ -82,7 +82,21 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
 
+        [HttpGet("ListarPantallasPermisos/{perfil}")]
+        public async Task<IActionResult> ListarPantallasPermisos(string perfil)
+        {
+            try
+            {
+                var usuario = await catalogoUsuarios.ListarPantallasPermisosAsync(perfil);
+                    return Ok(usuario);
 
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+        }
         [HttpDelete("{cedula}")]
         public async Task<IActionResult> BorrarUsuario(string cedula)
         {
@@ -109,6 +123,19 @@ namespace BUGGAFIT_BACK.Controllers
                 return StatusCode(500);
             }
 
+        }
+        [HttpGet("GetPerfiles")]
+        public async Task<IActionResult> ListarPerfiles()
+        {
+            try
+            {
+                var perfiles = await catalogoUsuarios.ListarPerfilesAsync();
+                return Ok(perfiles);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

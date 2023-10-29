@@ -1,5 +1,6 @@
 ﻿using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.DTOs;
+using BUGGAFIT_BACK.Modelos;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace BUGGAFIT_BACK.Catalogos
@@ -12,5 +13,7 @@ namespace BUGGAFIT_BACK.Catalogos
         Task BorrarUsuarioAsync(string cedula);
         Task<List<Usuario>> ListarUsuariosAsync();
         Task<bool> ValidadUsuarioConPermisosAdmin(LoginDTO loginDTO);
+        Task<List<PantallasPermisos>> ListarPantallasPermisosAsync(string perfil);
+        Task<List<PERFILES>> ListarPerfilesAsync();
     }
 }

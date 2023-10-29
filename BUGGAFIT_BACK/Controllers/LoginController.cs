@@ -45,6 +45,7 @@ namespace BUGGAFIT_BACK.Controllers
                                        USU_CONTRASEÑA = u.USU_CONTRASEÑA,
                                        USU_ROL = u.USU_ROL,
                                        USU_ESTADO = u.USU_ESTADO,
+                                       USU_NOMBREROL= myDbContext.PERFILES.Where(p => p.PER_CODIGO == u.USU_ROL).Select(p => p.PER_NOMBRE).First()
                                    }).ToListAsync();
 
                 if (query.Count <= 0)

@@ -5,6 +5,7 @@ using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.Xml;
 using System.Web.Http.ModelBinding;
 
 namespace BUGGAFIT_BACK.Catalogos
@@ -159,6 +160,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         USU_NOMBRE = x.USU_NOMBRE,
                         USU_CONTRASEÑA = x.USU_CONTRASEÑA,
                         USU_ROL = x.USU_ROL,
+                        USU_NOMBREROL= db.PERFILES.Where(p => p.PER_CODIGO == x.USU_ROL).Select(p => p.PER_NOMBRE).First(),
                     }).ToListAsync();
                     return usuarios;
                 }
@@ -202,6 +204,50 @@ namespace BUGGAFIT_BACK.Catalogos
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public async Task<List<PantallasPermisos>> ListarPantallasPermisosAsync(string perfil)
+        {
+            try
+            {
+                using (var db = myDbContext)
+                {
+                    List<PantallasPermisos> pantallas = await db.PERIMISOSPORPERFILS.Where(c =>c.PER_CODIGO==perfil && c.PANTALLAS.PAN_ESTADO==true)
+                        .Select(x => new PantallasPermisos
+                    {
+                        PAN_CODIGO = x.PANTALLAS.PAN_CODIGO,
+                        PAN_NOMBRE = x.PANTALLAS.PAN_NOMBRE,
+                        PAN_PATH = x.PANTALLAS.PAN_PATH,
+                        PAN_TEXT = x.PANTALLAS.PAN_TEXT,
+                        PAN_ICON = x.PANTALLAS.PAN_ICON,
+                        PPP_AGREGAR=x.PPP_AGREGAR,
+                        PPP_EDITAR=x.PPP_EDITAR,
+                        PPP_ELIMINAR=x.PPP_ELIMINAR,
+                        PPP_VER=    x.PPP_VER,
+                    }).ToListAsync();
+                    return pantallas;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<List<PERFILES>> ListarPerfilesAsync()
+        {
+            try
+            {
+                using (var db = myDbContext)
+                {
+                    List<PERFILES> Perfiles = await db.PERFILES.Where(c => c.PER_ESTADO == true).ToListAsync();
+                    return Perfiles;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }

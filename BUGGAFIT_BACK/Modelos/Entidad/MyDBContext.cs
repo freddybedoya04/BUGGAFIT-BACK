@@ -18,7 +18,9 @@ namespace BUGGAFIT_BACK.Modelos.Entidad
         public DbSet<MARCAS> MARCAS { get; set; }
         public DbSet<CATEGORIAS> CATEGORIAS { get; set; }
         public DbSet<TIPOSENVIOS> TIPOSENVIOS { get; set; }
-
+        public DbSet<PERFILES> PERFILES { get; set; }
+        public DbSet<PANTALLAS> PANTALLAS { get; set; }
+        public DbSet<PERIMISOSPORPERFIL> PERIMISOSPORPERFILS { get; set; }
 
         public MyDBContext(DbContextOptions <MyDBContext>options):base(options) { }    
     }
