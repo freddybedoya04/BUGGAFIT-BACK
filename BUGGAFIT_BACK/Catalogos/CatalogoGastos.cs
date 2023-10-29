@@ -91,18 +91,19 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
+                int ven_codigo = myDbContext.VENTAS.First().VEN_CODIGO;
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
-                    GAS_FECHACREACION = gasto.GAS_FECHACREACION,
-                    GAS_FECHAGASTO = gasto.GAS_FECHAGASTO,
+                    GAS_FECHACREACION = DateTime.Now,
+                    GAS_FECHAGASTO = gasto.GAS_FECHAGASTO.ToLocalTime(),
                     MOG_CODIGO = gasto.MOG_CODIGO,
                     GAS_VALOR = gasto.GAS_VALOR,
                     TIC_CODIGO = gasto.TIC_CODIGO,
-                    GAS_ESTADO = gasto.GAS_ESTADO,
+                    GAS_ESTADO = true,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = gasto.GAS_PENDIENTE,
-                    VEN_CODIGO = gasto.VEN_CODIGO,
+                    VEN_CODIGO = ven_codigo,
                 };
                 myDbContext.GASTOS.Add(_gasto);
                 await myDbContext.SaveChangesAsync();
