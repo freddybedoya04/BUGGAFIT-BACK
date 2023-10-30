@@ -113,7 +113,7 @@ namespace BUGGAFIT_BACK.Catalogos
 
                                                                  }).ToListAsync();
 
-                var movimientosGastos = await (from gas in myDbContext.GASTOS
+                dashboard.DatosGraficas.GastosCuentas = await (from gas in myDbContext.GASTOS
                                                where gas.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
                                                  && gas.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && gas.GAS_ESTADO == true
                                                group gas by gas.TipoCuentas.TIC_CODIGO into g
@@ -124,7 +124,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                                    MovimientoTotal = g.Sum(x => x.GAS_VALOR),
 
                                                }).ToListAsync();
-                var movimientosCompras = await (from co in myDbContext.COMPRAS
+                dashboard.DatosGraficas.ComprasCuentas = await (from co in myDbContext.COMPRAS
                                                 where co.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime()
                                                   && co.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && co.COM_ESTADO == true
                                                 group co by co.TipoCuenta.TIC_CODIGO into g
@@ -136,14 +136,14 @@ namespace BUGGAFIT_BACK.Catalogos
 
                                                 }).ToListAsync();
 
-                dashboard.DatosGraficas.GastosCuentas = movimientosCompras.Union(movimientosGastos).ToList()
-                    .GroupBy(x => x.Codigo)
-                    .Select(x => new MovimientoCuentas
-                    {
-                        Codigo = x.Key,
-                        Nombre = x.Where(y => y.Codigo == x.Key).First().Nombre,
-                        MovimientoTotal = x.Sum(y => y.MovimientoTotal)
-                    }).ToList();
+                //dashboard.DatosGraficas.GastosCuentas = movimientosCompras.Union(movimientosGastos).ToList()
+                //    .GroupBy(x => x.Codigo)
+                //    .Select(x => new MovimientoCuentas
+                //    {
+                //        Codigo = x.Key,
+                //        Nombre = x.Where(y => y.Codigo == x.Key).First().Nombre,
+                //        MovimientoTotal = x.Sum(y => y.MovimientoTotal)
+                //    }).ToList();
                 #endregion
                 return ResponseClass.Response(statusCode: 200, data: dashboard, message: "OK.");
             }

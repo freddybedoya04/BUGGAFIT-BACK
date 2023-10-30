@@ -32,6 +32,7 @@
         public List<Ventas> VentasRealizadas { get; set; } = new();
         public List<MovimientoCuentas> IngresosCuentas { get; set; } = new();
         public List<MovimientoCuentas> GastosCuentas { get; set; } = new();
+        public List<MovimientoCuentas> ComprasCuentas { get; set; } = new();
 
 
     }
