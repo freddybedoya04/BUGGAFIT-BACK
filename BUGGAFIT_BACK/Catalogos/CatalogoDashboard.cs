@@ -89,6 +89,8 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                       on ven.VEN_CODIGO equals det.VEN_CODIGO
                                                                       join pro in myDbContext.PRODUCTOS
                                                                       on det.PRO_CODIGO equals pro.PRO_CODIGO
+                                                                      where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() 
+                                                                      && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
                                                                       group det by det.PRO_CODIGO into g
                                                                       select new ListaProductosVendidos
                                                                       {
@@ -100,6 +102,8 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosGraficas.IngresosCuentas = await (from ven in myDbContext.VENTAS
                                                                  join cu in myDbContext.TIPOSCUENTAS
                                                                  on ven.TIC_CODIGO equals cu.TIC_CODIGO
+                                                                 where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() 
+                                                                 && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
                                                                  group ven by ven.TIC_CODIGO into g
                                                                  select new IngresosCuentas
                                                                  {
@@ -115,18 +119,6 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 throw;
             }
-
-
-
-            //.Where(x => x.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() && x.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && x.VEN_ESTADO == true)
-            //.Join(
-            //myDbContext.DETALLEVENTAS, 
-            //detalle => detalle.VEN_CODIGO, 
-            //venta => venta.VEN_CODIGO, 
-            //(detalle,venta) => new ListaProductosVendidos
-            //{
-
-            //}).ToListAsync();
         }
     }
 }
