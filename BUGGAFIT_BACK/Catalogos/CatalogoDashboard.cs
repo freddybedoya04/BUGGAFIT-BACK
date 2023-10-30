@@ -89,7 +89,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                       on ven.VEN_CODIGO equals det.VEN_CODIGO
                                                                       join pro in myDbContext.PRODUCTOS
                                                                       on det.PRO_CODIGO equals pro.PRO_CODIGO
-                                                                      where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() 
+                                                                      where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
                                                                       && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
                                                                       group det by det.PRO_CODIGO into g
                                                                       select new ListaProductosVendidos
@@ -102,16 +102,48 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosGraficas.IngresosCuentas = await (from ven in myDbContext.VENTAS
                                                                  join cu in myDbContext.TIPOSCUENTAS
                                                                  on ven.TIC_CODIGO equals cu.TIC_CODIGO
-                                                                 where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() 
+                                                                 where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
                                                                  && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
                                                                  group ven by ven.TIC_CODIGO into g
-                                                                 select new IngresosCuentas
+                                                                 select new MovimientoCuentas
                                                                  {
                                                                      Codigo = g.Key,
                                                                      Nombre = g.First().TIPOSCUENTAS.TIC_NOMBRE,
-                                                                     IngresosTotales = g.Sum(x => x.VEN_PRECIOTOTAL),
+                                                                     MovimientoTotal = g.Sum(x => x.VEN_PRECIOTOTAL),
 
                                                                  }).ToListAsync();
+
+                var movimientosGastos = await (from gas in myDbContext.GASTOS
+                                               where gas.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
+                                                 && gas.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && gas.GAS_ESTADO == true
+                                               group gas by gas.TipoCuentas.TIC_CODIGO into g
+                                               select new MovimientoCuentas
+                                               {
+                                                   Codigo = g.Key,
+                                                   Nombre = g.First().TipoCuentas.TIC_NOMBRE,
+                                                   MovimientoTotal = g.Sum(x => x.GAS_VALOR),
+
+                                               }).ToListAsync();
+                var movimientosCompras = await (from co in myDbContext.COMPRAS
+                                                where co.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime()
+                                                  && co.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && co.COM_ESTADO == true
+                                                group co by co.TipoCuenta.TIC_CODIGO into g
+                                                select new MovimientoCuentas
+                                                {
+                                                    Codigo = g.Key,
+                                                    Nombre = g.First().TipoCuenta.TIC_NOMBRE,
+                                                    MovimientoTotal = g.Sum(x => x.COM_VALORCOMPRA),
+
+                                                }).ToListAsync();
+
+                dashboard.DatosGraficas.GastosCuentas = movimientosCompras.Union(movimientosGastos).ToList()
+                    .GroupBy(x => x.Codigo)
+                    .Select(x => new MovimientoCuentas
+                    {
+                        Codigo = x.Key,
+                        Nombre = x.Where(y => y.Codigo == x.Key).First().Nombre,
+                        MovimientoTotal = x.Sum(y => y.MovimientoTotal)
+                    }).ToList();
                 #endregion
                 return ResponseClass.Response(statusCode: 200, data: dashboard, message: "OK.");
             }

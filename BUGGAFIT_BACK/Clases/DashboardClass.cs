@@ -30,7 +30,9 @@
     {
         public List<ListaProductosVendidos> ProductosMasVendidos { get; set; } = new();
         public List<Ventas> VentasRealizadas { get; set; } = new();
-        public List<IngresosCuentas> IngresosCuentas { get; set; } = new();
+        public List<MovimientoCuentas> IngresosCuentas { get; set; } = new();
+        public List<MovimientoCuentas> GastosCuentas { get; set; } = new();
+
 
     }
 
@@ -41,10 +43,10 @@
         public int CantidadProducto { get; set; }
     }
 
-    public class IngresosCuentas
+    public class MovimientoCuentas
     {
         public int Codigo { get; set; }
         public string? Nombre { get; set; }
-        public double IngresosTotales { get; set; }
+        public double MovimientoTotal { get; set; }
     }
 }
