@@ -22,6 +22,7 @@ namespace BUGGAFIT_BACK.Catalogos
             ArgumentNullException.ThrowIfNull(gasto.GAS_CODIGO, nameof(gasto));
             try
             {
+                int ven_codigo = myDbContext.VENTAS.First().VEN_CODIGO;
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
@@ -32,7 +33,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = gasto.GAS_PENDIENTE,
-                    VEN_CODIGO = gasto.VEN_CODIGO,
+                    VEN_CODIGO = ven_codigo,
                 };
                 myDbContext.Entry(_gasto).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
@@ -110,7 +111,7 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 return ResponseClass.Response(statusCode: 201, message: $"Gasto Creado Exitosamente.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
