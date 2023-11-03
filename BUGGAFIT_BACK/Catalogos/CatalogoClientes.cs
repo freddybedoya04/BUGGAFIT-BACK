@@ -110,6 +110,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     CLI_DIRECCION = cliente.CLI_DIRECCION,
                     CLI_FECHACREACION = DateTime.Now,
                     CLI_ESTADO = cliente.CLI_ESTADO,
+                    CLI_ESCREDITO = cliente.CLI_ESCREDITO,
                 };
                 myDbContext.CLIENTES.Add(_cliente);
                 await myDbContext.SaveChangesAsync();

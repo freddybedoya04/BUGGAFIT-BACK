@@ -13,5 +13,6 @@ namespace BUGGAFIT_BACK.Modelos
         public string CLI_DIRECCION { get; set; }
         public DateTime CLI_FECHACREACION { get; set; }
         public bool CLI_ESTADO { get; set; }
+        public bool? CLI_ESCREDITO { get; set; }
     }
 }
