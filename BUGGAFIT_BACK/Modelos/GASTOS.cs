@@ -18,7 +18,7 @@ namespace BUGGAFIT_BACK.Modelos
         public string USU_CEDULA { get; set; } // Clave foránea a Usuario
         public bool GAS_PENDIENTE { get; set; }
         public int? VEN_CODIGO { get; set; } // Clave foránea a Ventas
-
+        public string? GAS_OBSERVACIONES { get; set; }
         // Propiedades de navegación (relaciones)
         [ForeignKey("TIC_CODIGO")]
         public TIPOSCUENTAS TipoCuentas { get; set; } // Relación con TipoCuenta
