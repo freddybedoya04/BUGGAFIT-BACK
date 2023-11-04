@@ -225,7 +225,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         PPP_EDITAR=x.PPP_EDITAR,
                         PPP_ELIMINAR=x.PPP_ELIMINAR,
                         PPP_VER=    x.PPP_VER,
-                    }).ToListAsync();
+                    }).OrderBy(c =>c.PAN_NOMBRE).ToListAsync();
                     return pantallas;
                 }
             }
