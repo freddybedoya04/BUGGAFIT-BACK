@@ -26,13 +26,14 @@ namespace BUGGAFIT_BACK.Catalogos
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
-                    GAS_FECHAGASTO = gasto.GAS_FECHAGASTO,
+                    GAS_FECHAGASTO = gasto.GAS_FECHAGASTO.ToLocalTime(),
                     MOG_CODIGO = gasto.MOG_CODIGO,
                     GAS_VALOR = gasto.GAS_VALOR,
                     TIC_CODIGO = gasto.TIC_CODIGO,
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = gasto.GAS_PENDIENTE,
+                    GAS_OBSERVACIONES=gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = ven_codigo,
                 };
                 myDbContext.Entry(_gasto).State = EntityState.Modified;
@@ -104,6 +105,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     GAS_ESTADO = true,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = gasto.GAS_PENDIENTE,
+                    GAS_OBSERVACIONES=gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = ven_codigo,
                 };
                 myDbContext.GASTOS.Add(_gasto);
@@ -134,6 +136,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = gasto.GAS_PENDIENTE,
+                    GAS_OBSERVACIONES=gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = gasto.VEN_CODIGO,
                 };
                 myDbContext.GASTOS.Add(_gasto);
@@ -236,6 +239,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = x.TIC_CODIGO,
                         GAS_ESTADO = x.GAS_ESTADO,
                         USU_CEDULA = x.USU_CEDULA,
+                        GAS_OBSERVACIONES=x.GAS_OBSERVACIONES,
                         GAS_PENDIENTE = x.GAS_PENDIENTE,
                         VEN_CODIGO = x.VEN_CODIGO,
                         USU_NOMBRE = x.Usuarios.USU_NOMBRE,
