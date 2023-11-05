@@ -186,6 +186,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                        USU_NOMBRE = u.USU_NOMBRE,
                                        USU_CONTRASEÑA = u.USU_CONTRASEÑA,
                                        USU_ROL = u.USU_ROL,
+                                       USU_NOMBREROL=myDbContext.PERFILES.Where(x=>x.PER_CODIGO==u.USU_ROL).Select(x =>x.PER_NOMBRE).First(),
                                        USU_ESTADO = u.USU_ESTADO,
                                    }).ToListAsync();
 
@@ -197,7 +198,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     return false;
                 if (EncriptarContraseña(loginDTO.Password) != user.USU_CONTRASEÑA)
                     return false;
-                if (user.USU_ROL.ToLower() == "admin" || user.USU_ROL.ToLower() == "administrador" || user.USU_ROL.ToLower() == "administrator")
+                if (user.USU_NOMBREROL.ToLower() == "admin" || user.USU_NOMBREROL.ToLower() == "administrador" || user.USU_NOMBREROL.ToLower() == "administrator")
                     return true;
                 return false;
             }

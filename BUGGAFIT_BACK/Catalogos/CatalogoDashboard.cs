@@ -53,8 +53,9 @@ namespace BUGGAFIT_BACK.Catalogos
                     }).ToListAsync();
                 // guardamos los datos de las cards en el objeto 
                 dashboard.DatosCards.SumaCompras = queryCompras.Sum(x => x.comprasTotales);
-                dashboard.DatosCards.SumaCreditos = queryVentas.Sum(x => x.ventasACredito);
-
+                var ventascredito = myDbContext.VENTAS.Where(x => x.CLIENTES.CLI_ESCREDITO == true && x.VEN_ESTADO == true && x.VEN_ESTADOCREDITO==true).Sum(x => x.VEN_PRECIOTOTAL);
+                var abonos = myDbContext.CARTERAS.Where(x => x.VENTA.CLIENTES.CLI_ESCREDITO == true && x.CAR_ESTADO == true).Sum(x => x.CAR_VALORABONADO);
+                dashboard.DatosCards.SumaCreditos = ventascredito - abonos;
                 double deudasGastos, deudasCompras = 0;
                 deudasGastos = queryGastos.Sum(x => x.gastosNoPagos);
                 deudasCompras = queryCompras.Sum(x => x.comprasNoPagas);
@@ -111,6 +112,19 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                      Codigo = g.Key,
                                                                      Nombre = g.First().TIPOSCUENTAS.TIC_NOMBRE,
                                                                      MovimientoTotal = g.Sum(x => x.VEN_PRECIOTOTAL),
+
+                                                                 }).ToListAsync();
+                dashboard.DatosGraficas.AbonosCuentas = await (from car in myDbContext.CARTERAS
+                                                                 join cu in myDbContext.TIPOSCUENTAS
+                                                                 on car.TIC_CODIGO equals cu.TIC_CODIGO
+                                                                 where car.CAR_FECHACREDITO >= filtros.FechaInicio.ToLocalTime()
+                                                                 && car.CAR_FECHACREDITO <= filtros.FechaFin.ToLocalTime() && car.CAR_ESTADO == true
+                                                                 group car by car.TIC_CODIGO into g
+                                                                 select new MovimientoCuentas
+                                                                 {
+                                                                     Codigo = g.Key,
+                                                                     Nombre = g.First().TIPOSCUENTAS.TIC_NOMBRE,
+                                                                     MovimientoTotal = g.Sum(x => x.CAR_VALORABONADO),
 
                                                                  }).ToListAsync();
 
