@@ -35,6 +35,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     CLI_UBICACION = cliente.CLI_UBICACION,
                     CLI_DIRECCION = cliente.CLI_DIRECCION,
                     CLI_ESTADO = cliente.CLI_ESTADO,
+                    CLI_ESCREDITO = cliente.CLI_ESCREDITO,
                 };
                 myDbContext.Entry(_cliente).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();

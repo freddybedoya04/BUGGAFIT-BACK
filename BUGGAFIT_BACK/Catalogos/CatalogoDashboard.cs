@@ -104,6 +104,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                  on ven.TIC_CODIGO equals cu.TIC_CODIGO
                                                                  where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
                                                                  && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
+                                                                 && ven.VEN_ESTADOVENTA== true
                                                                  group ven by ven.TIC_CODIGO into g
                                                                  select new MovimientoCuentas
                                                                  {
@@ -114,19 +115,21 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                  }).ToListAsync();
 
                 dashboard.DatosGraficas.GastosCuentas = await (from gas in myDbContext.GASTOS
-                                               where gas.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
-                                                 && gas.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && gas.GAS_ESTADO == true
-                                               group gas by gas.TipoCuentas.TIC_CODIGO into g
-                                               select new MovimientoCuentas
-                                               {
-                                                   Codigo = g.Key,
-                                                   Nombre = g.First().TipoCuentas.TIC_NOMBRE,
-                                                   MovimientoTotal = g.Sum(x => x.GAS_VALOR),
+                                                               where gas.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
+                                                                 && gas.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && gas.GAS_ESTADO == true
+                                                                 && gas.GAS_PENDIENTE == false
+                                                               group gas by gas.TipoCuentas.TIC_CODIGO into g
+                                                               select new MovimientoCuentas
+                                                               {
+                                                                   Codigo = g.Key,
+                                                                   Nombre = g.First().TipoCuentas.TIC_NOMBRE,
+                                                                   MovimientoTotal = g.Sum(x => x.GAS_VALOR),
 
-                                               }).ToListAsync();
+                                                               }).ToListAsync();
                 dashboard.DatosGraficas.ComprasCuentas = await (from co in myDbContext.COMPRAS
                                                 where co.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime()
                                                   && co.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && co.COM_ESTADO == true
+                                                  && co.COM_CREDITO == false
                                                 group co by co.TipoCuenta.TIC_CODIGO into g
                                                 select new MovimientoCuentas
                                                 {
