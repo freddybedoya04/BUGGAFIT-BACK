@@ -17,7 +17,7 @@
         public bool VEN_ESTADOCREDITO { get; set; }
         public bool VEN_ENVIO { get; set; }
         public bool VEN_DOMICILIO { get; set; }
-        public string VEN_OBSERVACIONES { get; set; }
+        public string? VEN_OBSERVACIONES { get; set; }
         public DateTime VEN_ACTUALIZACION { get; set; }
         public string USU_CEDULA { get; set; } // Clave foránea a Usuario
         public string? USU_NOMBRE { get; set; }
