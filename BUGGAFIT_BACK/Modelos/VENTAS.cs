@@ -15,6 +15,12 @@ namespace BUGGAFIT_BACK.Modelos
         
         public int TIC_CODIGO { get; set; } // Clave foránea a TipoCuenta
         public string CLI_ID { get; set; } // Clave foránea a Cliente
+
+        // se carga en esta tabla la informacion del cliente
+        public string? CLI_NOMBRE { get; set; }
+        public string? CLI_TIPOCLIENTE { get; set; }
+        public string? CLI_UBICACION { get; set; }
+        public string? CLI_DIRECCION { get; set; }
         public float VEN_PRECIOTOTAL { get; set; }
         public bool? VEN_ESTADOCREDITO { get; set; } //Indica si la venta sera pagada a credito.
         public bool? VEN_ENVIO { get; set; }
