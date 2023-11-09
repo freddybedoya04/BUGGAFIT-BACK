@@ -73,7 +73,7 @@ namespace BUGGAFIT_BACK.Controllers
                 }
                 else
                 {
-                    return NotFound(); // Usuario no encontrado
+                    return Ok(); // Usuario no encontrado
                 }
             }
             catch (Exception)

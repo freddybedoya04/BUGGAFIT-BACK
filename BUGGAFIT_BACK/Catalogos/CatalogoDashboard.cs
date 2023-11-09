@@ -53,8 +53,9 @@ namespace BUGGAFIT_BACK.Catalogos
                     }).ToListAsync();
                 // guardamos los datos de las cards en el objeto 
                 dashboard.DatosCards.SumaCompras = queryCompras.Sum(x => x.comprasTotales);
-                dashboard.DatosCards.SumaCreditos = queryVentas.Sum(x => x.ventasACredito);
-
+                var ventascredito = myDbContext.VENTAS.Where(x => x.CLIENTES.CLI_ESCREDITO == true && x.VEN_ESTADO == true && x.VEN_ESTADOCREDITO==true).Sum(x => x.VEN_PRECIOTOTAL);
+                var abonos = myDbContext.CARTERAS.Where(x => x.VENTA.CLIENTES.CLI_ESCREDITO == true && x.CAR_ESTADO == true).Sum(x => x.CAR_VALORABONADO);
+                dashboard.DatosCards.SumaCreditos = ventascredito - abonos;
                 double deudasGastos, deudasCompras = 0;
                 deudasGastos = queryGastos.Sum(x => x.gastosNoPagos);
                 deudasCompras = queryCompras.Sum(x => x.comprasNoPagas);
@@ -104,6 +105,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                  on ven.TIC_CODIGO equals cu.TIC_CODIGO
                                                                  where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
                                                                  && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
+                                                                 && ven.VEN_ESTADOVENTA== true
                                                                  group ven by ven.TIC_CODIGO into g
                                                                  select new MovimientoCuentas
                                                                  {
@@ -112,21 +114,36 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                      MovimientoTotal = g.Sum(x => x.VEN_PRECIOTOTAL),
 
                                                                  }).ToListAsync();
+                dashboard.DatosGraficas.AbonosCuentas = await (from car in myDbContext.CARTERAS
+                                                                 join cu in myDbContext.TIPOSCUENTAS
+                                                                 on car.TIC_CODIGO equals cu.TIC_CODIGO
+                                                                 where car.CAR_FECHACREDITO >= filtros.FechaInicio.ToLocalTime()
+                                                                 && car.CAR_FECHACREDITO <= filtros.FechaFin.ToLocalTime() && car.CAR_ESTADO == true
+                                                                 group car by car.TIC_CODIGO into g
+                                                                 select new MovimientoCuentas
+                                                                 {
+                                                                     Codigo = g.Key,
+                                                                     Nombre = g.First().TIPOSCUENTAS.TIC_NOMBRE,
+                                                                     MovimientoTotal = g.Sum(x => x.CAR_VALORABONADO),
+
+                                                                 }).ToListAsync();
 
                 dashboard.DatosGraficas.GastosCuentas = await (from gas in myDbContext.GASTOS
-                                               where gas.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
-                                                 && gas.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && gas.GAS_ESTADO == true
-                                               group gas by gas.TipoCuentas.TIC_CODIGO into g
-                                               select new MovimientoCuentas
-                                               {
-                                                   Codigo = g.Key,
-                                                   Nombre = g.First().TipoCuentas.TIC_NOMBRE,
-                                                   MovimientoTotal = g.Sum(x => x.GAS_VALOR),
+                                                               where gas.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
+                                                                 && gas.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && gas.GAS_ESTADO == true
+                                                                 && gas.GAS_PENDIENTE == false
+                                                               group gas by gas.TipoCuentas.TIC_CODIGO into g
+                                                               select new MovimientoCuentas
+                                                               {
+                                                                   Codigo = g.Key,
+                                                                   Nombre = g.First().TipoCuentas.TIC_NOMBRE,
+                                                                   MovimientoTotal = g.Sum(x => x.GAS_VALOR),
 
-                                               }).ToListAsync();
+                                                               }).ToListAsync();
                 dashboard.DatosGraficas.ComprasCuentas = await (from co in myDbContext.COMPRAS
                                                 where co.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime()
                                                   && co.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && co.COM_ESTADO == true
+                                                  && co.COM_CREDITO == false
                                                 group co by co.TipoCuenta.TIC_CODIGO into g
                                                 select new MovimientoCuentas
                                                 {
