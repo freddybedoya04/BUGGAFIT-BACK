@@ -153,14 +153,18 @@ namespace BUGGAFIT_BACK.Catalogos
 
                                                 }).ToListAsync();
 
-                //dashboard.DatosGraficas.GastosCuentas = movimientosCompras.Union(movimientosGastos).ToList()
-                //    .GroupBy(x => x.Codigo)
-                //    .Select(x => new MovimientoCuentas
-                //    {
-                //        Codigo = x.Key,
-                //        Nombre = x.Where(y => y.Codigo == x.Key).First().Nombre,
-                //        MovimientoTotal = x.Sum(y => y.MovimientoTotal)
-                //    }).ToList();
+                dashboard.DatosGraficas.GastosCuentas = await (from co in myDbContext.GASTOS
+                                                               where co.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
+                                                                 && co.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && co.GAS_ESTADO == true
+                                                                 && co.GAS_PENDIENTE == true
+                                                               group co by co.TipoCuentas.TIC_CODIGO into g
+                                                               select new MovimientoCuentas
+                                                               {
+                                                                   Codigo = g.Key,
+                                                                   Nombre = g.First().TipoCuentas.TIC_NOMBRE,
+                                                                   MovimientoTotal = g.Sum(x => x.GAS_VALOR),
+
+                                                               }).ToListAsync();
                 #endregion
                 return ResponseClass.Response(statusCode: 200, data: dashboard, message: "OK.");
             }
