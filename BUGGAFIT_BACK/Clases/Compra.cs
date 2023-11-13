@@ -14,6 +14,7 @@
         public bool COM_ESTADO { get; set; }
         public bool COM_CREDITO { get; set; }
         public string USU_CEDULA { get; set; } // Clave foránea a Usuario
+        public bool? COM_ESANULADA { get; set; }
         public List<DetalleCompra> DetalleCompras { get; set; }
 
     }

@@ -31,6 +31,7 @@ namespace BUGGAFIT_BACK.Modelos
         public bool VEN_ESTADOVENTA { get; set; } //Indica si la venta ya ha sido pagada y confirmada.
         public bool VEN_ESTADO { get; set; }
         public int TIP_CODIGO { get; set; }
+        public bool? VEN_ESANULADA { get; set; }
         public ICollection<DETALLEVENTAS> DETALLEVENTAS { get; set; }
         // Propiedades de navegación (relaciones)
         [ForeignKey("TIC_CODIGO")]

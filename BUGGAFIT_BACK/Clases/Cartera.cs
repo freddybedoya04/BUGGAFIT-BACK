@@ -16,6 +16,7 @@ namespace BUGGAFIT_BACK.Clases
         public bool CAR_ESTADO { get; set; }
         public int TIC_CODIGO { get; set; } // Clave foránea a TipoCuenta
         public string? TIC_NOMBRE { get; set; } // Clave foránea a TipoCuenta
+        public bool? CAR_ESANULADA { get; set; }
 
     }
 }

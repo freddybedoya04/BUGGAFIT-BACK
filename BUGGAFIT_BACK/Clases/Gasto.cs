@@ -18,6 +18,7 @@ namespace BUGGAFIT_BACK.Clases
         public int? VEN_CODIGO { get; set; } // Clave foránea a Ventas
         public string? MOG_NOMBRE { get; set; }
         public string? GAS_OBSERVACIONES { get; set; }
+        public bool? GAS_ESANULADA { get; set; }
 
     }
 }

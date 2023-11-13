@@ -19,7 +19,7 @@ namespace BUGGAFIT_BACK.Modelos
         public bool COM_ESTADO { get; set; }
         public bool COM_CREDITO { get; set; }
         public string USU_CEDULA { get; set; } // Clave foránea a Usuario
-
+        public bool? COM_ESANULADA { get; set; }
         public ICollection<DETALLECOMPRAS>DetalleCompras { get; set; }    
         // Propiedades de navegación (relaciones)
         [ForeignKey("TIC_CODIGO")]

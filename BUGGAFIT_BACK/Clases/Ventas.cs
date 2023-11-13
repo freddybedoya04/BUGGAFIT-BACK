@@ -25,6 +25,7 @@
         public bool VEN_ESTADO { get; set; }
         public int? TIP_CODIGO { get; set; }
         public string? TIP_NOMBRE { get; set; }
+        public bool? VEN_ESANULADA { get; set; }
 
         public ICollection<DetalleVenta>? DetalleVentas { get; set; }
 
