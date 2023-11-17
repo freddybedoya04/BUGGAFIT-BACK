@@ -11,10 +11,12 @@ namespace BUGGAFIT_BACK.Catalogos
     public class CatalogoVentas : ICatalogoVentas
     {
         private readonly MyDBContext myDbContext;
+        private readonly ICatalogoTransacciones catalogoTransacciones;
 
-        public CatalogoVentas(MyDBContext context)
+        public CatalogoVentas(MyDBContext myDbContext, ICatalogoTransacciones catalogoTransacciones)
         {
-            myDbContext = context;
+            this.myDbContext = myDbContext;
+            this.catalogoTransacciones = catalogoTransacciones;
         }
 
         public async Task<ResponseObject> ActualizarVentaAsync(Ventas venta)
@@ -170,10 +172,10 @@ namespace BUGGAFIT_BACK.Catalogos
                     VEN_TIPOPAGO = venta.VEN_TIPOPAGO,
                     TIC_CODIGO = venta.TIC_CODIGO,
                     CLI_ID = venta.CLI_ID,
-                    CLI_DIRECCION=venta.CLI_DIRECCION,
-                    CLI_TIPOCLIENTE=venta.CLI_TIPOCLIENTE,
-                    CLI_NOMBRE=venta.CLI_NOMBRE,
-                    CLI_UBICACION=venta.CLI_UBICACION,
+                    CLI_DIRECCION = venta.CLI_DIRECCION,
+                    CLI_TIPOCLIENTE = venta.CLI_TIPOCLIENTE,
+                    CLI_NOMBRE = venta.CLI_NOMBRE,
+                    CLI_UBICACION = venta.CLI_UBICACION,
                     VEN_PRECIOTOTAL = venta.VEN_PRECIOTOTAL,
                     VEN_ESTADOCREDITO = venta.VEN_ESTADOCREDITO,
                     VEN_ENVIO = venta.VEN_ENVIO,
@@ -183,7 +185,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     USU_CEDULA = venta.USU_CEDULA,
                     VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
                     VEN_ESTADO = venta.VEN_ESTADO,
-                    TIP_CODIGO=(int)venta.TIP_CODIGO
+                    TIP_CODIGO = (int)venta.TIP_CODIGO
                 };
                 myDbContext.VENTAS.Add(_ventas);
                 await myDbContext.SaveChangesAsync();
@@ -200,11 +202,25 @@ namespace BUGGAFIT_BACK.Catalogos
                     //    await CrearEntradaDeCartera(_ventas.VEN_CODIGO, venta);
                     //}
                 }
+                //TODO: Agregar la creacion de la transaccion cuando se realiza la venta
+                //var _tskTransaccion = await catalogoTransacciones.CrearTrasaccionAsync(new()
+                //{
+                //    TIC_CUENTA = venta.,
+                //    TRA_TIPO = transaccion.TRA_TIPO, //TODO: Preguntar donde sacar la cuenta.
+                //    TRA_FECHACREACION = DateTime.Now,
+                //    TRA_CONFIRMADA = transaccion.TRA_CONFIRMADA,
+                //    TRA_ESTADO = transaccion.TRA_ESTADO,
+                //    TRA_FECHACONFIRMACION = DateTime.Now,
+                //    TRA_CODIGOENLACE = transaccion.TRA_CODIGOENLACE,
+                //    TRA_FUEANULADA = transaccion.TRA_FUEANULADA,
+                //    TRA_NUMEROTRANSACCIONBANCO = transaccion.TRA_NUMEROTRANSACCIONBANCO,
+                //    USU_CEDULA_CONFIRMADOR = transaccion.USU_CEDULA_CONFIRMADOR,
+                //});
                 return ResponseClass.Response(statusCode: 201, data: _ventas.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
             }
             catch (Exception ex)
             {
-                return ResponseClass.Response(statusCode: 500, data:ex, message: $"Error al crear venta.");
+                return ResponseClass.Response(statusCode: 500, data: ex, message: $"Error al crear venta.");
             }
         }
 
@@ -213,7 +229,7 @@ namespace BUGGAFIT_BACK.Catalogos
             try
             {
                 Ventas ventas = await myDbContext.VENTAS
-                     .Where(x => x.VEN_CODIGO ==Id
+                     .Where(x => x.VEN_CODIGO == Id
                                  && x.VEN_ESTADO == true)
                      .Select(d => new Ventas
                      {
@@ -240,7 +256,8 @@ namespace BUGGAFIT_BACK.Catalogos
                          TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
                          TIP_CODIGO = d.TIP_CODIGO,
                          TIP_NOMBRE = d.TIPOSENVIOS.TIP_NOMBRE,
-                         DetalleVentas=myDbContext.DETALLEVENTAS.Where(detalle =>detalle.VEN_CODIGO==Id && detalle.VED_ESTADO == true).Select(nuevo=> new DetalleVenta{
+                         DetalleVentas = myDbContext.DETALLEVENTAS.Where(detalle => detalle.VEN_CODIGO == Id && detalle.VED_ESTADO == true).Select(nuevo => new DetalleVenta
+                         {
                              VED_CODIGO = nuevo.VED_CODIGO,
                              VEN_CODIGO = nuevo.VEN_CODIGO,
                              PRO_CODIGO = nuevo.PRO_CODIGO,
@@ -281,36 +298,36 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-               List<Ventas> ventas = await myDbContext.VENTAS
-                    .Where(x => x.VEN_FECHAVENTA >= filtro.FechaInicio.ToLocalTime()
-                                && x.VEN_FECHAVENTA <= filtro.FechaFin.ToLocalTime()
-                                && x.VEN_ESTADO == true)
-                    .Select(d => new Ventas
-                        {
-                            VEN_CODIGO = d.VEN_CODIGO,
-                            VEN_FECHACREACION = d.VEN_FECHACREACION,
-                            VEN_FECHAVENTA = d.VEN_FECHAVENTA,
-                            VEN_TIPOPAGO = d.VEN_TIPOPAGO,
-                            TIC_CODIGO = d.TIC_CODIGO,
-                            CLI_ID = d.CLI_ID,
-                            VEN_PRECIOTOTAL = d.VEN_PRECIOTOTAL,
-                            VEN_ESTADOCREDITO = (bool)d.VEN_ESTADOCREDITO,
-                            VEN_ENVIO = (bool)d.VEN_ENVIO,
-                            VEN_DOMICILIO = (bool)d.VEN_DOMICILIO,
-                            VEN_OBSERVACIONES = d.VEN_OBSERVACIONES,
-                            VEN_ACTUALIZACION = (DateTime)d.VEN_ACTUALIZACION,
-                            USU_CEDULA = d.USU_CEDULA,
-                            USU_NOMBRE=d.USUARIOS.USU_NOMBRE,
-                            VEN_ESTADOVENTA = d.VEN_ESTADOVENTA,
-                            VEN_ESTADO = d.VEN_ESTADO,
-                            CLI_NOMBRE = d.CLI_NOMBRE,
-                            CLI_DIRECCION = d.CLI_DIRECCION,
-                            CLI_TIPOCLIENTE = d.CLI_TIPOCLIENTE,
-                            CLI_UBICACION = d.CLI_UBICACION,
-                            TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
-                            TIP_CODIGO=d.TIP_CODIGO,
-                            TIP_NOMBRE=d.TIPOSENVIOS.TIP_NOMBRE,
-                        }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
+                List<Ventas> ventas = await myDbContext.VENTAS
+                     .Where(x => x.VEN_FECHAVENTA >= filtro.FechaInicio.ToLocalTime()
+                                 && x.VEN_FECHAVENTA <= filtro.FechaFin.ToLocalTime()
+                                 && x.VEN_ESTADO == true)
+                     .Select(d => new Ventas
+                     {
+                         VEN_CODIGO = d.VEN_CODIGO,
+                         VEN_FECHACREACION = d.VEN_FECHACREACION,
+                         VEN_FECHAVENTA = d.VEN_FECHAVENTA,
+                         VEN_TIPOPAGO = d.VEN_TIPOPAGO,
+                         TIC_CODIGO = d.TIC_CODIGO,
+                         CLI_ID = d.CLI_ID,
+                         VEN_PRECIOTOTAL = d.VEN_PRECIOTOTAL,
+                         VEN_ESTADOCREDITO = (bool)d.VEN_ESTADOCREDITO,
+                         VEN_ENVIO = (bool)d.VEN_ENVIO,
+                         VEN_DOMICILIO = (bool)d.VEN_DOMICILIO,
+                         VEN_OBSERVACIONES = d.VEN_OBSERVACIONES,
+                         VEN_ACTUALIZACION = (DateTime)d.VEN_ACTUALIZACION,
+                         USU_CEDULA = d.USU_CEDULA,
+                         USU_NOMBRE = d.USUARIOS.USU_NOMBRE,
+                         VEN_ESTADOVENTA = d.VEN_ESTADOVENTA,
+                         VEN_ESTADO = d.VEN_ESTADO,
+                         CLI_NOMBRE = d.CLI_NOMBRE,
+                         CLI_DIRECCION = d.CLI_DIRECCION,
+                         CLI_TIPOCLIENTE = d.CLI_TIPOCLIENTE,
+                         CLI_UBICACION = d.CLI_UBICACION,
+                         TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
+                         TIP_CODIGO = d.TIP_CODIGO,
+                         TIP_NOMBRE = d.TIPOSENVIOS.TIP_NOMBRE,
+                     }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
             }
@@ -397,7 +414,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                List<DetalleVenta>  Detalle =await myDbContext.DETALLEVENTAS.Where(d => d.VEN_CODIGO == id).Select(x => new DetalleVenta
+                List<DetalleVenta> Detalle = await myDbContext.DETALLEVENTAS.Where(d => d.VEN_CODIGO == id).Select(x => new DetalleVenta
                 {
                     VED_CODIGO = x.VED_CODIGO,
                     VEN_CODIGO = x.VEN_CODIGO,
@@ -424,7 +441,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                List<Cartera> carteras = await myDbContext.CARTERAS.Where(d => d.VEN_CODIGO == id && d.CAR_ESTADO==true).Select(x => new Cartera
+                List<Cartera> carteras = await myDbContext.CARTERAS.Where(d => d.VEN_CODIGO == id && d.CAR_ESTADO == true).Select(x => new Cartera
                 {
                     CAR_CODIGO = x.CAR_CODIGO,
                     VEN_CODIGO = x.VEN_CODIGO,
@@ -432,7 +449,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     CAR_VALORABONADO = x.CAR_VALORABONADO,
                     TIC_CODIGO = x.TIC_CODIGO,
                     TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
-                }).OrderByDescending(x=>x.CAR_CODIGO).ToListAsync();
+                }).OrderByDescending(x => x.CAR_CODIGO).ToListAsync();
 
 
                 return ResponseClass.Response(statusCode: 200, data: carteras);
@@ -443,7 +460,7 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-        public async Task<ResponseObject> CrearAbonoAsync( Cartera cartera)
+        public async Task<ResponseObject> CrearAbonoAsync(Cartera cartera)
         {
             try
             {
@@ -456,12 +473,12 @@ namespace BUGGAFIT_BACK.Catalogos
                     CAR_VALORABONADO = cartera.CAR_VALORABONADO,
                     CAR_ESTADO = true,
                     CAR_MOTIVO = "",
-                    TIC_CODIGO= cartera.TIC_CODIGO,
+                    TIC_CODIGO = cartera.TIC_CODIGO,
                 };
                 myDbContext.CARTERAS.Add(_cartera);
 
                 await myDbContext.SaveChangesAsync();
-                return ResponseClass.Response(statusCode: 200,message:"Abono creado exitosamente");
+                return ResponseClass.Response(statusCode: 200, message: "Abono creado exitosamente");
             }
             catch (Exception ex)
             {
@@ -499,11 +516,36 @@ namespace BUGGAFIT_BACK.Catalogos
                 abono.CAR_FECHACREDITO = cartera.CAR_FECHACREDITO.ToLocalTime();
                 abono.TIC_CODIGO = cartera.TIC_CODIGO;
                 abono.CAR_VALORABONADO = cartera.CAR_VALORABONADO;
-                abono.CAR_FECHAACTUALIZACION=DateTime.Now;
+                abono.CAR_FECHAACTUALIZACION = DateTime.Now;
                 myDbContext.Entry(abono).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Abono Actualizado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> AnluarVentaAsync(int id)
+        {
+            try
+            {
+                var _venta = await myDbContext.VENTAS.FindAsync(id);
+                if (_venta == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La transaccion con el codigo {id} no existe.");
+
+                _venta.VEN_ESANULADA = true;
+                myDbContext.Entry(_venta).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+                await RegresarProductosAlInventario(_venta.VEN_CODIGO);
+
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _venta.VEN_CODIGO.ToString()).FirstOrDefaultAsync();
+                if (_transaccion != null)
+                    await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
+
+                return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente. {(_transaccion == null ? "No habian transacciones asociadas." : "")}");
             }
             catch (Exception)
             {

@@ -10,11 +10,13 @@ namespace BUGGAFIT_BACK.Controllers
     [ApiController]
     public class VentasController : ControllerBase
     {
-        private readonly ICatalogoVentas catalgo;
+        private readonly ICatalogoVentas catalogo;
+        private readonly ICatalogoTransacciones catalogoTransacciones;
 
-        public VentasController(ICatalogoVentas catalgo)
+        public VentasController(ICatalogoVentas catalgo, ICatalogoTransacciones transacciones)
         {
-            this.catalgo = catalgo;
+            this.catalogo = catalgo;
+            this.catalogoTransacciones = transacciones;
         }
 
         #region Metodos API
@@ -24,7 +26,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ListarVentasAsync();
+                var result = await catalogo.ListarVentasAsync();
 
                 if (result.StatusCode == 204)
                     return NoContent();
@@ -43,7 +45,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ListarVentaPorIDAsync(id);
+                var result = await catalogo.ListarVentaPorIDAsync(id);
 
                 if (result.StatusCode == 204)
                     return NoContent();
@@ -62,7 +64,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalgo.CrearVentaAsync(ventas));
+                return Ok(await catalogo.CrearVentaAsync(ventas));
             }
             catch (Exception ex)
             {
@@ -75,7 +77,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalgo.ListarVentasPorFechaAsync(filtro));
+                return Ok(await catalogo.ListarVentasPorFechaAsync(filtro));
             }
             catch (Exception ex)
             {
@@ -88,7 +90,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalgo.CrearDetalleVentaAsync(detallesVentas));
+                return Ok(await catalogo.CrearDetalleVentaAsync(detallesVentas));
             }
             catch (Exception ex)
             {
@@ -104,7 +106,7 @@ namespace BUGGAFIT_BACK.Controllers
                 return BadRequest(ResponseClass.Response(statusCode: 400, message: "El id no coincide."));
             try
             {
-                var result = await catalgo.ActualizarVentaAsync(ventas);
+                var result = await catalogo.ActualizarVentaAsync(ventas);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -120,7 +122,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ActualizarEstadoVentaAsync(id);
+                var result = await catalogo.ActualizarEstadoVentaAsync(id);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -136,7 +138,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.FinalizarCreditoAsync(id);
+                var result = await catalogo.FinalizarCreditoAsync(id);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -152,7 +154,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalgo.ListarDetallePorCodigoVentaAsync(id));
+                return Ok(await catalogo.ListarDetallePorCodigoVentaAsync(id));
             }
             catch (Exception ex)
             {
@@ -165,7 +167,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalgo.ListarAbonosPorCodigoVentaAsync(id));
+                return Ok(await catalogo.ListarAbonosPorCodigoVentaAsync(id));
             }
             catch (Exception ex)
             {
@@ -178,7 +180,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalgo.CrearAbonoAsync(cartera));
+                return Ok(await catalogo.CrearAbonoAsync(cartera));
             }
             catch (Exception ex)
             {
@@ -190,7 +192,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.BorrarAbonoAsync(id);
+                var result = await catalogo.BorrarAbonoAsync(id);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -207,7 +209,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.ActualizarAbonoAsync(cartera);
+                var result = await catalogo.ActualizarAbonoAsync(cartera);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -224,7 +226,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                var result = await catalgo.BorrarVentaAsync(id);
+                var result = await catalogo.BorrarVentaAsync(id);
                 if (result.StatusCode == 400)
                     return NotFound(result);
 
@@ -234,7 +236,19 @@ namespace BUGGAFIT_BACK.Controllers
             {
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
-        } 
+        }
+        [HttpPut("AnularVenta/{id}")]
+        public async Task<ActionResult<ResponseObject>> AnularVenta(int id)
+        {
+            try
+            {
+                return Ok(await catalogo.AnluarVentaAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
         #endregion
 
     }
