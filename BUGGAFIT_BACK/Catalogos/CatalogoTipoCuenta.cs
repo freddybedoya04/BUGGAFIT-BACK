@@ -20,13 +20,14 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             ArgumentNullException.ThrowIfNull(tipoCuenta.TIC_CODIGO, nameof(tipoCuenta));
             try
-            {
-                TIPOSCUENTAS _tipoCuenta = new()
-                {
-                    TIC_NOMBRE = tipoCuenta.TIC_NOMBRE,
-                    TIC_NUMEROREFERENCIA = tipoCuenta.TIC_NUMEROREFERENCIA,
-                    TIC_ESTADO = tipoCuenta.TIC_ESTADO,
-                };
+            {   
+
+                TIPOSCUENTAS _tipoCuenta = myDbContext.TIPOSCUENTAS.Where(x=>x.TIC_CODIGO==tipoCuenta.TIC_CODIGO).FirstOrDefault();
+
+                _tipoCuenta.TIC_NOMBRE = tipoCuenta.TIC_NOMBRE;
+                _tipoCuenta.TIC_NUMEROREFERENCIA = tipoCuenta.TIC_NUMEROREFERENCIA;
+                _tipoCuenta.TIC_ESTADO = tipoCuenta.TIC_ESTADO;
+                _tipoCuenta.TIC_DINEROTOTAL = tipoCuenta.TIC_DINEROTOTAL;
                 myDbContext.Entry(_tipoCuenta).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
             }
@@ -89,6 +90,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     TIC_NOMBRE = tipoCuenta.TIC_NOMBRE,
                     TIC_NUMEROREFERENCIA = tipoCuenta.TIC_NUMEROREFERENCIA,
                     TIC_ESTADO =true,
+                    TIC_DINEROTOTAL = tipoCuenta.TIC_DINEROTOTAL,
                     TIC_FECHACREACION = DateTime.Now,
                 };
                 myDbContext.TIPOSCUENTAS.Add(_tipoCuentas);
