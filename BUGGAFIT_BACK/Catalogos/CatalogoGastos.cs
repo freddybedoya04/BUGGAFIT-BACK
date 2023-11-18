@@ -94,6 +94,11 @@ namespace BUGGAFIT_BACK.Catalogos
             try
             {
                 int ven_codigo = myDbContext.VENTAS.First().VEN_CODIGO;
+                bool pendiente = true;
+                if (myDbContext.TIPOSCUENTAS.Where(x=>x.TIC_CODIGO==gasto.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
+                {
+                   pendiente = false;
+                }
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
@@ -104,7 +109,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     TIC_CODIGO = gasto.TIC_CODIGO,
                     GAS_ESTADO = true,
                     USU_CEDULA = gasto.USU_CEDULA,
-                    GAS_PENDIENTE = gasto.GAS_PENDIENTE,
+                    GAS_PENDIENTE = pendiente,
                     GAS_OBSERVACIONES=gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = ven_codigo,
                 };

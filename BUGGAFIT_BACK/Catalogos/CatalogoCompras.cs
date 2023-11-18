@@ -3,6 +3,7 @@ using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.ConexionBD; // Asegúrate de agregar esta línea
 using BUGGAFIT_BACK.Modelos.Entidad;
 using BUGGAFIT_BACK.Modelos;
+using Microsoft.EntityFrameworkCore;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -102,10 +103,14 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 using (var db = dbContext)
                 {
-                    COMPRAS compras= new COMPRAS(); 
-                    
-                        //compras.COM_CODIGO = nuevaCompra.COM_CODIGO;
-                        compras.COM_FECHACREACION = DateTime.Now;
+                    COMPRAS compras= new COMPRAS();
+                    bool pendiente = true;
+                    if (db.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == nuevaCompra.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
+                    {
+                        pendiente = false;
+                    }
+                    //compras.COM_CODIGO = nuevaCompra.COM_CODIGO;
+                    compras.COM_FECHACREACION = DateTime.Now;
                         compras.COM_FECHACOMPRA = nuevaCompra.COM_FECHACOMPRA.ToLocalTime();
                         compras.COM_VALORCOMPRA = nuevaCompra.COM_VALORCOMPRA;
                         compras.COM_PROVEEDOR = nuevaCompra.COM_PROVEEDOR;
@@ -113,7 +118,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         compras.COM_FECHAACTUALIZACION = DateTime.Now;
                         compras.COM_ENBODEGA = nuevaCompra.COM_ENBODEGA;
                         compras.COM_ESTADO = true;
-                        compras.COM_CREDITO = nuevaCompra.COM_CREDITO;
+                        compras.COM_CREDITO = pendiente;
                         compras.USU_CEDULA = nuevaCompra.USU_CEDULA;
                         
                     db.COMPRAS.Add(compras);
@@ -161,7 +166,6 @@ namespace BUGGAFIT_BACK.Catalogos
                 using (var db = dbContext)
                 {
                     COMPRAS CompraAnterior = db.COMPRAS.Where(x => x.COM_CODIGO == nuevaCompra.COM_CODIGO).FirstOrDefault();
-
                     //compras.COM_CODIGO = nuevaCompra.COM_CODIGO;
                     CompraAnterior.COM_FECHACOMPRA = nuevaCompra.COM_FECHACOMPRA.ToLocalTime();
                     CompraAnterior.COM_VALORCOMPRA = nuevaCompra.COM_VALORCOMPRA;
@@ -170,7 +174,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     CompraAnterior.COM_FECHAACTUALIZACION = DateTime.Now;
                     CompraAnterior.COM_ENBODEGA = nuevaCompra.COM_ENBODEGA;
                     CompraAnterior.COM_ESTADO = nuevaCompra.COM_ESTADO;
-                    CompraAnterior.COM_CREDITO = nuevaCompra.COM_CREDITO;
+                    CompraAnterior.COM_CREDITO = CompraAnterior.COM_CREDITO;//no se actualiza
                     CompraAnterior.USU_CEDULA = nuevaCompra.USU_CEDULA;
                     db.SaveChanges();
 
