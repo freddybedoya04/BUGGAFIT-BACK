@@ -13,6 +13,7 @@
         public bool TRA_FUEANULADA { get; set; }
         public int? TRA_NUMEROTRANSACCIONBANCO { get; set; }
         public string? USU_CEDULA_CONFIRMADOR { get; set; }
+        public float? TRA_VALOR { get; set; }
     }
 
     public enum TiposTransacciones
