@@ -160,7 +160,7 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 _transaccion.TRA_ESTADO = false;
                 myDbContext.Entry(_transaccion).State = EntityState.Modified;
-                await RetornarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
+                //await RetornarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0); si no esta confirmada no debe realizar movimientos de dinero
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Transaccion Eliminada Exitosamente.");

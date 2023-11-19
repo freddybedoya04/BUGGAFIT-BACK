@@ -1,6 +1,7 @@
 ﻿using BUGGAFIT_BACK.Catalogos;
 using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.DTOs;
+using BUGGAFIT_BACK.DTOs.Response;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -104,6 +105,19 @@ namespace BUGGAFIT_BACK.Controllers
             {
 
                 throw ex;
+            }
+        }
+        [HttpPut("AnularCompra/{id}")]
+        public async Task<ActionResult<ResponseObject>> AnularCompra(int id)
+        {
+            try
+            {
+                catalogoCompras.AnularCompra(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
     }

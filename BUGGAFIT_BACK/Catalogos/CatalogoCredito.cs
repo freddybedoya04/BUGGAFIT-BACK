@@ -41,6 +41,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         CAR_VALORABONADO = x.CAR_VALORABONADO,
                         TIC_CODIGO = x.TIC_CODIGO,
                         TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
+                        CAR_ESTADOCREDITO=x.CAR_ESTADOCREDITO,
+                        CAR_ESANULADA=x.CAR_ESANULADA
                     }).OrderByDescending(x => x.CAR_CODIGO).ToListAsync();
 
                     //creamos el creditos 
@@ -82,6 +84,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         CAR_VALORABONADO = x.CAR_VALORABONADO,
                         TIC_CODIGO = x.TIC_CODIGO,
                         TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
+                        CAR_ESANULADA=x.CAR_ESANULADA,
+                        CAR_ESTADOCREDITO=x.CAR_ESTADOCREDITO,
                     }).OrderByDescending(x => x.CAR_CODIGO).ToListAsync();
 
                     //creamos el creditos 

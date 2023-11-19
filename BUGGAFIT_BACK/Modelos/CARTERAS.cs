@@ -20,6 +20,7 @@ namespace BUGGAFIT_BACK.Modelos
         public bool CAR_ESTADO { get; set; }
         public int TIC_CODIGO { get; set; } // Clave foránea a TipoCuenta
         public bool? CAR_ESANULADA { get; set; }
+        public string? USU_CEDULA { get; set; }
         // Propiedades de navegación (relaciones)
         [ForeignKey("VEN_CODIGO")]
         public VENTAS VENTA { get; set; } // Relación con Ventas

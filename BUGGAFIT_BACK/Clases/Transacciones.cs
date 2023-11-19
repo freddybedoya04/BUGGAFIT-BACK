@@ -30,8 +30,8 @@
         public static TiposTransacciones ABONO { get { return new TiposTransacciones("ABONO", false); } }
         public static TiposTransacciones TRANSFERENCIA { get { return new TiposTransacciones("TRANSFERENCIA", false); } }
         public static TiposTransacciones DEVOLUCION_VENTA { get { return new TiposTransacciones("DEVOLUCION_VENTA", true); } }
-        public static TiposTransacciones DEVOLUCION_COMPRA { get { return new TiposTransacciones("DEVOLUCION_COMPRA", false); } }
-        public static TiposTransacciones DEVOLUCION_GASTO { get { return new TiposTransacciones("DEVOLUCION_GASTO", false); } }
+        public static TiposTransacciones DEVOLUCION_COMPRA { get { return new TiposTransacciones("DEVOLUCION_COMPRA", true); } }
+        public static TiposTransacciones DEVOLUCION_GASTO { get { return new TiposTransacciones("DEVOLUCION_GASTO", true); } }
         public static TiposTransacciones DEVOLUCION_ABONO { get { return new TiposTransacciones("DEVOLUCION_ABONO", true); } }
         public static TiposTransacciones DEVOLUCION_TRANSFERENCIA { get { return new TiposTransacciones("DEVOLUCION_TRANSFERENCIA", true); } }
         public static TiposTransacciones GetTipoTransaccion(string tipoTransaccion)

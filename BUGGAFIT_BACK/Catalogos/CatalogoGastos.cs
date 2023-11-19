@@ -78,7 +78,30 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> AnularGastoAsync(int id)
+        {
+            try
+            {
+                var _gasto = await myDbContext.GASTOS.FindAsync(id);
+                if (_gasto == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La transaccion con el codigo {id} no existe.");
 
+                _gasto.GAS_ESANULADA = true;
+                myDbContext.Entry(_gasto).State = EntityState.Modified;
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _gasto.GAS_CODIGO.ToString()).FirstOrDefaultAsync();
+                if (_transaccion != null)
+                {
+                    await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
+                }
+
+                await myDbContext.SaveChangesAsync();
+                return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente. {(_transaccion == null ? "No habian transacciones asociadas." : "")}");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         public async Task<ResponseObject> RemoverGastoAsync(int id)
         {
             try
@@ -304,7 +327,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         VEN_CODIGO = x.VEN_CODIGO,
                         USU_NOMBRE = x.Usuarios.USU_NOMBRE,
                         TIC_NOMBRE = x.TipoCuentas.TIC_NOMBRE,
-                        MOG_NOMBRE = x.MOTIVOSGASTOS.MOG_NOMBRE
+                        MOG_NOMBRE = x.MOTIVOSGASTOS.MOG_NOMBRE,
+                        GAS_ESANULADA=x.GAS_ESANULADA
                     })
                     .OrderByDescending(x => x.GAS_FECHAGASTO)
                     .ToListAsync();

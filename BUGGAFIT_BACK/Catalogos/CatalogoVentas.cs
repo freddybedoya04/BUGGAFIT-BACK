@@ -342,6 +342,7 @@ namespace BUGGAFIT_BACK.Catalogos
                          TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
                          TIP_CODIGO = d.TIP_CODIGO,
                          TIP_NOMBRE = d.TIPOSENVIOS.TIP_NOMBRE,
+                         VEN_ESANULADA=d.VEN_ESANULADA
                      }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
@@ -490,6 +491,8 @@ namespace BUGGAFIT_BACK.Catalogos
                     CAR_VALORABONADO = x.CAR_VALORABONADO,
                     TIC_CODIGO = x.TIC_CODIGO,
                     TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
+                    CAR_ESTADOCREDITO=x.CAR_ESTADOCREDITO,
+                    CAR_ESANULADA=x.CAR_ESANULADA
                 }).OrderByDescending(x => x.CAR_CODIGO).ToListAsync();
 
 
@@ -504,6 +507,12 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
+
+                bool esEfectivo = false;
+                if (myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == cartera.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
+                {
+                    esEfectivo = true;
+                }
                 CARTERAS _cartera = new()
                 {
                     CAR_FECHACREACION = DateTime.Now,
@@ -513,11 +522,14 @@ namespace BUGGAFIT_BACK.Catalogos
                     CAR_VALORABONADO = cartera.CAR_VALORABONADO,
                     CAR_ESTADO = true,
                     CAR_MOTIVO = "",
+                    CAR_ESTADOCREDITO=Convert.ToInt32(esEfectivo),
                     TIC_CODIGO = cartera.TIC_CODIGO,
+                    USU_CEDULA=cartera.USU_CEDULA,
                 };
-                myDbContext.CARTERAS.Add(_cartera);
+                await myDbContext.CARTERAS.AddAsync(_cartera);
+                await myDbContext.SaveChangesAsync();
 
-                bool esEfectivo = _cartera.TIPOSCUENTAS.TIC_NOMBRE.ToLower().Contains("efectivo");
+          
                 var tipoTransaccion = TiposTransacciones.ABONO;
                 await catalogoTransacciones.CrearTrasaccionAsync(new()
                 {
@@ -531,7 +543,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     TRA_CODIGOENLACE = _cartera.CAR_CODIGO.ToString(),
                     TRA_FUEANULADA = false,
                     TRA_NUMEROTRANSACCIONBANCO = 0,
-                    USU_CEDULA_CONFIRMADOR = esEfectivo ? "xxxx" : null, //TODO: no se que cedula ponerle.
+                    USU_CEDULA_CONFIRMADOR = esEfectivo ? _cartera.USU_CEDULA : null, //TODO: no se que cedula ponerle.
                     TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_cartera.CAR_VALORABONADO) : _cartera.CAR_VALORABONADO
                 });
 

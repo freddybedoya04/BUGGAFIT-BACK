@@ -171,6 +171,19 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+
+        [HttpPut("AnularGasto/{id}")]
+        public async Task<ActionResult<ResponseObject>> AnularGasto(int id)
+        {
+            try
+            {
+                return Ok(await catalogo.AnularGastoAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
         #endregion
     }
 }

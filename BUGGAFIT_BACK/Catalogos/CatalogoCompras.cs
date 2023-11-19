@@ -47,6 +47,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         COM_ESTADO = x.COM_ESTADO,
                         COM_CREDITO = x.COM_CREDITO,
                         USU_CEDULA = x.USU_CEDULA,
+                        COM_ESANULADA=x.COM_ESANULADA,
                         DetalleCompras = db.DETALLECOMPRAS.Where(d => d.COM_CODIGO == x.COM_CODIGO && d.DEC_ESTADO == true).Select(d => new DetalleCompra
                         {
                             COM_CODIGO = d.COM_CODIGO,
@@ -157,8 +158,6 @@ namespace BUGGAFIT_BACK.Catalogos
                         }
                     }
 
-                    if (!compras.COM_CREDITO)
-                    {
                         var tipoTransaccion = TiposTransacciones.COMPRA;
 
                         catalogoTransacciones.CrearTrasaccionAsync(new()
@@ -176,8 +175,7 @@ namespace BUGGAFIT_BACK.Catalogos
                             USU_CEDULA_CONFIRMADOR = pendiente ? null : compras.USU_CEDULA,
                             TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(compras.COM_VALORCOMPRA) : compras.COM_VALORCOMPRA,
                         }).Wait();
-                    }
-
+                    
                     db.SaveChanges();
                 }
             }
