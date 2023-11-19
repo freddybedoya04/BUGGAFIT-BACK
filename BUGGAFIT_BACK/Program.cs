@@ -37,6 +37,7 @@ builder.Services.AddScoped<ICatalogoTiposEnvios, CatalogoTiposEnvios>();
 builder.Services.AddScoped<ICatalogoDashboard, CatalogoDashboard>();
 builder.Services.AddScoped<ICatalogoCredito, CatalogoCredito>();
 builder.Services.AddScoped<ICatalogoTransacciones, CatalogoTransacciones>();
+
 #endregion
 
 #region Configuracion de Json Web Tokens
