@@ -19,7 +19,6 @@ namespace BUGGAFIT_BACK.Modelos
         public int? TRA_NUMEROTRANSACCIONBANCO { get; set; }
         public string? USU_CEDULA_CONFIRMADOR { get; set; }
         public float? TRA_VALOR { get; set; }
-        public string? USU_CEDULA_CONFIRMADOR { get; set; }
         public int TIC_CODIGO { get; set; }
 
 

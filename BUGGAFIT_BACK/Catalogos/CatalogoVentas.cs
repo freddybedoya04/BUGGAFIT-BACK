@@ -65,7 +65,6 @@ namespace BUGGAFIT_BACK.Catalogos
             }
             catch (Exception)
             {
-                return ResponseClass.Response(statusCode: 400, message: $"Error al actualizar el estado de la venta");
                 throw;
             }
 
@@ -84,7 +83,6 @@ namespace BUGGAFIT_BACK.Catalogos
             }
             catch (Exception)
             {
-                return ResponseClass.Response(statusCode: 400, message: $"Error al actualizar el estado de la venta");
                 throw;
             }
 
@@ -102,7 +100,8 @@ namespace BUGGAFIT_BACK.Catalogos
                 venta.VEN_ESTADO = false;
                 myDbContext.Entry(venta).State = EntityState.Modified;
                 await RegresarProductosAlInventario(venta.VEN_CODIGO);
-                await catalogoTransacciones.BorrarTrasaccionAsync(venta.VEN_CODIGO);
+                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(venta.VEN_CODIGO.ToString());
+
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Venta Eliminada Exitosamente.");
@@ -209,11 +208,12 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 if (!venta.VEN_ESTADOCREDITO)
                 {
+                    var tipoTransaccion = TiposTransacciones.VENTA;
                     await catalogoTransacciones.CrearTrasaccionAsync(new()
                     {
                         TIC_CUENTA = _venta.TIC_CODIGO,
                         TIC_CODIGO = _venta.TIC_CODIGO,
-                        TRA_TIPO = TiposTransacciones.VENTA.Valor,
+                        TRA_TIPO = tipoTransaccion.Valor,
                         TRA_FECHACREACION = DateTime.Now,
                         TRA_CONFIRMADA = _venta.VEN_ESTADOVENTA,
                         TRA_ESTADO = true,
@@ -222,13 +222,14 @@ namespace BUGGAFIT_BACK.Catalogos
                         TRA_FUEANULADA = false,
                         TRA_NUMEROTRANSACCIONBANCO = 0,
                         USU_CEDULA_CONFIRMADOR = _venta.VEN_ESTADOVENTA ? _venta.USU_CEDULA : null,
+                        TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_venta.VEN_PRECIOTOTAL) : _venta.VEN_PRECIOTOTAL,
                     });
                 }
                 return ResponseClass.Response(statusCode: 201, data: _venta.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
             }
             catch (Exception ex)
             {
-                return ResponseClass.Response(statusCode: 500, data: ex, message: $"Error al crear venta.");
+                throw;
             }
         }
 
@@ -485,12 +486,31 @@ namespace BUGGAFIT_BACK.Catalogos
                 };
                 myDbContext.CARTERAS.Add(_cartera);
 
+                bool esEfectivo = _cartera.TIPOSCUENTAS.TIC_NOMBRE.ToLower().Contains("efectivo");
+                var tipoTransaccion = TiposTransacciones.ABONO;
+                await catalogoTransacciones.CrearTrasaccionAsync(new()
+                {
+                    TIC_CUENTA = _cartera.TIC_CODIGO,
+                    TIC_CODIGO = _cartera.TIC_CODIGO,
+                    TRA_TIPO = tipoTransaccion.Valor,
+                    TRA_FECHACREACION = DateTime.Now,
+                    TRA_CONFIRMADA = esEfectivo,
+                    TRA_ESTADO = true,
+                    TRA_FECHACONFIRMACION = esEfectivo ? DateTime.Now : null,
+                    TRA_CODIGOENLACE = _cartera.CAR_CODIGO.ToString(),
+                    TRA_FUEANULADA = false,
+                    TRA_NUMEROTRANSACCIONBANCO = 0,
+                    USU_CEDULA_CONFIRMADOR = esEfectivo ? "xxxx" : null, //TODO: no se que cedula ponerle.
+                    TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_cartera.CAR_VALORABONADO) : _cartera.CAR_VALORABONADO
+                });
+
                 await myDbContext.SaveChangesAsync();
                 return ResponseClass.Response(statusCode: 200, message: "Abono creado exitosamente");
+
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
         public async Task<ResponseObject> BorrarAbonoAsync(int car_codigo)
@@ -500,9 +520,9 @@ namespace BUGGAFIT_BACK.Catalogos
                 var abono = await myDbContext.CARTERAS.FindAsync(car_codigo);
                 if (abono == null)
                     return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {car_codigo} no existe.");
-
                 abono.CAR_ESTADO = false;
                 myDbContext.Entry(abono).State = EntityState.Modified;
+                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(abono.CAR_CODIGO.ToString());
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Abono Eliminado Exitosamente.");
@@ -546,7 +566,6 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 _venta.VEN_ESANULADA = true;
                 myDbContext.Entry(_venta).State = EntityState.Modified;
-                await myDbContext.SaveChangesAsync();
                 await RegresarProductosAlInventario(_venta.VEN_CODIGO);
 
                 var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _venta.VEN_CODIGO.ToString()).FirstOrDefaultAsync();
@@ -555,6 +574,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
                 }
 
+                await myDbContext.SaveChangesAsync();
                 return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente. {(_transaccion == null ? "No habian transacciones asociadas." : "")}");
             }
             catch (Exception)

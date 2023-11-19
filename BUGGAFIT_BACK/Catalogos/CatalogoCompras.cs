@@ -10,10 +10,13 @@ namespace BUGGAFIT_BACK.Catalogos
     public class CatalogoCompras : ICatalogoCompras
     {
         private MyDBContext dbContext;
+        private readonly ICatalogoTransacciones catalogoTransacciones;
 
-        public CatalogoCompras(MyDBContext Context)
+
+        public CatalogoCompras(MyDBContext Context, ICatalogoTransacciones catalogoTransacciones)
         {
             dbContext = Context;
+            this.catalogoTransacciones = catalogoTransacciones;
         }
 
         List<Compra> ICatalogoCompras.ListarComprasPorFecha(FiltrosDTO filtro)
@@ -147,6 +150,28 @@ namespace BUGGAFIT_BACK.Catalogos
                             producto.PRO_ACTUALIZACION = DateTime.Now;
                         }
                     }
+                    //TODO: revisar las condicionales para la creacion de la transaccion
+                    if (true)
+                    {
+                        var tipoTransaccion = TiposTransacciones.COMPRA;
+
+                        catalogoTransacciones.CrearTrasaccionAsync(new()
+                        {
+                            TIC_CUENTA = compras.TIC_CODIGO,
+                            TIC_CODIGO = compras.TIC_CODIGO,
+                            TRA_TIPO = tipoTransaccion.Valor,
+                            TRA_FECHACREACION = DateTime.Now,
+                            TRA_CONFIRMADA = !pendiente,
+                            TRA_ESTADO = true,
+                            TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
+                            TRA_CODIGOENLACE = compras.COM_CODIGO.ToString(),
+                            TRA_FUEANULADA = false,
+                            TRA_NUMEROTRANSACCIONBANCO = 0,
+                            USU_CEDULA_CONFIRMADOR = pendiente ? null : compras.USU_CEDULA,
+                            TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(compras.COM_VALORCOMPRA) : compras.COM_VALORCOMPRA,
+                        }).Wait();
+                    }
+
                     db.SaveChanges();
                 }
             }
@@ -261,6 +286,7 @@ namespace BUGGAFIT_BACK.Catalogos
                             producto.PRO_ACTUALIZACION = DateTime.Now;
                         }
                     }
+                    catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(com_codigo.ToString()).Wait();
                     db.SaveChanges();
                 }
             }

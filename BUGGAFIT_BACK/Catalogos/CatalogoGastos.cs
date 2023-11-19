@@ -62,6 +62,8 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 _gasto.GAS_ESTADO = false;
                 myDbContext.Entry(_gasto).State = EntityState.Modified;
+                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(_gasto.GAS_CODIGO.ToString());
+
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Gasto Eliminado Exitosamente.");
@@ -121,19 +123,21 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 if (!_gasto.TipoCuentas.TIC_NOMBRE.ToLower().Contains("credito"))
                 {
-                    var _tskTransaccion = await catalogoTransacciones.CrearTrasaccionAsync(new()
+                    var tipoTransaccion = TiposTransacciones.GASTO;
+                    await catalogoTransacciones.CrearTrasaccionAsync(new()
                     {
                         TIC_CUENTA = _gasto.TIC_CODIGO,
                         TIC_CODIGO = _gasto.TIC_CODIGO,
-                        TRA_TIPO = TiposTransacciones.GASTO.Valor,
+                        TRA_TIPO = tipoTransaccion.Valor,
                         TRA_FECHACREACION = DateTime.Now,
                         TRA_CONFIRMADA = !pendiente,
                         TRA_ESTADO = true,
                         TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
-                        TRA_CODIGOENLACE = _gasto.VEN_CODIGO.ToString(),
+                        TRA_CODIGOENLACE = _gasto.GAS_CODIGO.ToString(),
                         TRA_FUEANULADA = false,
                         TRA_NUMEROTRANSACCIONBANCO = 0,
                         USU_CEDULA_CONFIRMADOR = pendiente ? null : _gasto.USU_CEDULA,
+                        TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_gasto.GAS_VALOR) : gasto.GAS_VALOR,
                     });
                 }
 
@@ -175,19 +179,21 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 if (!_gasto.TipoCuentas.TIC_NOMBRE.ToLower().Contains("credito"))
                 {
-                    var _tskTransaccion = await catalogoTransacciones.CrearTrasaccionAsync(new()
+                    var tipoTransaccion = TiposTransacciones.GASTO;
+                    await catalogoTransacciones.CrearTrasaccionAsync(new()
                     {
                         TIC_CUENTA = _gasto.TIC_CODIGO,
                         TIC_CODIGO = _gasto.TIC_CODIGO,
-                        TRA_TIPO = TiposTransacciones.GASTO.Valor,
+                        TRA_TIPO = tipoTransaccion.Valor,
                         TRA_FECHACREACION = DateTime.Now,
                         TRA_CONFIRMADA = !pendiente,
                         TRA_ESTADO = true,
                         TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
-                        TRA_CODIGOENLACE = _gasto.VEN_CODIGO.ToString(),
+                        TRA_CODIGOENLACE = _gasto.GAS_CODIGO.ToString(),
                         TRA_FUEANULADA = false,
                         TRA_NUMEROTRANSACCIONBANCO = 0,
                         USU_CEDULA_CONFIRMADOR = pendiente ? null : _gasto.USU_CEDULA,
+                        TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_gasto.GAS_VALOR) : gasto.GAS_VALOR,
                     });
                 }
 

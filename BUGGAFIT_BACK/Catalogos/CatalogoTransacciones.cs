@@ -24,17 +24,17 @@ namespace BUGGAFIT_BACK.Catalogos
                 TRANSACCIONES _transaccion = new()
                 {
                     TIC_CODIGO = transaccion.TIC_CODIGO,
-                    TRA_CODIGO = transaccion.TRA_CODIGO,
                     TIC_CUENTA = transaccion.TIC_CUENTA,
                     TRA_TIPO = transaccion.TRA_TIPO,
                     TRA_FECHACREACION = DateTime.Now,
-                    TRA_CONFIRMADA = transaccion.TRA_CONFIRMADA,
-                    TRA_ESTADO = transaccion.TRA_ESTADO,
-                    TRA_FECHACONFIRMACION = DateTime.Now,
-                    TRA_CODIGOENLACE = transaccion.TRA_CODIGOENLACE,
-                    TRA_FUEANULADA = transaccion.TRA_FUEANULADA,
+                    //TRA_CONFIRMADA = transaccion.TRA_CONFIRMADA,
+                    //TRA_ESTADO = transaccion.TRA_ESTADO,
+                    //TRA_FECHACONFIRMACION = DateTime.Now,
+                    //TRA_CODIGOENLACE = transaccion.TRA_CODIGOENLACE,
+                    //TRA_FUEANULADA = transaccion.TRA_FUEANULADA,
                     TRA_NUMEROTRANSACCIONBANCO = transaccion.TRA_NUMEROTRANSACCIONBANCO,
                     USU_CEDULA_CONFIRMADOR = transaccion.USU_CEDULA_CONFIRMADOR,
+                    //TRA_VALOR = transaccion.TRA_VALOR
                 };
                 myDbContext.Entry(_transaccion).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
@@ -57,10 +57,64 @@ namespace BUGGAFIT_BACK.Catalogos
                 var _transaccion = await myDbContext.TRANSACCIONES.FindAsync(Id) ?? throw new Exception($"La transaccion con el codigo {Id} no existe.");
                 _transaccion.TRA_FUEANULADA = true;
                 myDbContext.Entry(_transaccion).State = EntityState.Modified;
+
+                var tipoTransaccion = TiposTransacciones.GetTipoDevolucion(_transaccion.TRA_TIPO);
+                await CrearTrasaccionAsync(new()
+                {
+                    TIC_CUENTA = _transaccion.TIC_CODIGO,
+                    TIC_CODIGO = _transaccion.TIC_CODIGO,
+                    TRA_TIPO = tipoTransaccion.Valor,
+                    TRA_FECHACREACION = DateTime.Now,
+                    TRA_CONFIRMADA = true,
+                    TRA_ESTADO = true,
+                    TRA_FECHACONFIRMACION = DateTime.Now,
+                    TRA_CODIGOENLACE = _transaccion.TRA_CODIGO.ToString(),
+                    TRA_FUEANULADA = false,
+                    TRA_NUMEROTRANSACCIONBANCO = 0,
+                    USU_CEDULA_CONFIRMADOR = _transaccion.USU_CEDULA_CONFIRMADOR,
+                    TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_transaccion.TRA_VALOR) : _transaccion.TRA_VALOR,
+                });
+
+                await myDbContext.SaveChangesAsync();
+                return ResponseClass.Response(statusCode: 204, message: $"Transaccion Anulada Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<ResponseObject> AnularTrasaccionesPorIdEnlaceAsync(string idEnlace)
+        {
+            try
+            {
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace).FirstOrDefaultAsync()
+                    ?? throw new NullReferenceException($"La transaccion con el codigo de enlace {idEnlace} no existe.");
+                _transaccion.TRA_FUEANULADA = false;
+                myDbContext.Entry(_transaccion).State = EntityState.Modified;
+
+                var tipoTransaccion = TiposTransacciones.GetTipoDevolucion(_transaccion.TRA_TIPO);
+                await CrearTrasaccionAsync(new()
+                {
+                    TIC_CUENTA = _transaccion.TIC_CODIGO,
+                    TIC_CODIGO = _transaccion.TIC_CODIGO,
+                    TRA_TIPO = tipoTransaccion.Valor,
+                    TRA_FECHACREACION = DateTime.Now,
+                    TRA_CONFIRMADA = true,
+                    TRA_ESTADO = true,
+                    TRA_FECHACONFIRMACION = DateTime.Now,
+                    TRA_CODIGOENLACE = _transaccion.TRA_CODIGO.ToString(),
+                    TRA_FUEANULADA = false,
+                    TRA_NUMEROTRANSACCIONBANCO = 0,
+                    USU_CEDULA_CONFIRMADOR = _transaccion.USU_CEDULA_CONFIRMADOR,
+                    TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_transaccion.TRA_VALOR) : _transaccion.TRA_VALOR,
+                });
                 await myDbContext.SaveChangesAsync();
 
-                await RetornarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: 0); //TODO:
-                return ResponseClass.Response(statusCode: 204, message: $"Transaccion Eliminada Exitosamente.");
+                return ResponseClass.Response(statusCode: 204, message: $"Transaccion Anulada Exitosamente.");
+            }
+            catch (NullReferenceException ex)
+            {
+                return ResponseClass.Response(statusCode: 500, message: ex.Message);
             }
             catch (Exception)
             {
@@ -73,8 +127,12 @@ namespace BUGGAFIT_BACK.Catalogos
             try
             {
                 var _transaccion = await myDbContext.TRANSACCIONES.FindAsync(Id) ?? throw new Exception($"La transaccion con el codigo {Id} no existe.");
+                if (_transaccion.TRA_CONFIRMADA == true)
+                    throw new Exception($"La transaccion con el codigo {Id} no se puede eliminar. Transaccion Confirmada.");
+
                 _transaccion.TRA_ESTADO = false;
                 myDbContext.Entry(_transaccion).State = EntityState.Modified;
+                await RetornarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Transaccion Eliminada Exitosamente.");
@@ -89,31 +147,22 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace).FirstOrDefaultAsync() ?? throw new Exception($"La transaccion con el codigo {idEnlace} no existe.");
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace).FirstOrDefaultAsync()
+                    ?? throw new NullReferenceException($"La transaccion con el codigo de enlace {idEnlace} no existe.");
                 if (_transaccion.TRA_CONFIRMADA == true)
                     throw new Exception($"La transaccion con el codigo {idEnlace} no se puede eliminar. Transaccion Confirmada.");
 
                 _transaccion.TRA_ESTADO = false;
                 myDbContext.Entry(_transaccion).State = EntityState.Modified;
+                await RetornarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Transaccion Eliminada Exitosamente.");
             }
-            catch (Exception)
+            catch (NullReferenceException ex)
             {
-                throw;
-            }
-        }
-        public async Task<ResponseObject> AnularTrasaccionPorIdEnlaceAsync(string idEnlace)
-        {
-            try
-            {
-                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace).FirstOrDefaultAsync() ?? throw new Exception($"La transaccion con el codigo {idEnlace} no existe.");
-                _transaccion.TRA_FUEANULADA = false;
-                myDbContext.Entry(_transaccion).State = EntityState.Modified;
-                await myDbContext.SaveChangesAsync();
+                return ResponseClass.Response(statusCode: 500, message: ex.Message);
 
-                return ResponseClass.Response(statusCode: 204, message: $"Transaccion Anulada Exitosamente.");
             }
             catch (Exception)
             {
@@ -131,6 +180,7 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 _transaccion.TRA_CONFIRMADA = true;
                 myDbContext.Entry(_transaccion).State = EntityState.Modified;
+                await AgregarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Transaccion Eliminada Exitosamente.");
@@ -158,8 +208,13 @@ namespace BUGGAFIT_BACK.Catalogos
                     TRA_FUEANULADA = transaccion.TRA_FUEANULADA,
                     TRA_NUMEROTRANSACCIONBANCO = transaccion.TRA_NUMEROTRANSACCIONBANCO,
                     USU_CEDULA_CONFIRMADOR = transaccion.USU_CEDULA_CONFIRMADOR,
+                    TRA_VALOR = transaccion.TRA_VALOR
                 };
                 myDbContext.TRANSACCIONES.Add(_transaccion);
+                if (transaccion.TRA_CONFIRMADA == true)
+                {
+                        await AgregarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
+                }
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 201, message: $"Transaccion Creada Exitosamente.");
@@ -209,10 +264,24 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var _tipoCuenta = await myDbContext.TRANSACCIONES.Where(x => x.TRA_ESTADO == true && x.TRA_CODIGO == Id).FirstOrDefaultAsync();
-                return _tipoCuenta == null
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_ESTADO == true && x.TRA_CODIGO == Id).FirstOrDefaultAsync();
+                return _transaccion == null
                     ? throw new Exception($"La transaccion con el codigo {Id} no existe.")
-                    : ResponseClass.Response(statusCode: 200, data: _tipoCuenta);
+                    : ResponseClass.Response(statusCode: 200, data: _transaccion);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<ResponseObject> ListarTrasaccionPorIDEnlaceAsync(string idEnlace)
+        {
+            try
+            {
+                var _transacciones = await myDbContext.TRANSACCIONES.Where(x => x.TRA_ESTADO == true && x.TRA_CODIGOENLACE == idEnlace).ToListAsync();
+                return _transacciones == null
+                    ? throw new Exception($"No hay Transacciones con el codigo de enlace {idEnlace}.")
+                    : ResponseClass.Response(statusCode: 200, data: _transacciones);
             }
             catch (Exception)
             {
@@ -225,12 +294,22 @@ namespace BUGGAFIT_BACK.Catalogos
             return myDbContext.TIPOSCUENTAS.Any(e => e.TIC_CODIGO == id);
         }
 
+        private async Task AgregarDineroCuentas(int idCuenta, float cantidadDinero)
+        {
+            var cuenta = await myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == idCuenta).FirstOrDefaultAsync()
+                ?? throw new Exception("No se puede agregar el dinero de la Transaccion. La Cuenta no Existe.");
+            cuenta.TIC_DINEROTOTAL += (cantidadDinero);
+
+            myDbContext.Entry(cuenta).State = EntityState.Modified;
+            await myDbContext.SaveChangesAsync();
+        }
         private async Task RetornarDineroCuentas(int idCuenta, float cantidadDinero)
         {
-            var cuenta = await myDbContext.TIPOSCUENTAS.Where(x=>x.TIC_CODIGO == idCuenta).FirstOrDefaultAsync() ?? throw new Exception("No se puede retornar el dinero de la Transaccion. La Cuenta no Existe.");
-            cuenta.TIC_DINEROTOTAL = -(cantidadDinero);
+            var cuenta = await myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == idCuenta).FirstOrDefaultAsync()
+                ?? throw new Exception("No se puede retornar el dinero de la Transaccion. La Cuenta no Existe.");
+            cuenta.TIC_DINEROTOTAL -= (cantidadDinero);
 
-            myDbContext.TIPOSCUENTAS.Add(cuenta);
+            myDbContext.Entry(cuenta).State = EntityState.Modified;
             await myDbContext.SaveChangesAsync();
         }
     }
