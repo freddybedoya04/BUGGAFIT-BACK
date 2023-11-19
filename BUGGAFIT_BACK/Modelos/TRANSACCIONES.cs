@@ -17,7 +17,9 @@ namespace BUGGAFIT_BACK.Modelos
         public string? TRA_CODIGOENLACE { get; set; }
         public bool TRA_FUEANULADA { get; set; }
         public int? TRA_NUMEROTRANSACCIONBANCO { get; set; }
-        public string? USU_CEDULA_CONFIRMADOR { get; set; } 
+        public string? USU_CEDULA_CONFIRMADOR { get; set; }
+        public int TIC_CODIGO { get; set; }
+
 
         [ForeignKey("TIC_CODIGO")]
         public virtual TIPOSCUENTAS TIPOSCUENTAS { get; set; } // Relación con TipoCuenta

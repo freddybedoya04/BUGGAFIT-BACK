@@ -11,10 +11,13 @@ namespace BUGGAFIT_BACK.Catalogos
     public class CatalogoGastos : ICatalogoGastos
     {
         private readonly MyDBContext myDbContext;
+        private readonly ICatalogoTransacciones catalogoTransacciones;
 
-        public CatalogoGastos(MyDBContext myDbContext)
+        public CatalogoGastos(MyDBContext myDbContext, ICatalogoTransacciones catalogoTransacciones)
         {
             this.myDbContext = myDbContext;
+            this.catalogoTransacciones = catalogoTransacciones;
+
         }
 
         public async Task<ResponseObject> ActualizarGastoAsync(Gasto gasto)
@@ -33,7 +36,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = gasto.GAS_PENDIENTE,
-                    GAS_OBSERVACIONES=gasto.GAS_OBSERVACIONES,
+                    GAS_OBSERVACIONES = gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = ven_codigo,
                 };
                 myDbContext.Entry(_gasto).State = EntityState.Modified;
@@ -95,9 +98,9 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 int ven_codigo = myDbContext.VENTAS.First().VEN_CODIGO;
                 bool pendiente = true;
-                if (myDbContext.TIPOSCUENTAS.Where(x=>x.TIC_CODIGO==gasto.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
+                if (myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == gasto.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
                 {
-                   pendiente = false;
+                    pendiente = false;
                 }
                 GASTOS _gasto = new()
                 {
@@ -110,11 +113,29 @@ namespace BUGGAFIT_BACK.Catalogos
                     GAS_ESTADO = true,
                     USU_CEDULA = gasto.USU_CEDULA,
                     GAS_PENDIENTE = pendiente,
-                    GAS_OBSERVACIONES=gasto.GAS_OBSERVACIONES,
+                    GAS_OBSERVACIONES = gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = ven_codigo,
                 };
                 myDbContext.GASTOS.Add(_gasto);
                 await myDbContext.SaveChangesAsync();
+
+                if (!_gasto.TipoCuentas.TIC_NOMBRE.ToLower().Contains("credito"))
+                {
+                    var _tskTransaccion = await catalogoTransacciones.CrearTrasaccionAsync(new()
+                    {
+                        TIC_CUENTA = _gasto.TIC_CODIGO,
+                        TIC_CODIGO = _gasto.TIC_CODIGO,
+                        TRA_TIPO = TiposTransacciones.GASTO.Valor,
+                        TRA_FECHACREACION = DateTime.Now,
+                        TRA_CONFIRMADA = !pendiente,
+                        TRA_ESTADO = true,
+                        TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
+                        TRA_CODIGOENLACE = _gasto.VEN_CODIGO.ToString(),
+                        TRA_FUEANULADA = false,
+                        TRA_NUMEROTRANSACCIONBANCO = 0,
+                        USU_CEDULA_CONFIRMADOR = pendiente ? null : _gasto.USU_CEDULA,
+                    });
+                }
 
                 return ResponseClass.Response(statusCode: 201, message: $"Gasto Creado Exitosamente.");
             }
@@ -129,7 +150,12 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO") && x.MOG_ESTADO == true).Select(x => x.MOG_CODIGO).FirstAsync().Result;
                 float valor = myDbContext.VENTAS.Where(x => x.VEN_CODIGO == gasto.VEN_CODIGO).Select(x => x.TIPOSENVIOS.TIP_VALOR).FirstAsync().Result;
-                
+                bool pendiente = true;
+
+                if (myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == gasto.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
+                {
+                    pendiente = false;
+                }
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
@@ -140,12 +166,30 @@ namespace BUGGAFIT_BACK.Catalogos
                     TIC_CODIGO = gasto.TIC_CODIGO,
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
-                    GAS_PENDIENTE = gasto.GAS_PENDIENTE,
-                    GAS_OBSERVACIONES=gasto.GAS_OBSERVACIONES,
+                    GAS_PENDIENTE = pendiente,
+                    GAS_OBSERVACIONES = gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = gasto.VEN_CODIGO,
                 };
                 myDbContext.GASTOS.Add(_gasto);
                 await myDbContext.SaveChangesAsync();
+
+                if (!_gasto.TipoCuentas.TIC_NOMBRE.ToLower().Contains("credito"))
+                {
+                    var _tskTransaccion = await catalogoTransacciones.CrearTrasaccionAsync(new()
+                    {
+                        TIC_CUENTA = _gasto.TIC_CODIGO,
+                        TIC_CODIGO = _gasto.TIC_CODIGO,
+                        TRA_TIPO = TiposTransacciones.GASTO.Valor,
+                        TRA_FECHACREACION = DateTime.Now,
+                        TRA_CONFIRMADA = !pendiente,
+                        TRA_ESTADO = true,
+                        TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
+                        TRA_CODIGOENLACE = _gasto.VEN_CODIGO.ToString(),
+                        TRA_FUEANULADA = false,
+                        TRA_NUMEROTRANSACCIONBANCO = 0,
+                        USU_CEDULA_CONFIRMADOR = pendiente ? null : _gasto.USU_CEDULA,
+                    });
+                }
 
                 return ResponseClass.Response(statusCode: 201, message: $"Gasto Creado Exitosamente.");
             }
@@ -244,12 +288,12 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = x.TIC_CODIGO,
                         GAS_ESTADO = x.GAS_ESTADO,
                         USU_CEDULA = x.USU_CEDULA,
-                        GAS_OBSERVACIONES=x.GAS_OBSERVACIONES,
+                        GAS_OBSERVACIONES = x.GAS_OBSERVACIONES,
                         GAS_PENDIENTE = x.GAS_PENDIENTE,
                         VEN_CODIGO = x.VEN_CODIGO,
                         USU_NOMBRE = x.Usuarios.USU_NOMBRE,
                         TIC_NOMBRE = x.TipoCuentas.TIC_NOMBRE,
-                        MOG_NOMBRE=x.MOTIVOSGASTOS.MOG_NOMBRE
+                        MOG_NOMBRE = x.MOTIVOSGASTOS.MOG_NOMBRE
                     })
                     .OrderByDescending(x => x.GAS_FECHAGASTO)
                     .ToListAsync();

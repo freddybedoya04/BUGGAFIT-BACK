@@ -96,11 +96,13 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 var venta = await myDbContext.VENTAS.FindAsync(Id);
                 if (venta == null)
-                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {Id} no existe.");
-
+                    return ResponseClass.Response(statusCode: 404, message: $"La venta con el codigo {Id} no existe.");
+                if (venta.VEN_ESTADOVENTA == true)
+                    return ResponseClass.Response(statusCode: 400, message: $"La venta con el codigo {Id} no se puede eliminar. Venta ya confirmada.");
                 venta.VEN_ESTADO = false;
                 myDbContext.Entry(venta).State = EntityState.Modified;
                 await RegresarProductosAlInventario(venta.VEN_CODIGO);
+                await catalogoTransacciones.BorrarTrasaccionAsync(venta.VEN_CODIGO);
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Venta Eliminada Exitosamente.");
@@ -110,6 +112,8 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+
+
 
         public async Task<ResponseObject> RemoverVentaAsync(int Id)
         {
@@ -164,7 +168,7 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                VENTAS _ventas = new()
+                VENTAS _venta = new()
                 {
                     VEN_CODIGO = venta.VEN_CODIGO,
                     VEN_FECHACREACION = DateTime.Now,
@@ -187,36 +191,40 @@ namespace BUGGAFIT_BACK.Catalogos
                     VEN_ESTADO = venta.VEN_ESTADO,
                     TIP_CODIGO = (int)venta.TIP_CODIGO
                 };
-                myDbContext.VENTAS.Add(_ventas);
+                myDbContext.VENTAS.Add(_venta);
                 await myDbContext.SaveChangesAsync();
                 if (venta.DetalleVentas != null)
                 {
-                    venta.DetalleVentas.ToList().ForEach(x => x.VEN_CODIGO = _ventas.VEN_CODIGO);
+                    venta.DetalleVentas.ToList().ForEach(x => x.VEN_CODIGO = _venta.VEN_CODIGO);
 
                     //creamos las tareas necesarias para la creacion de la venta
                     await CrearDetalleVentaAsync((List<DetalleVenta>)venta.DetalleVentas);
 
-                    await RetirarProductosDelInventario(_ventas.VEN_CODIGO);
+                    await RetirarProductosDelInventario(_venta.VEN_CODIGO);
                     //if (_ventas.VEN_ESTADOCREDITO == true)
                     //{
                     //    await CrearEntradaDeCartera(_ventas.VEN_CODIGO, venta);
                     //}
                 }
-                //TODO: Agregar la creacion de la transaccion cuando se realiza la venta
-                //var _tskTransaccion = await catalogoTransacciones.CrearTrasaccionAsync(new()
-                //{
-                //    TIC_CUENTA = venta.,
-                //    TRA_TIPO = transaccion.TRA_TIPO, //TODO: Preguntar donde sacar la cuenta.
-                //    TRA_FECHACREACION = DateTime.Now,
-                //    TRA_CONFIRMADA = transaccion.TRA_CONFIRMADA,
-                //    TRA_ESTADO = transaccion.TRA_ESTADO,
-                //    TRA_FECHACONFIRMACION = DateTime.Now,
-                //    TRA_CODIGOENLACE = transaccion.TRA_CODIGOENLACE,
-                //    TRA_FUEANULADA = transaccion.TRA_FUEANULADA,
-                //    TRA_NUMEROTRANSACCIONBANCO = transaccion.TRA_NUMEROTRANSACCIONBANCO,
-                //    USU_CEDULA_CONFIRMADOR = transaccion.USU_CEDULA_CONFIRMADOR,
-                //});
-                return ResponseClass.Response(statusCode: 201, data: _ventas.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
+
+                if (!venta.VEN_ESTADOCREDITO)
+                {
+                    await catalogoTransacciones.CrearTrasaccionAsync(new()
+                    {
+                        TIC_CUENTA = _venta.TIC_CODIGO,
+                        TIC_CODIGO = _venta.TIC_CODIGO,
+                        TRA_TIPO = TiposTransacciones.VENTA.Valor,
+                        TRA_FECHACREACION = DateTime.Now,
+                        TRA_CONFIRMADA = _venta.VEN_ESTADOVENTA,
+                        TRA_ESTADO = true,
+                        TRA_FECHACONFIRMACION = _venta.VEN_ESTADOVENTA ? DateTime.Now : null,
+                        TRA_CODIGOENLACE = _venta.VEN_CODIGO.ToString(),
+                        TRA_FUEANULADA = false,
+                        TRA_NUMEROTRANSACCIONBANCO = 0,
+                        USU_CEDULA_CONFIRMADOR = _venta.VEN_ESTADOVENTA ? _venta.USU_CEDULA : null,
+                    });
+                }
+                return ResponseClass.Response(statusCode: 201, data: _venta.VEN_CODIGO, message: $"Venta Creada Exitosamente.");
             }
             catch (Exception ex)
             {
@@ -528,7 +536,7 @@ namespace BUGGAFIT_BACK.Catalogos
             }
         }
 
-        public async Task<ResponseObject> AnluarVentaAsync(int id)
+        public async Task<ResponseObject> AnularVentaAsync(int id)
         {
             try
             {
@@ -543,7 +551,9 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _venta.VEN_CODIGO.ToString()).FirstOrDefaultAsync();
                 if (_transaccion != null)
+                {
                     await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
+                }
 
                 return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente. {(_transaccion == null ? "No habian transacciones asociadas." : "")}");
             }

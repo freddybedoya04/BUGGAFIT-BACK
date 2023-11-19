@@ -12,6 +12,7 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> ListarVentasAsync();
         Task<ResponseObject> ActualizarVentaAsync(Ventas venta);
         Task<ResponseObject> BorrarVentaAsync(int Id);
+        Task<ResponseObject> AnularVentaAsync(int Id);
         Task<ResponseObject> ListarVentaPorIDAsync(int Id);
         Task<ResponseObject> ListarVentasPorFechaAsync(FiltrosDTO filtro);
         Task<ResponseObject> ActualizarEstadoVentaAsync(int id);
@@ -21,6 +22,5 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> BorrarAbonoAsync(int car_codigo);
         Task<ResponseObject> ActualizarAbonoAsync(Cartera cartera);
         Task<ResponseObject> FinalizarCreditoAsync(int id);
-        Task<ResponseObject> AnluarVentaAsync(int id);
     }
 }

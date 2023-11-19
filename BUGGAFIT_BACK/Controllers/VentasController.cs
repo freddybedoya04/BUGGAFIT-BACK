@@ -242,7 +242,7 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
-                return Ok(await catalogo.AnluarVentaAsync(id));
+                return Ok(await catalogo.AnularVentaAsync(id));
             }
             catch (Exception ex)
             {
