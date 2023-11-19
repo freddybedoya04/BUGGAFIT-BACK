@@ -77,11 +77,24 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
         [HttpPut("ConfirmarTransaccion/{id}")]
-        public async Task<ActionResult<ResponseObject>> ConfirmarTransaccion(int id)
+        public async Task<ActionResult<ResponseObject>> ConfirmarTransaccion(int id, [FromQuery] string usuario)
         {
             try
             {
-                return Ok(await catalogo.ConfirmarTrasaccionesAsync(id));
+                return Ok(await catalogo.ConfirmarTrasaccionAsync(id, usuario));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
+
+        [HttpPost("ConfirmarTransacciones/")]
+        public async Task<ActionResult<ResponseObject>> ConfirmarTransaccion([FromBody] List<int> transacciones, [FromQuery] string usuario)
+        {
+            try
+            {
+                return Ok(await catalogo.ConfirmarTrasaccionesAsync(transacciones, usuario));
             }
             catch (Exception ex)
             {

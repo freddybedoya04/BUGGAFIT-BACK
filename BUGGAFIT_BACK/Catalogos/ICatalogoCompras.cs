@@ -10,5 +10,7 @@ namespace BUGGAFIT_BACK.Catalogos
         void CrearCompra(Compra nuevaCompra);
         void ActualizarCompra(Compra nuevaCompra);
         void EliminarCompra(int com_codigo);
+        void AnularCompra(int com_codigo);
+        void ConfirmarCompra(int id);
     }
 }

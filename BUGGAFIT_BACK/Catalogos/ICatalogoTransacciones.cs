@@ -9,7 +9,8 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> CrearTrasaccionAsync(Transacciones transaccion);
         Task<ResponseObject> ListarTrasaccionesAsync();
         Task<ResponseObject> AnularTrasaccionesAsync(int Id);
-        Task<ResponseObject> ConfirmarTrasaccionesAsync(int Id);
+        Task<ResponseObject> ConfirmarTrasaccionAsync(int Id, string usurioConfirmador);
+        Task<ResponseObject> ConfirmarTrasaccionesAsync(List<int> Id, string usurioConfirmador);
         Task<ResponseObject> ListarTrasaccionesPorFechaAsync(FiltrosDTO filtro);
         Task<ResponseObject> ActualizarTrasaccionAsync(Transacciones transaccion);
         Task<ResponseObject> BorrarTrasaccionAsync(int Id);

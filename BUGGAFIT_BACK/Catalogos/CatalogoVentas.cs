@@ -11,12 +11,17 @@ namespace BUGGAFIT_BACK.Catalogos
     public class CatalogoVentas : ICatalogoVentas
     {
         private readonly MyDBContext myDbContext;
-        private readonly ICatalogoTransacciones catalogoTransacciones;
+        private readonly ICatalogoTransacciones? catalogoTransacciones;
 
         public CatalogoVentas(MyDBContext myDbContext, ICatalogoTransacciones catalogoTransacciones)
         {
             this.myDbContext = myDbContext;
             this.catalogoTransacciones = catalogoTransacciones;
+        }
+
+        public CatalogoVentas(MyDBContext myDbContext)
+        {
+            this.myDbContext = myDbContext;
         }
 
         public async Task<ResponseObject> ActualizarVentaAsync(Ventas venta)
@@ -57,10 +62,11 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                VENTAS venta = myDbContext.VENTAS.Where(x => x.VEN_CODIGO == id).FirstOrDefault();
+                VENTAS venta = await myDbContext.VENTAS.Where(x => x.VEN_CODIGO == id).FirstOrDefaultAsync();
                 venta.VEN_ESTADOVENTA = true;
                 venta.VEN_ACTUALIZACION = DateTime.Now;
                 myDbContext.Entry(venta).State = EntityState.Modified;
+
                 await myDbContext.SaveChangesAsync();
             }
             catch (Exception)
@@ -445,7 +451,33 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> AnularVentaAsync(int id)
+        {
+            try
+            {
+                var _venta = await myDbContext.VENTAS.FindAsync(id);
+                if (_venta == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La transaccion con el codigo {id} no existe.");
 
+                _venta.VEN_ESANULADA = true;
+                myDbContext.Entry(_venta).State = EntityState.Modified;
+                await RegresarProductosAlInventario(_venta.VEN_CODIGO);
+
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _venta.VEN_CODIGO.ToString()).FirstOrDefaultAsync();
+                if (_transaccion != null)
+                {
+                    await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
+                }
+
+                await myDbContext.SaveChangesAsync();
+                return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente. {(_transaccion == null ? "No habian transacciones asociadas." : "")}");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #region Abonos
         public async Task<ResponseObject> ListarAbonosPorCodigoVentaAsync(int id)
         {
             try
@@ -468,7 +500,6 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-
         public async Task<ResponseObject> CrearAbonoAsync(Cartera cartera)
         {
             try
@@ -533,6 +564,45 @@ namespace BUGGAFIT_BACK.Catalogos
             }
 
         }
+        public async Task<ResponseObject> AnularAbonoAsync(int car_codigo)
+        {
+            try
+            {
+                var abono = await myDbContext.CARTERAS.FindAsync(car_codigo);
+                if (abono == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {car_codigo} no existe.");
+                abono.CAR_ESANULADA = true;
+                myDbContext.Entry(abono).State = EntityState.Modified;
+                await catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(abono.CAR_CODIGO.ToString());
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Abono Anulado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
+        public async Task<ResponseObject> ConfirmarAbonoAsync(int car_codigo)
+        {
+            try
+            {
+                var abono = await myDbContext.CARTERAS.FindAsync(car_codigo);
+                if (abono == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {car_codigo} no existe.");
+                abono.CAR_ESTADOCREDITO = 0;
+                myDbContext.Entry(abono).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 204, message: $"Abono Confirmado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
         public async Task<ResponseObject> ActualizarAbonoAsync(Cartera cartera)
         {
             try
@@ -554,33 +624,8 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 throw;
             }
-        }
+        } 
+        #endregion
 
-        public async Task<ResponseObject> AnularVentaAsync(int id)
-        {
-            try
-            {
-                var _venta = await myDbContext.VENTAS.FindAsync(id);
-                if (_venta == null)
-                    return ResponseClass.Response(statusCode: 400, message: $"La transaccion con el codigo {id} no existe.");
-
-                _venta.VEN_ESANULADA = true;
-                myDbContext.Entry(_venta).State = EntityState.Modified;
-                await RegresarProductosAlInventario(_venta.VEN_CODIGO);
-
-                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _venta.VEN_CODIGO.ToString()).FirstOrDefaultAsync();
-                if (_transaccion != null)
-                {
-                    await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
-                }
-
-                await myDbContext.SaveChangesAsync();
-                return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente. {(_transaccion == null ? "No habian transacciones asociadas." : "")}");
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
     }
 }

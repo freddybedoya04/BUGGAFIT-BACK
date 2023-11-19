@@ -11,13 +11,18 @@ namespace BUGGAFIT_BACK.Catalogos
     public class CatalogoGastos : ICatalogoGastos
     {
         private readonly MyDBContext myDbContext;
-        private readonly ICatalogoTransacciones catalogoTransacciones;
+        private readonly ICatalogoTransacciones? catalogoTransacciones;
 
         public CatalogoGastos(MyDBContext myDbContext, ICatalogoTransacciones catalogoTransacciones)
         {
             this.myDbContext = myDbContext;
             this.catalogoTransacciones = catalogoTransacciones;
 
+        }
+
+        public CatalogoGastos(MyDBContext myDbContext)
+        {
+            this.myDbContext = myDbContext;
         }
 
         public async Task<ResponseObject> ActualizarGastoAsync(Gasto gasto)
