@@ -15,6 +15,8 @@
         public string? USU_CEDULA_CONFIRMADOR { get; set; }
         public float? TRA_VALOR { get; set; }
         public int TIC_CODIGO { get; set; }
+        public string? TIC_NOMBRE { get; set; }
+        public string? USU_NOMBRE { get; set; }
 
     }
 

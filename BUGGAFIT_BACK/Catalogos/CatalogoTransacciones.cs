@@ -288,7 +288,26 @@ namespace BUGGAFIT_BACK.Catalogos
             try
             {
                 var _transacciones = await myDbContext.TRANSACCIONES
-                    .Where(x => x.TRA_FECHACREACION >= filtro.FechaInicio.ToLocalTime() && x.TRA_FECHACREACION <= filtro.FechaFin.ToLocalTime() && x.TRA_ESTADO == true)
+                    .Where(x => x.TRA_FECHACREACION >= filtro.FechaInicio.ToLocalTime() && x.TRA_FECHACREACION <= filtro.FechaFin.ToLocalTime() && x.TRA_ESTADO == true).
+                    Select(x => new Transacciones
+                    {
+                        TRA_CODIGO = x.TRA_CODIGO,
+                        TIC_CUENTA = x.TIC_CUENTA,
+                        TRA_TIPO = x.TRA_TIPO,
+                        TRA_FECHACREACION = x.TRA_FECHACREACION,
+                        TRA_CONFIRMADA = x.TRA_CONFIRMADA,
+                        TRA_ESTADO = x.TRA_ESTADO,
+                        TRA_FECHACONFIRMACION = x.TRA_FECHACONFIRMACION,
+                        TRA_CODIGOENLACE = x.TRA_CODIGOENLACE,
+                        TRA_FUEANULADA = x.TRA_FUEANULADA,
+                        TRA_NUMEROTRANSACCIONBANCO = x.TRA_NUMEROTRANSACCIONBANCO,
+                        USU_CEDULA_CONFIRMADOR = x.USU_CEDULA_CONFIRMADOR,
+                        TRA_VALOR = x.TRA_VALOR,
+                        TIC_CODIGO = x.TIC_CODIGO,
+                        TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
+                        USU_NOMBRE = x.USU_CEDULA_CONFIRMADOR == null ? "" : myDbContext.USUARIOS.Where(u => u.USU_CEDULA == x.USU_CEDULA_CONFIRMADOR).Select(u => u.USU_NOMBRE).FirstOrDefault(),
+                    })
+                    .OrderByDescending(x => x.TRA_CODIGO)
                     .ToListAsync();
                 if (_transacciones == null || !_transacciones.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay transacciones.");
@@ -300,7 +319,43 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> ListarTrasaccionesPorFechaYCuentaAsync(int cuenta, FiltrosDTO filtro)
+        {
 
+            try
+            {
+                var _transacciones = await myDbContext.TRANSACCIONES
+                    .Where(x => x.TIC_CODIGO == cuenta && x.TRA_FECHACREACION >= filtro.FechaInicio.ToLocalTime() && x.TRA_FECHACREACION <= filtro.FechaFin.ToLocalTime() && x.TRA_ESTADO == true).
+                    Select(x => new Transacciones
+                    {
+                        TRA_CODIGO = x.TRA_CODIGO,
+                        TIC_CUENTA = x.TIC_CUENTA,
+                        TRA_TIPO = x.TRA_TIPO,
+                        TRA_FECHACREACION = x.TRA_FECHACREACION,
+                        TRA_CONFIRMADA = x.TRA_CONFIRMADA,
+                        TRA_ESTADO = x.TRA_ESTADO,
+                        TRA_FECHACONFIRMACION = x.TRA_FECHACONFIRMACION,
+                        TRA_CODIGOENLACE = x.TRA_CODIGOENLACE,
+                        TRA_FUEANULADA = x.TRA_FUEANULADA,
+                        TRA_NUMEROTRANSACCIONBANCO = x.TRA_NUMEROTRANSACCIONBANCO,
+                        USU_CEDULA_CONFIRMADOR = x.USU_CEDULA_CONFIRMADOR,
+                        TRA_VALOR = x.TRA_VALOR,
+                        TIC_CODIGO = x.TIC_CODIGO,
+                        TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
+                        USU_NOMBRE = x.USU_CEDULA_CONFIRMADOR == null ? myDbContext.USUARIOS.Where(u => u.USU_CEDULA == x.USU_CEDULA_CONFIRMADOR).Select(u => u.USU_NOMBRE).FirstOrDefault() : x.USU_CEDULA_CONFIRMADOR,
+                    })
+                    .OrderByDescending(x => x.TRA_CODIGO)
+                    .ToListAsync();
+                if (_transacciones == null || !_transacciones.Any())
+                    return ResponseClass.Response(statusCode: 204, message: "No hay transacciones.");
+
+                return ResponseClass.Response(statusCode: 200, data: _transacciones);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         public async Task<ResponseObject> ListarTrasaccionPorIDAsync(int Id)
         {
             try

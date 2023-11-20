@@ -36,8 +36,8 @@ namespace BUGGAFIT_BACK.Controllers
             }
         }
         // POST api/GetTransaccionesPorFecha
-        [HttpPost("GetTransaccionesPorFecha")]
-        public async Task<IActionResult> GetDashboard([FromBody] FiltrosDTO filtro)
+        [HttpPost("TransaccionesPorFecha")]
+        public async Task<IActionResult> TransaccionesPorFecha([FromBody] FiltrosDTO filtro)
         {
             try
             {
@@ -51,7 +51,21 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
-
+        [HttpPost("TransaccionesPorFechaYCuenta/{id}")]
+        public async Task<IActionResult> GetDashboard(int id,[FromBody] FiltrosDTO filtro)
+        {
+            try
+            {
+                var result = await catalogo.ListarTrasaccionesPorFechaYCuentaAsync(id,filtro);
+                if (result.StatusCode == 400)
+                    return BadRequest(ResponseClass.ErrorResponse(statusCode: 400, message: result.Message, error: new Exception()));
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
         [HttpPost("PostCrearTransaccion")]
         public async Task<ActionResult<ResponseObject>> PostCrearTransaccion(Transacciones transaccion)
         {
