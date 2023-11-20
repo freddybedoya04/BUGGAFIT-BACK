@@ -157,6 +157,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+   
 
         public async Task<ResponseObject> CrearVentaAsync(Ventas venta)
         {
@@ -419,6 +420,40 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> ListarDetalleVentasPorFechaAsync(FiltrosDTO filtro)
+        {
+            try
+            {
+                var detallesVentas = await myDbContext.DETALLEVENTAS
+                    .Include(d => d.VENTAS)
+                    .Where(detalle => detalle.VENTAS.VEN_FECHAVENTA >= filtro.FechaInicio.ToLocalTime()
+                                      && detalle.VENTAS.VEN_FECHAVENTA <= filtro.FechaFin.ToLocalTime()
+                                      && detalle.VENTAS.VEN_ESTADO == true
+                                      && detalle.VED_ESTADO == true)
+                    .Select(detalle => new
+                    {
+                        detalle.VED_CODIGO,
+                        detalle.VEN_CODIGO,
+                        detalle.PRO_CODIGO,
+                        detalle.PRODUCTOS.PRO_NOMBRE,
+                        detalle.VED_UNIDADES,
+                        detalle.VED_PRECIOVENTA_UND,
+                        detalle.VED_VALORDESCUENTO_UND,
+                        detalle.VED_PRECIOVENTA_TOTAL,
+                        detalle.VED_ACTUALIZACION,
+                        detalle.VED_ESTADO
+                    })
+                    .ToListAsync();
+
+                return ResponseClass.Response(statusCode: 200, data: detallesVentas);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
 
         public async Task<ResponseObject> ListarAbonosPorCodigoVentaAsync(int id)
         {

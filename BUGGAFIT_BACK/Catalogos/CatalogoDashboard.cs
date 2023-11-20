@@ -85,21 +85,24 @@ namespace BUGGAFIT_BACK.Catalogos
                         VEN_ESTADOVENTA = x.VEN_ESTADOVENTA,
                         VEN_ESTADO = x.VEN_ESTADO,
                     }).Take(10).ToListAsync();
-                dashboard.DatosGraficas.ProductosMasVendidos = await (from ven in myDbContext.VENTAS
-                                                                      join det in myDbContext.DETALLEVENTAS
-                                                                      on ven.VEN_CODIGO equals det.VEN_CODIGO
-                                                                      join pro in myDbContext.PRODUCTOS
-                                                                      on det.PRO_CODIGO equals pro.PRO_CODIGO
-                                                                      where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
-                                                                      && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
-                                                                      group det by det.PRO_CODIGO into g
-                                                                      select new ListaProductosVendidos
-                                                                      {
-                                                                          Codigo = g.Key,
-                                                                          Nombre = g.First().PRODUCTOS.PRO_NOMBRE,
-                                                                          CantidadProducto = g.Count(),
+                dashboard.DatosGraficas.ProductosVendidos = await (from ven in myDbContext.VENTAS
+                                                                   join det in myDbContext.DETALLEVENTAS
+                                                                   on ven.VEN_CODIGO equals det.VEN_CODIGO
+                                                                   join pro in myDbContext.PRODUCTOS
+                                                                   on det.PRO_CODIGO equals pro.PRO_CODIGO
+                                                                   where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
+                                                                   && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
+                                                                   group det by new { pro.PRO_CODIGO, pro.PRO_NOMBRE, det.VED_PRECIOVENTA_TOTAL } into g
+                                                                   select new ListaProductosVendidos
+                                                                   {
+                                                                       Codigo = g.Key.PRO_CODIGO,
+                                                                       Nombre = g.Key.PRO_NOMBRE,
+                                                                       Precio = g.Key.VED_PRECIOVENTA_TOTAL,
+                                                                       CantidadProducto = g.Sum(x => x.VED_UNIDADES),
+                                                                   }).ToListAsync();
 
-                                                                      }).ToListAsync();
+
+
                 dashboard.DatosGraficas.IngresosCuentas = await (from ven in myDbContext.VENTAS
                                                                  join cu in myDbContext.TIPOSCUENTAS
                                                                  on ven.TIC_CODIGO equals cu.TIC_CODIGO

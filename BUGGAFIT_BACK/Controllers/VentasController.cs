@@ -234,8 +234,26 @@ namespace BUGGAFIT_BACK.Controllers
             {
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
-        } 
+        }
+        [HttpPost("BuscarDetallesPorFecha")]
+        public async Task<ActionResult<ResponseObject>> BuscarDetallesPorFecha(FiltrosDTO filtro)
+        {
+            try
+            {
+                var result = await catalgo.ListarDetalleVentasPorFechaAsync(filtro);
+
+                if (result.StatusCode == 204)
+                    return NoContent();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la petición.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
         #endregion
 
     }
 }
+
