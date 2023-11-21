@@ -219,7 +219,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     {
                         TIC_CUENTA = _venta.TIC_CODIGO,
                         TIC_CODIGO = _venta.TIC_CODIGO,
-                        TRA_TIPO = tipoTransaccion.Valor,
+                        TRA_TIPO = tipoTransaccion.Nombre,
                         TRA_FECHACREACION = DateTime.Now,
                         TRA_CONFIRMADA = _venta.VEN_ESTADOVENTA,
                         TRA_ESTADO = true,
@@ -535,7 +535,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 {
                     TIC_CUENTA = _cartera.TIC_CODIGO,
                     TIC_CODIGO = _cartera.TIC_CODIGO,
-                    TRA_TIPO = tipoTransaccion.Valor,
+                    TRA_TIPO = tipoTransaccion.Nombre,
                     TRA_FECHACREACION = DateTime.Now,
                     TRA_CONFIRMADA = esEfectivo,
                     TRA_ESTADO = true,

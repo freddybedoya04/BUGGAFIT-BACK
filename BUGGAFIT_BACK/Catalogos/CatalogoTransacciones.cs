@@ -55,7 +55,6 @@ namespace BUGGAFIT_BACK.Catalogos
             catch (Exception) { throw; }
             return ResponseClass.Response(statusCode: 204, message: $"Transaccion Actualizada Exitosamente.");
         }
-
         public async Task<ResponseObject> AnularTrasaccionesAsync(int Id)
         {
             try
@@ -69,7 +68,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 {
                     TIC_CUENTA = _transaccion.TIC_CODIGO,
                     TIC_CODIGO = _transaccion.TIC_CODIGO,
-                    TRA_TIPO = tipoTransaccion.Valor,
+                    TRA_TIPO = tipoTransaccion.Nombre,
                     TRA_FECHACREACION = DateTime.Now,
                     TRA_CONFIRMADA = true,
                     TRA_ESTADO = true,
@@ -103,7 +102,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 {
                     TIC_CUENTA = _transaccion.TIC_CODIGO,
                     TIC_CODIGO = _transaccion.TIC_CODIGO,
-                    TRA_TIPO = tipoTransaccion.Valor,
+                    TRA_TIPO = tipoTransaccion.Nombre,
                     TRA_FECHACREACION = DateTime.Now,
                     TRA_CONFIRMADA = true,
                     TRA_ESTADO = true,
@@ -127,7 +126,6 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-
         public async Task<ResponseObject> BorrarTrasaccionAsync(int Id)
         {
             try
@@ -148,7 +146,6 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-
         public async Task<ResponseObject> BorrarTrasaccionPorIdEnlaceAsync(string idEnlace)
         {
             try
@@ -175,7 +172,6 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-
         public async Task<ResponseObject> ConfirmarTrasaccionAsync(int Id, string usurioConfirmador)
         {
             try
@@ -183,7 +179,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 var _transaccion = await myDbContext.TRANSACCIONES.FindAsync(Id);
                 if (_transaccion == null)
                     throw new Exception($"La transaccion con el codigo {Id} no existe.");
-                if(_transaccion.TRA_CONFIRMADA == true)
+                if (_transaccion.TRA_CONFIRMADA == true)
                     return ResponseClass.Response(statusCode: 204, message: $"Transaccion ya confirmada Exitosamente.");
 
                 _transaccion.TRA_CONFIRMADA = true;
@@ -233,7 +229,6 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-
         public async Task<ResponseObject> CrearTrasaccionAsync(Transacciones transaccion)
         {
             try
@@ -384,12 +379,88 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        public async Task<ResponseObject> CrearTrasaccionEntreCuentasAsync(TransaccionEntreCuentas transaccion)
+        {
+            try
+            {
+                // transaccion de origen
+                ArgumentNullException.ThrowIfNull(argument: transaccion.IdCuentaOrigen, nameof(transaccion.IdCuentaOrigen));
+                TiposTransacciones tipoTransaccion = TiposTransacciones.TRANSFERENCIA;
+                await CrearTrasaccionAsync(new()
+                {
+                    TIC_CUENTA = transaccion.IdCuentaOrigen ?? 0,
+                    TIC_CODIGO = transaccion.IdCuentaOrigen ?? 0,
+                    TRA_TIPO = tipoTransaccion.Nombre,
+                    TRA_FECHACREACION = DateTime.Now,
+                    TRA_CONFIRMADA = true,
+                    TRA_ESTADO = true,
+                    TRA_FECHACONFIRMACION = DateTime.Now,
+                    TRA_CODIGOENLACE = null,
+                    TRA_FUEANULADA = false,
+                    TRA_NUMEROTRANSACCIONBANCO = 0,
+                    USU_CEDULA_CONFIRMADOR = transaccion.CedulaConfirmador,
+                    TRA_VALOR = -transaccion.ValorTranferencia,
+                });
+                // transaccion de destino
+                await CrearTrasaccionAsync(new()
+                {
+                    TIC_CUENTA = transaccion.IdCuentaDestino,
+                    TIC_CODIGO = transaccion.IdCuentaDestino,
+                    TRA_TIPO = tipoTransaccion.Nombre,
+                    TRA_FECHACREACION = DateTime.Now,
+                    TRA_CONFIRMADA = true,
+                    TRA_ESTADO = true,
+                    TRA_FECHACONFIRMACION = DateTime.Now,
+                    TRA_CODIGOENLACE = null,
+                    TRA_FUEANULADA = false,
+                    TRA_NUMEROTRANSACCIONBANCO = 0,
+                    USU_CEDULA_CONFIRMADOR = transaccion.CedulaConfirmador,
+                    TRA_VALOR = transaccion.ValorTranferencia,
+                });
+                return ResponseClass.Response(statusCode: 204, message: $"Transaccion Realizada Exitosamente.");
 
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<ResponseObject> AjustarDineroAUnaCuenta(TransaccionEntreCuentas transaccion)
+        {
+            try
+            {
+                var _tipoCuenta = await myDbContext.TIPOSCUENTAS.FindAsync(transaccion.IdCuentaDestino);
+                if (_tipoCuenta == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"La cuenta con el codigo {transaccion.IdCuentaDestino} no existe.");
+                TiposTransacciones tipoTransaccion = TiposTransacciones.TRANSFERENCIA;
+
+                await CrearTrasaccionAsync(new()
+                {
+                    TIC_CUENTA = transaccion.IdCuentaDestino,
+                    TIC_CODIGO = transaccion.IdCuentaDestino,
+                    TRA_TIPO = tipoTransaccion.Nombre,
+                    TRA_FECHACREACION = DateTime.Now,
+                    TRA_CONFIRMADA = true,
+                    TRA_ESTADO = true,
+                    TRA_FECHACONFIRMACION = DateTime.Now,
+                    TRA_CODIGOENLACE = null,
+                    TRA_FUEANULADA = false,
+                    TRA_NUMEROTRANSACCIONBANCO = 0,
+                    USU_CEDULA_CONFIRMADOR = transaccion.CedulaConfirmador,
+                    TRA_VALOR = (transaccion.ValorTranferencia - _tipoCuenta.TIC_DINEROTOTAL),
+                });
+                return ResponseClass.Response(statusCode: 204, message: $"Transaccion Realizada Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #region private Methods
         private bool ExisteTrasaccion(int id)
         {
             return myDbContext.TIPOSCUENTAS.Any(e => e.TIC_CODIGO == id);
         }
-
         private async Task AgregarDineroCuentas(int idCuenta, float cantidadDinero)
         {
             var cuenta = await myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == idCuenta).FirstOrDefaultAsync()
@@ -408,32 +479,31 @@ namespace BUGGAFIT_BACK.Catalogos
             myDbContext.Entry(cuenta).State = EntityState.Modified;
             await myDbContext.SaveChangesAsync();
         }
-
         private async Task CentroDeConfirmacionDeEnlaces(TiposTransacciones tipoTransaccion, int idEnlace)
         {
             try
             {
-                if (tipoTransaccion.Valor == TiposTransacciones.VENTA.Valor)
+                if (tipoTransaccion.Nombre == TiposTransacciones.VENTA.Nombre)
                 {
                     await catalogoVentas.ActualizarEstadoVentaAsync(idEnlace);
                     return;
                 }
-                if (tipoTransaccion.Valor == TiposTransacciones.GASTO.Valor)
+                if (tipoTransaccion.Nombre == TiposTransacciones.GASTO.Nombre)
                 {
                     await catalogoGastos.CerrarGasto(idEnlace);
                     return;
                 }
-                if (tipoTransaccion.Valor == TiposTransacciones.COMPRA.Valor)
+                if (tipoTransaccion.Nombre == TiposTransacciones.COMPRA.Nombre)
                 {
                     catalogoCompras.ConfirmarCompra(idEnlace);
                     return;
                 }
-                if (tipoTransaccion.Valor == TiposTransacciones.ABONO.Valor)
+                if (tipoTransaccion.Nombre == TiposTransacciones.ABONO.Nombre)
                 {
                     await catalogoVentas.ConfirmarAbonoAsync(idEnlace);
                     return;
                 }
-                if (tipoTransaccion.Valor == TiposTransacciones.TRANSFERENCIA.Valor)
+                if (tipoTransaccion.Nombre == TiposTransacciones.TRANSFERENCIA.Nombre)
                 {
                     return;
                 }
@@ -443,5 +513,6 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+        #endregion
     }
 }

@@ -115,6 +115,30 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+        [HttpPost("CrearTransaccionEntreCuentas/")]
+        public async Task<ActionResult<ResponseObject>> CrearTransaccionEntreCuentas(TransaccionEntreCuentas transaccion)
+        {
+            try
+            {
+                return Ok(await catalogo.CrearTrasaccionEntreCuentasAsync(transaccion));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
+        [HttpPost("AjustarDineroCuenta/")]
+        public async Task<ActionResult<ResponseObject>> AjustarDineroAUnaCuenta(TransaccionEntreCuentas transaccion)
+        {
+            try
+            {
+                return Ok(await catalogo.AjustarDineroAUnaCuenta(transaccion));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
 
     }
 }

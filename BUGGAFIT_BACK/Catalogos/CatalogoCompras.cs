@@ -164,7 +164,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         {
                             TIC_CUENTA = compras.TIC_CODIGO,
                             TIC_CODIGO = compras.TIC_CODIGO,
-                            TRA_TIPO = tipoTransaccion.Valor,
+                            TRA_TIPO = tipoTransaccion.Nombre,
                             TRA_FECHACREACION = DateTime.Now,
                             TRA_CONFIRMADA = !pendiente,
                             TRA_ESTADO = true,

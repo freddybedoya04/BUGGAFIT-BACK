@@ -7,6 +7,8 @@ namespace BUGGAFIT_BACK.Catalogos
     public interface ICatalogoTransacciones
     {
         Task<ResponseObject> CrearTrasaccionAsync(Transacciones transaccion);
+        Task<ResponseObject> CrearTrasaccionEntreCuentasAsync(TransaccionEntreCuentas transaccion);
+        Task<ResponseObject> AjustarDineroAUnaCuenta(TransaccionEntreCuentas transaccion);
         Task<ResponseObject> ListarTrasaccionesAsync();
         Task<ResponseObject> AnularTrasaccionesAsync(int Id);
         Task<ResponseObject> ConfirmarTrasaccionAsync(int Id, string usurioConfirmador);

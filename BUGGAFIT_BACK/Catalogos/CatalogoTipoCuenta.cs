@@ -39,7 +39,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     await catalogoTransacciones.CrearTrasaccionAsync(new()
                     {
                         TIC_CODIGO = _tipoCuenta.TIC_CODIGO,
-                        TRA_TIPO = tipoTransaccion.Valor,
+                        TRA_TIPO = tipoTransaccion.Nombre,
                         TRA_FECHACREACION = DateTime.Now,
                         TRA_CONFIRMADA = true,
                         TRA_ESTADO = true,

@@ -22,9 +22,9 @@
 
     public class TiposTransacciones
     {
-        private TiposTransacciones(string value, bool esRetiroDeDinero) { Valor = value; EsRetiroDeDinero = esRetiroDeDinero; }
-        private TiposTransacciones(string value) { Valor = value; EsRetiroDeDinero = false; }
-        public string Valor { get; private set; }
+        private TiposTransacciones(string value, bool esRetiroDeDinero) { Nombre = value; EsRetiroDeDinero = esRetiroDeDinero; }
+        private TiposTransacciones(string value) { Nombre = value; EsRetiroDeDinero = false; }
+        public string Nombre { get; private set; }
         public bool EsRetiroDeDinero { get; private set; }
         public static TiposTransacciones VENTA { get { return new TiposTransacciones("VENTA", false); } }
         public static TiposTransacciones COMPRA { get { return new TiposTransacciones("COMPRA", true); } }
@@ -71,5 +71,13 @@
                 _ => DEVOLUCION_TRANSFERENCIA,
             };
         }
+    }
+
+    public class TransaccionEntreCuentas
+    {
+        public int? IdCuentaOrigen { get; set; }
+        public int IdCuentaDestino { get; set; }
+        public float ValorTranferencia { get; set; }
+        public string? CedulaConfirmador { get; set; }
     }
 }
