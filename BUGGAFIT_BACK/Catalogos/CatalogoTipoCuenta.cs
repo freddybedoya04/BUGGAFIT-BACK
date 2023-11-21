@@ -10,10 +10,12 @@ namespace BUGGAFIT_BACK.Catalogos
     public class CatalogoTipoCuenta : ICatalogoTipoCuenta
     {
         private readonly MyDBContext myDbContext;
+        private readonly ICatalogoTransacciones? catalogoTransacciones;
 
-        public CatalogoTipoCuenta(MyDBContext myDbContext)
+        public CatalogoTipoCuenta(MyDBContext myDbContext, ICatalogoTransacciones? catalogoTransacciones)
         {
             this.myDbContext = myDbContext;
+            this.catalogoTransacciones = catalogoTransacciones;
         }
 
         public async Task<ResponseObject> ActualizarTipoCuentaAsync(TipoCuenta tipoCuenta)
@@ -23,13 +25,32 @@ namespace BUGGAFIT_BACK.Catalogos
             {   
 
                 TIPOSCUENTAS _tipoCuenta = myDbContext.TIPOSCUENTAS.Where(x=>x.TIC_CODIGO==tipoCuenta.TIC_CODIGO).FirstOrDefault();
-
+                float diferencia = (float)(tipoCuenta.TIC_DINEROTOTAL - _tipoCuenta.TIC_DINEROTOTAL); 
                 _tipoCuenta.TIC_NOMBRE = tipoCuenta.TIC_NOMBRE;
                 _tipoCuenta.TIC_NUMEROREFERENCIA = tipoCuenta.TIC_NUMEROREFERENCIA;
                 _tipoCuenta.TIC_ESTADO = tipoCuenta.TIC_ESTADO;
-                _tipoCuenta.TIC_DINEROTOTAL = tipoCuenta.TIC_DINEROTOTAL;
+                //_tipoCuenta.TIC_DINEROTOTAL = tipoCuenta.TIC_DINEROTOTAL;
                 myDbContext.Entry(_tipoCuenta).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
+
+                if (diferencia !=0)
+                {
+                    var tipoTransaccion = TiposTransacciones.MOVIMIENTO;
+                    await catalogoTransacciones.CrearTrasaccionAsync(new()
+                    {
+                        TIC_CODIGO = _tipoCuenta.TIC_CODIGO,
+                        TRA_TIPO = tipoTransaccion.Valor,
+                        TRA_FECHACREACION = DateTime.Now,
+                        TRA_CONFIRMADA = true,
+                        TRA_ESTADO = true,
+                        TRA_FECHACONFIRMACION =DateTime.Now ,
+                        TRA_CODIGOENLACE = null,
+                        TRA_FUEANULADA = false,
+                        TRA_NUMEROTRANSACCIONBANCO = 0,
+                        USU_CEDULA_CONFIRMADOR = null,
+                        TRA_VALOR = diferencia,
+                    }); 
+                }
             }
             catch (DbUpdateConcurrencyException)
             {

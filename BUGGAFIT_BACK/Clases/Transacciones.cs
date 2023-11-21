@@ -30,6 +30,7 @@
         public static TiposTransacciones COMPRA { get { return new TiposTransacciones("COMPRA", true); } }
         public static TiposTransacciones GASTO { get { return new TiposTransacciones("GASTO", true); } }
         public static TiposTransacciones ABONO { get { return new TiposTransacciones("ABONO", false); } }
+        public static TiposTransacciones MOVIMIENTO { get { return new TiposTransacciones("MOVIMIENTO", false); } }
         public static TiposTransacciones TRANSFERENCIA { get { return new TiposTransacciones("TRANSFERENCIA", false); } }
         public static TiposTransacciones DEVOLUCION_VENTA { get { return new TiposTransacciones("DEVOLUCION_VENTA", true); } }
         public static TiposTransacciones DEVOLUCION_COMPRA { get { return new TiposTransacciones("DEVOLUCION_COMPRA", true); } }
