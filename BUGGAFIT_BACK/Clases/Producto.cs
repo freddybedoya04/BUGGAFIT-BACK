@@ -14,5 +14,6 @@
         public DateTime PRO_ACTUALIZACION { get; set; }
         public DateTime PRO_FECHACREACION { get; set; }
         public bool PRO_ESTADO { get; set; }
+        public bool? PRO_REGALO { get; set; }
     }
 }

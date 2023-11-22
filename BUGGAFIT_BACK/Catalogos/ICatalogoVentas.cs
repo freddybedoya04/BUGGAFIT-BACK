@@ -24,5 +24,6 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> FinalizarCreditoAsync(int id);
         Task<ResponseObject> ConfirmarAbonoAsync(int car_codigo);
         Task<ResponseObject> AnularAbonoAsync(int car_codigo);
+        Task<ResponseObject> ListarDetalleVentasPorFechaAsync(FiltrosDTO filtro);
     }
 }

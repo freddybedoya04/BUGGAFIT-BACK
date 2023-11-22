@@ -35,6 +35,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     PRO_UNIDADES_MINIMAS_ALERTA = producto.PRO_UNIDADES_MINIMAS_ALERTA,
                     PRO_ACTUALIZACION = DateTime.Now,
                     PRO_ESTADO = producto.PRO_ESTADO,
+                    PRO_REGALO = producto.PRO_REGALO
                 };
                 myDbContext.Entry(_producto).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
@@ -107,6 +108,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     PRO_ACTUALIZACION = DateTime.Now,
                     PRO_FECHACREACION = DateTime.Now,
                     PRO_ESTADO = producto.PRO_ESTADO,
+                    PRO_REGALO = producto.PRO_REGALO
                 };
                 myDbContext.PRODUCTOS.Add(_producto);
                 await myDbContext.SaveChangesAsync();
@@ -186,6 +188,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                             PRO_ACTUALIZACION = p.PRO_ACTUALIZACION,
                                             PRO_FECHACREACION = p.PRO_FECHACREACION,
                                             PRO_ESTADO = p.PRO_ESTADO,
+                                            PRO_REGALO = p.PRO_REGALO
                                         }).OrderBy(x => x.PRO_NOMBRE).ToListAsync();
                 if (_productos == null || !_productos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay Productos.");

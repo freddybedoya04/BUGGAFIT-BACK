@@ -84,6 +84,18 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+        [HttpPost("BuscarDetallesPorFecha")]
+        public async Task<ActionResult<ResponseObject>> ListarDetalleVentasPorFechaAsync(FiltrosDTO filtro)
+        {
+            try
+            {
+                return Ok(await catalogo.ListarDetalleVentasPorFechaAsync(filtro));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
         // POST: api/Ventas
         [HttpPost("PostDetalleVenta")]
         public async Task<ActionResult<ResponseObject>> PostDetalleVenta(List<DetalleVenta> detallesVentas)
@@ -265,3 +277,4 @@ namespace BUGGAFIT_BACK.Controllers
 
     }
 }
+

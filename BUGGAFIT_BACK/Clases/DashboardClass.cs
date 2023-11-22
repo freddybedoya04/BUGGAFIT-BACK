@@ -28,14 +28,13 @@
     }
     public class DatosGraficas
     {
-        public List<ListaProductosVendidos> ProductosMasVendidos { get; set; } = new();
+        public List<ListaProductosVendidos> ProductosVendidos { get; set; } = new();
         public List<Ventas> VentasRealizadas { get; set; } = new();
         public List<MovimientoCuentas> IngresosCuentas { get; set; } = new();
         public List<MovimientoCuentas> GastosCuentas { get; set; } = new();
         public List<MovimientoCuentas> ComprasCuentas { get; set; } = new();
         public List<MovimientoCuentas> AbonosCuentas { get; set; } = new();
-
-
+     
     }
 
     public class ListaProductosVendidos
@@ -43,6 +42,7 @@
         public string? Codigo { get; set; }
         public string? Nombre { get; set; }
         public int CantidadProducto { get; set; }
+        public object Precio { get; internal set; }
     }
 
     public class MovimientoCuentas

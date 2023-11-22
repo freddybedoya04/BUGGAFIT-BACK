@@ -52,7 +52,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         credito.Ventas = ventas;
                         credito.Carteras = carteras;
                         credito.TotalVendido = ventas.Sum(x => x.VEN_PRECIOTOTAL);
-                        credito.TotalAbonado = carteras.Sum(x => x.CAR_VALORABONADO);
+                        credito.TotalAbonado = carteras.Where(x => x.CAR_ESANULADA !=true).Sum(x => x.CAR_VALORABONADO);
                         credito.DiferenciaTotal = credito.TotalVendido - credito.TotalAbonado;
                     //Se agrega el credito a la lista
                     creditos.Add(credito);
@@ -95,7 +95,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     credito.Ventas = ventas;
                     credito.Carteras = carteras;
                     credito.TotalVendido = ventas.Sum(x => x.VEN_PRECIOTOTAL);
-                    credito.TotalAbonado = carteras.Sum(x => x.CAR_VALORABONADO);
+                    credito.TotalAbonado = carteras.Where(x => x.CAR_ESANULADA != true).Sum(x => x.CAR_VALORABONADO);
                     credito.DiferenciaTotal = credito.TotalVendido - credito.TotalAbonado;
                     
                 

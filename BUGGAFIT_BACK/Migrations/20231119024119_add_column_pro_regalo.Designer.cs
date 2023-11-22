@@ -4,6 +4,7 @@ using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BUGGAFIT_BACK.Migrations
 {
     [DbContext(typeof(MyDBContext))]
-    partial class MyDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231119024119_add_column_pro_regalo")]
+    partial class add_column_pro_regalo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,9 +63,6 @@ namespace BUGGAFIT_BACK.Migrations
 
                     b.Property<int>("TIC_CODIGO")
                         .HasColumnType("int");
-
-                    b.Property<string>("USU_CEDULA")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("VEN_CODIGO")
                         .HasColumnType("int");
@@ -604,9 +604,6 @@ namespace BUGGAFIT_BACK.Migrations
                     b.Property<string>("TRA_TIPO")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<float?>("TRA_VALOR")
-                        .HasColumnType("real");
 
                     b.Property<string>("USU_CEDULA_CONFIRMADOR")
                         .HasColumnType("nvarchar(max)");
