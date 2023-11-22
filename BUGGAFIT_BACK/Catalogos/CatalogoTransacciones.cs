@@ -209,7 +209,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     var _transaccion = await myDbContext.TRANSACCIONES.FindAsync(id);
                     if (_transaccion == null)
                         continue;
-                    if (_transaccion.TRA_CONFIRMADA == true)
+                    if (_transaccion.TRA_CONFIRMADA == true || _transaccion.TRA_FUEANULADA == true)
                         continue;
                     _transaccion.TRA_CONFIRMADA = true;
                     _transaccion.USU_CEDULA_CONFIRMADOR = usurioConfirmador;
@@ -432,7 +432,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 var _tipoCuenta = await myDbContext.TIPOSCUENTAS.FindAsync(transaccion.IdCuentaDestino);
                 if (_tipoCuenta == null)
                     return ResponseClass.Response(statusCode: 400, message: $"La cuenta con el codigo {transaccion.IdCuentaDestino} no existe.");
-                TiposTransacciones tipoTransaccion = TiposTransacciones.TRANSFERENCIA;
+                TiposTransacciones tipoTransaccion = TiposTransacciones.MOVIMIENTO;
 
                 await CrearTrasaccionAsync(new()
                 {

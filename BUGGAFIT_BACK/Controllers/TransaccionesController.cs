@@ -104,7 +104,7 @@ namespace BUGGAFIT_BACK.Controllers
         }
 
         [HttpPost("ConfirmarTransacciones/")]
-        public async Task<ActionResult<ResponseObject>> ConfirmarTransaccion([FromBody] List<int> transacciones, [FromQuery] string usuario)
+        public async Task<ActionResult<ResponseObject>> ConfirmarTransacciones([FromBody] List<int> transacciones, [FromQuery] string usuario)
         {
             try
             {
@@ -120,6 +120,10 @@ namespace BUGGAFIT_BACK.Controllers
         {
             try
             {
+                if (transaccion.IdCuentaOrigen == transaccion.IdCuentaDestino)
+                    return BadRequest(ResponseClass.ErrorResponse(statusCode: 400, message: "Las cuentas de origen y destino no pueden ser iguales.", details: ""));
+                if (transaccion.ValorTranferencia <= 0)
+                    return BadRequest(ResponseClass.ErrorResponse(statusCode: 400, message: "el valor de la transferencia no puede ser menor o igual a cero.", details: ""));
                 return Ok(await catalogo.CrearTrasaccionEntreCuentasAsync(transaccion));
             }
             catch (Exception ex)
