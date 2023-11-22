@@ -639,7 +639,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 var abono = await myDbContext.CARTERAS.FindAsync(car_codigo);
                 if (abono == null)
                     return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {car_codigo} no existe.");
-                abono.CAR_ESTADOCREDITO = 0;
+                abono.CAR_ESTADOCREDITO = 1;
                 myDbContext.Entry(abono).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
 

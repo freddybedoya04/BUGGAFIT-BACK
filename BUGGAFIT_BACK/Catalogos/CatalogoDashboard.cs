@@ -35,7 +35,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         gastosNoPagos = x.Where(x => x.GAS_PENDIENTE == true).Sum(x => x.GAS_VALOR)
                     }).ToListAsync();
                 var queryVentas = await myDbContext.VENTAS
-                    .Where(x => x.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() && x.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && x.VEN_ESTADO == true && x.VEN_ESANULADA != true)
+                    .Where(x => x.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() && x.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && x.VEN_ESTADO == true
+                    &&x.VEN_ESTADOCREDITO==false && x.VEN_ESANULADA != true)
                     .GroupBy(x => x.VEN_CODIGO)
                     .Select(x => new
                     {
@@ -160,7 +161,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosGraficas.GastosCuentas = await (from co in myDbContext.GASTOS
                                                                where co.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
                                                                  && co.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && co.GAS_ESTADO == true
-                                                                 && co.GAS_PENDIENTE == true && co.GAS_ESANULADA != true
+                                                                 && co.GAS_PENDIENTE == false && co.GAS_ESANULADA != true
                                                                group co by co.TipoCuentas.TIC_CODIGO into g
                                                                select new MovimientoCuentas
                                                                {
