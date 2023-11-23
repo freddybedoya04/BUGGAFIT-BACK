@@ -55,7 +55,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 // guardamos los datos de las cards en el objeto 
                 dashboard.DatosCards.SumaCompras = queryCompras.Sum(x => x.comprasTotales);
                 var ventascredito = myDbContext.VENTAS.Where(x => x.CLIENTES.CLI_ESCREDITO == true && x.VEN_ESTADO == true && x.VEN_ESTADOCREDITO==true && x.VEN_ESANULADA != true).Sum(x => x.VEN_PRECIOTOTAL);
-                var abonos = myDbContext.CARTERAS.Where(x => x.VENTA.CLIENTES.CLI_ESCREDITO == true && x.CAR_ESTADO == true && x.CAR_ESANULADA != true).Sum(x => x.CAR_VALORABONADO);
+                var abonos = myDbContext.CARTERAS.Where(x => x.VENTA.CLIENTES.CLI_ESCREDITO == true && x.CAR_ESTADO == true && x.CAR_ESTADOCREDITO==1 && x.CAR_ESANULADA != true).Sum(x => x.CAR_VALORABONADO);
                 dashboard.DatosCards.SumaCreditos = ventascredito - abonos;
                 double deudasGastos, deudasCompras = 0;
                 deudasGastos = queryGastos.Sum(x => x.gastosNoPagos);
@@ -93,12 +93,12 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                    on det.PRO_CODIGO equals pro.PRO_CODIGO
                                                                    where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
                                                                    && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true && ven.VEN_ESANULADA != true
-                                                                   group det by new { pro.PRO_CODIGO, pro.PRO_NOMBRE, det.VED_PRECIOVENTA_TOTAL } into g
+                                                                   group det by new { pro.PRO_CODIGO, pro.PRO_NOMBRE, det.VED_PRECIOVENTA_UND } into g
                                                                    select new ListaProductosVendidos
                                                                    {
                                                                        Codigo = g.Key.PRO_CODIGO,
                                                                        Nombre = g.Key.PRO_NOMBRE,
-                                                                       Precio = g.Key.VED_PRECIOVENTA_TOTAL,
+                                                                       Precio = g.Key.VED_PRECIOVENTA_UND,
                                                                        CantidadProducto = g.Sum(x => x.VED_UNIDADES),
                                                                    }).OrderByDescending(g=>g.CantidadProducto).ToListAsync();
 
@@ -123,7 +123,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                  on car.TIC_CODIGO equals cu.TIC_CODIGO
                                                                  where car.CAR_FECHACREDITO >= filtros.FechaInicio.ToLocalTime()
                                                                  && car.CAR_FECHACREDITO <= filtros.FechaFin.ToLocalTime() && car.CAR_ESTADO == true
-                                                                 && car.CAR_ESANULADA != true
+                                                                 && car.CAR_ESANULADA != true && car.CAR_ESTADOCREDITO==1
                                                                  group car by car.TIC_CODIGO into g
                                                                  select new MovimientoCuentas
                                                                  {
