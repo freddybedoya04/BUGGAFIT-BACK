@@ -13,6 +13,8 @@
         public string? CLI_DIRECCION { get; set; }
         public string? CLI_TIPOCLIENTE { get; set; }
         public string? CLI_UBICACION{ get; set; }
+        public int? CLI_TELEFONO { get; set; }
+        public string? CLI_CORREO {  get; set; }
         public float VEN_PRECIOTOTAL { get; set; }
         public bool VEN_ESTADOCREDITO { get; set; }
         public bool VEN_ENVIO { get; set; }

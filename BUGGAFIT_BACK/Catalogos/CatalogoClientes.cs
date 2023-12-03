@@ -36,6 +36,8 @@ namespace BUGGAFIT_BACK.Catalogos
                     CLI_DIRECCION = cliente.CLI_DIRECCION,
                     CLI_ESTADO = cliente.CLI_ESTADO,
                     CLI_ESCREDITO = cliente.CLI_ESCREDITO,
+                    CLI_CORREO = cliente.CLI_CORREO,
+                    CLI_TELEFONO = cliente.CLI_TELEFONO
                 };
                 myDbContext.Entry(_cliente).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
@@ -112,6 +114,8 @@ namespace BUGGAFIT_BACK.Catalogos
                     CLI_FECHACREACION = DateTime.Now,
                     CLI_ESTADO = cliente.CLI_ESTADO,
                     CLI_ESCREDITO = cliente.CLI_ESCREDITO,
+                    CLI_TELEFONO = cliente.CLI_TELEFONO,
+                    CLI_CORREO = cliente.CLI_CORREO
                 };
                 myDbContext.CLIENTES.Add(_cliente);
                 await myDbContext.SaveChangesAsync();

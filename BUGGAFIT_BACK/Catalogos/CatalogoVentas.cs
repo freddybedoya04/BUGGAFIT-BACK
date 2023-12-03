@@ -318,33 +318,40 @@ namespace BUGGAFIT_BACK.Catalogos
                      .Where(x => x.VEN_FECHAVENTA >= filtro.FechaInicio.ToLocalTime()
                                  && x.VEN_FECHAVENTA <= filtro.FechaFin.ToLocalTime()
                                  && x.VEN_ESTADO == true)
-                     .Select(d => new Ventas
-                     {
-                         VEN_CODIGO = d.VEN_CODIGO,
-                         VEN_FECHACREACION = d.VEN_FECHACREACION,
-                         VEN_FECHAVENTA = d.VEN_FECHAVENTA,
-                         VEN_TIPOPAGO = d.VEN_TIPOPAGO,
-                         TIC_CODIGO = d.TIC_CODIGO,
-                         CLI_ID = d.CLI_ID,
-                         VEN_PRECIOTOTAL = d.VEN_PRECIOTOTAL,
-                         VEN_ESTADOCREDITO = (bool)d.VEN_ESTADOCREDITO,
-                         VEN_ENVIO = (bool)d.VEN_ENVIO,
-                         VEN_DOMICILIO = (bool)d.VEN_DOMICILIO,
-                         VEN_OBSERVACIONES = d.VEN_OBSERVACIONES,
-                         VEN_ACTUALIZACION = (DateTime)d.VEN_ACTUALIZACION,
-                         USU_CEDULA = d.USU_CEDULA,
-                         USU_NOMBRE = d.USUARIOS.USU_NOMBRE,
-                         VEN_ESTADOVENTA = d.VEN_ESTADOVENTA,
-                         VEN_ESTADO = d.VEN_ESTADO,
-                         CLI_NOMBRE = d.CLI_NOMBRE,
-                         CLI_DIRECCION = d.CLI_DIRECCION,
-                         CLI_TIPOCLIENTE = d.CLI_TIPOCLIENTE,
-                         CLI_UBICACION = d.CLI_UBICACION,
-                         TIC_NOMBRE = d.TIPOSCUENTAS.TIC_NOMBRE,
-                         TIP_CODIGO = d.TIP_CODIGO,
-                         TIP_NOMBRE = d.TIPOSENVIOS.TIP_NOMBRE,
-                         VEN_ESANULADA=d.VEN_ESANULADA
-                     }).OrderByDescending(x => x.VEN_FECHAVENTA).ToListAsync();
+                     .Join(myDbContext.CLIENTES,
+                           venta => venta.CLI_ID,
+                           cliente => cliente.CLI_ID,
+                           (venta, cliente) => new Ventas
+                           {
+                               VEN_CODIGO = venta.VEN_CODIGO,
+                               VEN_FECHACREACION = venta.VEN_FECHACREACION,
+                               VEN_FECHAVENTA = venta.VEN_FECHAVENTA,
+                               VEN_TIPOPAGO = venta.VEN_TIPOPAGO,
+                               TIC_CODIGO = venta.TIC_CODIGO,
+                               CLI_ID = venta.CLI_ID,
+                               VEN_PRECIOTOTAL = venta.VEN_PRECIOTOTAL,
+                               VEN_ESTADOCREDITO = (bool)venta.VEN_ESTADOCREDITO,
+                               VEN_ENVIO = (bool)venta.VEN_ENVIO,
+                               VEN_DOMICILIO = (bool)venta.VEN_DOMICILIO,
+                               VEN_OBSERVACIONES = venta.VEN_OBSERVACIONES,
+                               VEN_ACTUALIZACION = (DateTime)venta.VEN_ACTUALIZACION,
+                               USU_CEDULA = venta.USU_CEDULA,
+                               USU_NOMBRE = venta.USUARIOS.USU_NOMBRE,
+                               VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
+                               VEN_ESTADO = venta.VEN_ESTADO,
+                               CLI_NOMBRE = cliente.CLI_NOMBRE,
+                               CLI_TELEFONO = cliente.CLI_TELEFONO, // Agregado el teléfono
+                               CLI_CORREO=cliente.CLI_CORREO,
+                               CLI_DIRECCION = cliente.CLI_DIRECCION,
+                               CLI_TIPOCLIENTE = cliente.CLI_TIPOCLIENTE,
+                               CLI_UBICACION = cliente.CLI_UBICACION,
+                               TIC_NOMBRE = venta.TIPOSCUENTAS.TIC_NOMBRE,
+                               TIP_CODIGO = venta.TIP_CODIGO,
+                               TIP_NOMBRE = venta.TIPOSENVIOS.TIP_NOMBRE,
+                               VEN_ESANULADA = venta.VEN_ESANULADA
+                           })
+                     .OrderByDescending(x => x.VEN_FECHAVENTA)
+                     .ToListAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: ventas);
             }
@@ -353,6 +360,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+
 
         private bool VentasExists(int id)
         {
