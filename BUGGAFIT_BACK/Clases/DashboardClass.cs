@@ -24,6 +24,7 @@
         public double SumaCompras { get; set; } = 0;
         public double SumaCreditos { get; set; } = 0;
         public double SumaDeudas { get; set; } = 0;
+        public double Utilidades { get; set; } = 0;
 
     }
     public class DatosGraficas

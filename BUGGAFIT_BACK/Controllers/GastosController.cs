@@ -74,6 +74,24 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+        // POST api/
+        [HttpPost]
+        [Route("EstadisticaGastos")]
+        public async Task<IActionResult> EstadisticaGastos([FromBody] FiltrosDTO filtro)
+        {
+            try
+            {
+                var result = await catalogo.EstadisticaGastos(filtro);
+                if (result.StatusCode == 204)
+                    return NoContent();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
 
         // GET: api/GetGasto/5
         [HttpGet("GetGasto/MotivoEnvio")]

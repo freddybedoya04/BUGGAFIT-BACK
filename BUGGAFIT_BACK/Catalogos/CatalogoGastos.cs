@@ -88,11 +88,15 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 _gasto.GAS_ESANULADA = true;
                 myDbContext.Entry(_gasto).State = EntityState.Modified;
-                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _gasto.GAS_CODIGO.ToString()).FirstOrDefaultAsync();
-                if (_transaccion != null)
+                var _transaccion = await myDbContext.TRANSACCIONES
+                    .Where(x => x.TRA_CODIGOENLACE == _gasto.GAS_CODIGO.ToString() && x.TRA_TIPO == TiposTransacciones.GASTO.Nombre)
+                    .FirstOrDefaultAsync();
+
+                if (_transaccion == null)
                 {
-                    await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
+                    return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente.");
                 }
+                await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
 
                 await myDbContext.SaveChangesAsync();
                 return ResponseClass.Response(statusCode: 204, message: $"Venta Analudada Exitosamente. {(_transaccion == null ? "No habian transacciones asociadas." : "")}");
@@ -205,6 +209,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 myDbContext.GASTOS.Add(_gasto);
                 await myDbContext.SaveChangesAsync();
 
+                // creacion de las transacciones de envio
                 if (!_gasto.TipoCuentas.TIC_NOMBRE.ToLower().Contains("credito"))
                 {
                     var tipoTransaccion = TiposTransacciones.GASTO;
@@ -214,13 +219,13 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = _gasto.TIC_CODIGO,
                         TRA_TIPO = tipoTransaccion.Nombre,
                         TRA_FECHACREACION = DateTime.Now,
-                        TRA_CONFIRMADA = !pendiente,
+                        TRA_CONFIRMADA = true,
                         TRA_ESTADO = true,
-                        TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
+                        TRA_FECHACONFIRMACION = DateTime.Now,
                         TRA_CODIGOENLACE = _gasto.GAS_CODIGO.ToString(),
                         TRA_FUEANULADA = false,
                         TRA_NUMEROTRANSACCIONBANCO = 0,
-                        USU_CEDULA_CONFIRMADOR = pendiente ? null : _gasto.USU_CEDULA,
+                        USU_CEDULA_CONFIRMADOR = _gasto.USU_CEDULA,
                         TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_gasto.GAS_VALOR) : gasto.GAS_VALOR,
                     });
                 }
@@ -328,7 +333,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         USU_NOMBRE = x.Usuarios.USU_NOMBRE,
                         TIC_NOMBRE = x.TipoCuentas.TIC_NOMBRE,
                         MOG_NOMBRE = x.MOTIVOSGASTOS.MOG_NOMBRE,
-                        GAS_ESANULADA=x.GAS_ESANULADA
+                        GAS_ESANULADA = x.GAS_ESANULADA
                     })
                     .OrderByDescending(x => x.GAS_FECHAGASTO)
                     .ToListAsync();
@@ -336,6 +341,51 @@ namespace BUGGAFIT_BACK.Catalogos
                 if (!gastos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay gastos.");
                 return ResponseClass.Response(statusCode: 200, data: gastos);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseObject> EstadisticaGastos(FiltrosDTO filtro)
+        {
+            try
+            {
+                List<EstadisticasGastos> gastos = new();
+                // Accede a la instancia de MyDBContext a través de ConexionBD 
+
+                // Realiza consultas de Entity Framework aquí
+                var _motivoGastos = await myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_ESTADO == true).OrderBy(x => x.MOG_NOMBRE)
+                    .Select(x => new EstadisticasGastos
+                    {
+                        MOG_CODIGO = x.MOG_CODIGO,
+                        MOG_NOMBRE = x.MOG_NOMBRE,
+                        MOG_VALORGASTADO = 0,
+                    }).ToListAsync();
+
+                if (!_motivoGastos.Any())
+                    return ResponseClass.Response(statusCode: 204, message: "No hay motivos de gastos.");
+
+                gastos = await myDbContext.GASTOS
+                    .Where(x => x.GAS_FECHAGASTO >= filtro.FechaInicio.ToLocalTime()
+                        && x.GAS_FECHAGASTO <= filtro.FechaFin.ToLocalTime()
+                        && x.GAS_ESTADO == true
+                        && _motivoGastos.Select(y => y.MOG_CODIGO).Contains(x.MOG_CODIGO))
+                    .GroupBy(x => x.MOG_CODIGO)
+                    .Select(x => new EstadisticasGastos
+                    {
+                        MOG_CODIGO = x.Key,
+                        MOG_NOMBRE = x.First().MOTIVOSGASTOS.MOG_NOMBRE,
+                        MOG_VALORGASTADO = x.Sum(y => y.GAS_VALOR),
+                    })
+                    .OrderByDescending(x => x.MOG_CODIGO)
+                    .ToListAsync();
+                var result = gastos.Union(_motivoGastos, new EstadisticasGastosComparer()).ToList();
+
+                if (!result.Any())
+                    return ResponseClass.Response(statusCode: 204, message: "No hay gastos.");
+                return ResponseClass.Response(statusCode: 200, data: result);
             }
             catch (Exception)
             {
