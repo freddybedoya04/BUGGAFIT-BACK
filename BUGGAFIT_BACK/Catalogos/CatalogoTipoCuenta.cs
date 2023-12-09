@@ -29,6 +29,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 _tipoCuenta.TIC_NOMBRE = tipoCuenta.TIC_NOMBRE;
                 _tipoCuenta.TIC_NUMEROREFERENCIA = tipoCuenta.TIC_NUMEROREFERENCIA;
                 _tipoCuenta.TIC_ESTADO = tipoCuenta.TIC_ESTADO;
+                _tipoCuenta.TIC_ESTIPOENVIO = tipoCuenta.TIC_ESTIPOENVIO;
                 //_tipoCuenta.TIC_DINEROTOTAL = tipoCuenta.TIC_DINEROTOTAL;
                 myDbContext.Entry(_tipoCuenta).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
@@ -113,6 +114,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     TIC_ESTADO =true,
                     TIC_DINEROTOTAL = tipoCuenta.TIC_DINEROTOTAL,
                     TIC_FECHACREACION = DateTime.Now,
+                    TIC_ESTIPOENVIO=tipoCuenta.TIC_ESTIPOENVIO
                 };
                 myDbContext.TIPOSCUENTAS.Add(_tipoCuentas);
                 await myDbContext.SaveChangesAsync();

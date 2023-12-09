@@ -348,7 +348,8 @@ namespace BUGGAFIT_BACK.Catalogos
                                TIC_NOMBRE = venta.TIPOSCUENTAS.TIC_NOMBRE,
                                TIP_CODIGO = venta.TIP_CODIGO,
                                TIP_NOMBRE = venta.TIPOSENVIOS.TIP_NOMBRE,
-                               VEN_ESANULADA = venta.VEN_ESANULADA
+                               VEN_ESANULADA = venta.VEN_ESANULADA,
+                               VEN_COSTOENVIO=myDbContext.GASTOS.Where(x=>x.VEN_CODIGO==venta.VEN_CODIGO).Select(x=>x.GAS_VALOR).FirstOrDefault(),
                            })
                      .OrderByDescending(x => x.VEN_FECHAVENTA)
                      .ToListAsync();

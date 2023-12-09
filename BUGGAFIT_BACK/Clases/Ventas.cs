@@ -28,6 +28,7 @@
         public int? TIP_CODIGO { get; set; }
         public string? TIP_NOMBRE { get; set; }
         public bool? VEN_ESANULADA { get; set; }
+        public float? VEN_COSTOENVIO { get; set; }
 
         public ICollection<DetalleVenta>? DetalleVentas { get; set; }
 

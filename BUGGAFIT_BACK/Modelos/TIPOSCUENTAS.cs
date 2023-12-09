@@ -13,5 +13,6 @@ namespace BUGGAFIT_BACK.Modelos
         public DateTime TIC_FECHACREACION { get; set; }
         public bool TIC_ESTADO { get; set; }
         public float? TIC_DINEROTOTAL { get; set; }
+        public bool? TIC_ESTIPOENVIO { get; set; }
     }
 }

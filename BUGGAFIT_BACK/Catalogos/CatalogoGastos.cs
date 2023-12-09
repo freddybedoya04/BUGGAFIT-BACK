@@ -182,12 +182,12 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 int codigoMotivo = myDbContext.MOTIVOSGASTOS.Where(x => x.MOG_NOMBRE.ToUpper().Contains("ENVIO") && x.MOG_ESTADO == true).Select(x => x.MOG_CODIGO).FirstAsync().Result;
                 float valor = myDbContext.VENTAS.Where(x => x.VEN_CODIGO == gasto.VEN_CODIGO).Select(x => x.TIPOSENVIOS.TIP_VALOR).FirstAsync().Result;
-                bool pendiente = true;
+                bool pendiente = false;
 
-                if (myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == gasto.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
-                {
-                    pendiente = false;
-                }
+                //if (myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == gasto.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
+                //{
+                //    pendiente = false;
+                //}
                 GASTOS _gasto = new()
                 {
                     GAS_CODIGO = gasto.GAS_CODIGO,
@@ -198,14 +198,13 @@ namespace BUGGAFIT_BACK.Catalogos
                     TIC_CODIGO = gasto.TIC_CODIGO,
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
-                    GAS_PENDIENTE = pendiente,
+                    GAS_PENDIENTE = false,
                     GAS_OBSERVACIONES = gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = gasto.VEN_CODIGO,
                 };
                 myDbContext.GASTOS.Add(_gasto);
                 await myDbContext.SaveChangesAsync();
-
-                if (!_gasto.TipoCuentas.TIC_NOMBRE.ToLower().Contains("credito"))
+                if (!myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == _gasto.TIC_CODIGO).Select(x => x.TIC_NOMBRE).FirstOrDefault().ToLower().Contains("credito"))
                 {
                     var tipoTransaccion = TiposTransacciones.GASTO;
                     await catalogoTransacciones.CrearTrasaccionAsync(new()
@@ -214,13 +213,13 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = _gasto.TIC_CODIGO,
                         TRA_TIPO = tipoTransaccion.Nombre,
                         TRA_FECHACREACION = DateTime.Now,
-                        TRA_CONFIRMADA = !pendiente,
+                        TRA_CONFIRMADA = true,
                         TRA_ESTADO = true,
-                        TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
+                        TRA_FECHACONFIRMACION = DateTime.Now,
                         TRA_CODIGOENLACE = _gasto.GAS_CODIGO.ToString(),
                         TRA_FUEANULADA = false,
                         TRA_NUMEROTRANSACCIONBANCO = 0,
-                        USU_CEDULA_CONFIRMADOR = pendiente ? null : _gasto.USU_CEDULA,
+                        USU_CEDULA_CONFIRMADOR = _gasto.USU_CEDULA,
                         TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_gasto.GAS_VALOR) : gasto.GAS_VALOR,
                     });
                 }
