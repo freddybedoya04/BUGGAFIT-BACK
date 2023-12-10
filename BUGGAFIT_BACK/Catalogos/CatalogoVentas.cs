@@ -509,7 +509,9 @@ namespace BUGGAFIT_BACK.Catalogos
                 myDbContext.Entry(_venta).State = EntityState.Modified;
                 await RegresarProductosAlInventario(_venta.VEN_CODIGO);
 
-                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == _venta.VEN_CODIGO.ToString()).FirstOrDefaultAsync();
+                var _transaccion = await myDbContext.TRANSACCIONES
+                    .Where(x => x.TRA_CODIGOENLACE == _venta.VEN_CODIGO.ToString() && x.TRA_TIPO == TiposTransacciones.VENTA.Nombre)
+                    .FirstOrDefaultAsync();
                 if (_transaccion != null)
                 {
                     await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);

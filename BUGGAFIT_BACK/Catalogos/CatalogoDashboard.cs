@@ -52,18 +52,20 @@ namespace BUGGAFIT_BACK.Catalogos
                         comprasTotales = x.Sum(x => x.COM_VALORCOMPRA),
                         comprasNoPagas = x.Where(x => x.COM_CREDITO == true).Sum(x => x.COM_VALORCOMPRA)
                     }).ToListAsync();
-                // guardamos los datos de las cards en el objeto 
-                dashboard.DatosCards.SumaCompras = queryCompras.Sum(x => x.comprasTotales);
+                //calculamos variables adicionales 
                 var ventascredito = myDbContext.VENTAS.Where(x => x.CLIENTES.CLI_ESCREDITO == true && x.VEN_ESTADO == true && x.VEN_ESTADOCREDITO==true && x.VEN_ESANULADA != true).Sum(x => x.VEN_PRECIOTOTAL);
                 var abonos = myDbContext.CARTERAS.Where(x => x.VENTA.CLIENTES.CLI_ESCREDITO == true && x.CAR_ESTADO == true && x.CAR_ESTADOCREDITO==1 && x.CAR_ESANULADA != true).Sum(x => x.CAR_VALORABONADO);
-                dashboard.DatosCards.SumaCreditos = ventascredito - abonos;
                 double deudasGastos, deudasCompras = 0;
                 deudasGastos = queryGastos.Sum(x => x.gastosNoPagos);
                 deudasCompras = queryCompras.Sum(x => x.comprasNoPagas);
-                dashboard.DatosCards.SumaDeudas = deudasCompras + deudasGastos;
 
+                // guardamos los datos de las cards en el objeto 
+                dashboard.DatosCards.SumaCreditos = ventascredito - abonos;
+                dashboard.DatosCards.SumaCompras = queryCompras.Sum(x => x.comprasTotales);
+                dashboard.DatosCards.SumaDeudas = deudasCompras + deudasGastos;
                 dashboard.DatosCards.SumaGastos = queryGastos.Sum(x => x.gastosTotales);
                 dashboard.DatosCards.SumaVentas = queryVentas.Sum(x => x.ventasTotales);
+                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - dashboard.DatosCards.SumaCompras;
                 #endregion
 
                 #region datos de las graficas

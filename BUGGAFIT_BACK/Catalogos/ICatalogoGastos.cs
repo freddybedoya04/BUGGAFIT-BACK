@@ -17,5 +17,6 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> ListarMotivoGastosDeEnvioAsync();
         Task<ResponseObject> CerrarGasto(int id);
         Task<ResponseObject> ListarGastosPorFecha(FiltrosDTO filtro);
+        Task<ResponseObject> EstadisticaGastos(FiltrosDTO filtro);
     }
 }
