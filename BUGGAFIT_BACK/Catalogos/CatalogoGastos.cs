@@ -371,6 +371,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     .Where(x => x.GAS_FECHAGASTO >= filtro.FechaInicio.ToLocalTime()
                         && x.GAS_FECHAGASTO <= filtro.FechaFin.ToLocalTime()
                         && x.GAS_ESTADO == true
+                        && x.GAS_ESANULADA == false
                         && _motivoGastos.Select(y => y.MOG_CODIGO).Contains(x.MOG_CODIGO))
                     .GroupBy(x => x.MOG_CODIGO)
                     .Select(x => new EstadisticasGastos
