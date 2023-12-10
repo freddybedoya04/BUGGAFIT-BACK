@@ -27,7 +27,10 @@ namespace BUGGAFIT_BACK.Catalogos
                 #region Datos de las cards
                 // buscamos la info necesaria para las cards
                 var queryGastos = await myDbContext.GASTOS
-                    .Where(x => x.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime() && x.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime() && x.GAS_ESTADO == true &&x.GAS_ESANULADA !=true)
+                    .Where(x => x.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime() && x.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime()
+                    && x.GAS_ESTADO == true
+                    && x.GAS_ESANULADA != true
+                    && x.GAS_PENDIENTE == false)
                     .GroupBy(x => x.GAS_CODIGO)
                     .Select(x => new
                     {
@@ -36,7 +39,9 @@ namespace BUGGAFIT_BACK.Catalogos
                     }).ToListAsync();
                 var queryVentas = await myDbContext.VENTAS
                     .Where(x => x.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() && x.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && x.VEN_ESTADO == true
-                    &&x.VEN_ESTADOCREDITO==false && x.VEN_ESANULADA != true)
+                    && x.VEN_ESTADOCREDITO == false
+                    && x.VEN_ESTADOVENTA == true
+                    && x.VEN_ESANULADA != true)
                     .GroupBy(x => x.VEN_CODIGO)
                     .Select(x => new
                     {
@@ -45,16 +50,24 @@ namespace BUGGAFIT_BACK.Catalogos
                     }).ToListAsync();
 
                 var queryCompras = await myDbContext.COMPRAS
-                    .Where(x => x.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime() && x.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && x.COM_ESTADO == true && x.COM_ESANULADA != true)
+                    .Where(x => x.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime() && x.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && x.COM_ESTADO == true
+                    && x.COM_ESANULADA != true
+                    && x.COM_CREDITO == false)
                     .GroupBy(x => x.COM_CODIGO)
                     .Select(x => new
                     {
                         comprasTotales = x.Sum(x => x.COM_VALORCOMPRA),
                         comprasNoPagas = x.Where(x => x.COM_CREDITO == true).Sum(x => x.COM_VALORCOMPRA)
                     }).ToListAsync();
+
+                var ventascredito = myDbContext.VENTAS
+                    .Where(x => x.CLIENTES.CLI_ESCREDITO == true && x.VEN_ESTADO == true && x.VEN_ESTADOCREDITO == true && x.VEN_ESANULADA != true)
+                    .Sum(x => x.VEN_PRECIOTOTAL);
+
+                var abonos = myDbContext.CARTERAS
+                    .Where(x => x.VENTA.CLIENTES.CLI_ESCREDITO == true && x.CAR_ESTADO == true && x.CAR_ESTADOCREDITO == 1 && x.CAR_ESANULADA != true)
+                    .Sum(x => x.CAR_VALORABONADO);
                 //calculamos variables adicionales 
-                var ventascredito = myDbContext.VENTAS.Where(x => x.CLIENTES.CLI_ESCREDITO == true && x.VEN_ESTADO == true && x.VEN_ESTADOCREDITO==true && x.VEN_ESANULADA != true).Sum(x => x.VEN_PRECIOTOTAL);
-                var abonos = myDbContext.CARTERAS.Where(x => x.VENTA.CLIENTES.CLI_ESCREDITO == true && x.CAR_ESTADO == true && x.CAR_ESTADOCREDITO==1 && x.CAR_ESANULADA != true).Sum(x => x.CAR_VALORABONADO);
                 double deudasGastos, deudasCompras = 0;
                 deudasGastos = queryGastos.Sum(x => x.gastosNoPagos);
                 deudasCompras = queryCompras.Sum(x => x.comprasNoPagas);
@@ -102,7 +115,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                        Nombre = g.Key.PRO_NOMBRE,
                                                                        Precio = g.Key.VED_PRECIOVENTA_UND,
                                                                        CantidadProducto = g.Sum(x => x.VED_UNIDADES),
-                                                                   }).OrderByDescending(g=>g.CantidadProducto).ToListAsync();
+                                                                   }).OrderByDescending(g => g.CantidadProducto).ToListAsync();
 
 
 
@@ -111,7 +124,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                                                  on ven.TIC_CODIGO equals cu.TIC_CODIGO
                                                                  where ven.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime()
                                                                  && ven.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && ven.VEN_ESTADO == true
-                                                                 && ven.VEN_ESTADOVENTA== true && ven.VEN_ESANULADA != true
+                                                                 && ven.VEN_ESTADOVENTA == true && ven.VEN_ESANULADA != true
                                                                  group ven by ven.TIC_CODIGO into g
                                                                  select new MovimientoCuentas
                                                                  {
@@ -121,19 +134,19 @@ namespace BUGGAFIT_BACK.Catalogos
 
                                                                  }).ToListAsync();
                 dashboard.DatosGraficas.AbonosCuentas = await (from car in myDbContext.CARTERAS
-                                                                 join cu in myDbContext.TIPOSCUENTAS
-                                                                 on car.TIC_CODIGO equals cu.TIC_CODIGO
-                                                                 where car.CAR_FECHACREDITO >= filtros.FechaInicio.ToLocalTime()
-                                                                 && car.CAR_FECHACREDITO <= filtros.FechaFin.ToLocalTime() && car.CAR_ESTADO == true
-                                                                 && car.CAR_ESANULADA != true && car.CAR_ESTADOCREDITO==1
-                                                                 group car by car.TIC_CODIGO into g
-                                                                 select new MovimientoCuentas
-                                                                 {
-                                                                     Codigo = g.Key,
-                                                                     Nombre = g.First().TIPOSCUENTAS.TIC_NOMBRE,
-                                                                     MovimientoTotal = g.Sum(x => x.CAR_VALORABONADO),
+                                                               join cu in myDbContext.TIPOSCUENTAS
+                                                               on car.TIC_CODIGO equals cu.TIC_CODIGO
+                                                               where car.CAR_FECHACREDITO >= filtros.FechaInicio.ToLocalTime()
+                                                               && car.CAR_FECHACREDITO <= filtros.FechaFin.ToLocalTime() && car.CAR_ESTADO == true
+                                                               && car.CAR_ESANULADA != true && car.CAR_ESTADOCREDITO == 1
+                                                               group car by car.TIC_CODIGO into g
+                                                               select new MovimientoCuentas
+                                                               {
+                                                                   Codigo = g.Key,
+                                                                   Nombre = g.First().TIPOSCUENTAS.TIC_NOMBRE,
+                                                                   MovimientoTotal = g.Sum(x => x.CAR_VALORABONADO),
 
-                                                                 }).ToListAsync();
+                                                               }).ToListAsync();
 
                 dashboard.DatosGraficas.GastosCuentas = await (from gas in myDbContext.GASTOS
                                                                where gas.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
@@ -148,17 +161,17 @@ namespace BUGGAFIT_BACK.Catalogos
 
                                                                }).ToListAsync();
                 dashboard.DatosGraficas.ComprasCuentas = await (from co in myDbContext.COMPRAS
-                                                where co.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime()
-                                                  && co.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && co.COM_ESTADO == true
-                                                  && co.COM_CREDITO == false && co.COM_ESANULADA != true
-                                                  group co by co.TipoCuenta.TIC_CODIGO into g
-                                                select new MovimientoCuentas
-                                                {
-                                                    Codigo = g.Key,
-                                                    Nombre = g.First().TipoCuenta.TIC_NOMBRE,
-                                                    MovimientoTotal = g.Sum(x => x.COM_VALORCOMPRA),
+                                                                where co.COM_FECHACOMPRA >= filtros.FechaInicio.ToLocalTime()
+                                                                  && co.COM_FECHACOMPRA <= filtros.FechaFin.ToLocalTime() && co.COM_ESTADO == true
+                                                                  && co.COM_CREDITO == false && co.COM_ESANULADA != true
+                                                                group co by co.TipoCuenta.TIC_CODIGO into g
+                                                                select new MovimientoCuentas
+                                                                {
+                                                                    Codigo = g.Key,
+                                                                    Nombre = g.First().TipoCuenta.TIC_NOMBRE,
+                                                                    MovimientoTotal = g.Sum(x => x.COM_VALORCOMPRA),
 
-                                                }).ToListAsync();
+                                                                }).ToListAsync();
 
                 dashboard.DatosGraficas.GastosCuentas = await (from co in myDbContext.GASTOS
                                                                where co.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime()
