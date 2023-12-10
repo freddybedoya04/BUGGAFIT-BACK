@@ -162,13 +162,13 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = _gasto.TIC_CODIGO,
                         TRA_TIPO = tipoTransaccion.Nombre,
                         TRA_FECHACREACION = DateTime.Now,
-                        TRA_CONFIRMADA = !pendiente,
+                        TRA_CONFIRMADA = false,
                         TRA_ESTADO = true,
-                        TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
+                        TRA_FECHACONFIRMACION = null,
                         TRA_CODIGOENLACE = _gasto.GAS_CODIGO.ToString(),
                         TRA_FUEANULADA = false,
                         TRA_NUMEROTRANSACCIONBANCO = 0,
-                        USU_CEDULA_CONFIRMADOR = pendiente ? null : _gasto.USU_CEDULA,
+                        USU_CEDULA_CONFIRMADOR = null,
                         TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_gasto.GAS_VALOR) : gasto.GAS_VALOR,
                     });
                 }
@@ -371,6 +371,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     .Where(x => x.GAS_FECHAGASTO >= filtro.FechaInicio.ToLocalTime()
                         && x.GAS_FECHAGASTO <= filtro.FechaFin.ToLocalTime()
                         && x.GAS_ESTADO == true
+                        && x.GAS_PENDIENTE == false
                         && x.GAS_ESANULADA == false
                         && _motivoGastos.Select(y => y.MOG_CODIGO).Contains(x.MOG_CODIGO))
                     .GroupBy(x => x.MOG_CODIGO)

@@ -583,13 +583,13 @@ namespace BUGGAFIT_BACK.Catalogos
                     TIC_CODIGO = _cartera.TIC_CODIGO,
                     TRA_TIPO = tipoTransaccion.Nombre,
                     TRA_FECHACREACION = DateTime.Now,
-                    TRA_CONFIRMADA = esEfectivo,
+                    TRA_CONFIRMADA = false,
                     TRA_ESTADO = true,
-                    TRA_FECHACONFIRMACION = esEfectivo ? DateTime.Now : null,
+                    TRA_FECHACONFIRMACION = null,
                     TRA_CODIGOENLACE = _cartera.CAR_CODIGO.ToString(),
                     TRA_FUEANULADA = false,
                     TRA_NUMEROTRANSACCIONBANCO = 0,
-                    USU_CEDULA_CONFIRMADOR = esEfectivo ? _cartera.USU_CEDULA : null, //TODO: no se que cedula ponerle.
+                    USU_CEDULA_CONFIRMADOR = null,
                     TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_cartera.CAR_VALORABONADO) : _cartera.CAR_VALORABONADO
                 });
 

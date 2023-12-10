@@ -166,13 +166,13 @@ namespace BUGGAFIT_BACK.Catalogos
                             TIC_CODIGO = compras.TIC_CODIGO,
                             TRA_TIPO = tipoTransaccion.Nombre,
                             TRA_FECHACREACION = DateTime.Now,
-                            TRA_CONFIRMADA = !pendiente,
+                            TRA_CONFIRMADA = false,
                             TRA_ESTADO = true,
-                            TRA_FECHACONFIRMACION = pendiente ? null : DateTime.Now,
+                            TRA_FECHACONFIRMACION = null,
                             TRA_CODIGOENLACE = compras.COM_CODIGO.ToString(),
                             TRA_FUEANULADA = false,
                             TRA_NUMEROTRANSACCIONBANCO = 0,
-                            USU_CEDULA_CONFIRMADOR = pendiente ? null : compras.USU_CEDULA,
+                            USU_CEDULA_CONFIRMADOR = null,
                             TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(compras.COM_VALORCOMPRA) : compras.COM_VALORCOMPRA,
                         }).Wait();
                     
