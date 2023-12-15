@@ -15,5 +15,7 @@
         public DateTime PRO_FECHACREACION { get; set; }
         public bool PRO_ESTADO { get; set; }
         public bool? PRO_REGALO { get; set; }
+        public int? PRO_UNIDADREGALO { get; set; }
+        public int? PRO_UNIDAD_MINIMAREGALO { get; set; }
     }
 }

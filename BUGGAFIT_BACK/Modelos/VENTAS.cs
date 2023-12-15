@@ -32,6 +32,7 @@ namespace BUGGAFIT_BACK.Modelos
         public bool VEN_ESTADO { get; set; }
         public int TIP_CODIGO { get; set; }
         public bool? VEN_ESANULADA { get; set; }
+        public bool? VEN_TIENE_REGALOSDEMAS { get; set; }
         public ICollection<DETALLEVENTAS> DETALLEVENTAS { get; set; }
         // Propiedades de navegación (relaciones)
         [ForeignKey("TIC_CODIGO")]

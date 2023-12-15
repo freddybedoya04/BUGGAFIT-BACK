@@ -35,7 +35,9 @@ namespace BUGGAFIT_BACK.Catalogos
                     PRO_UNIDADES_MINIMAS_ALERTA = producto.PRO_UNIDADES_MINIMAS_ALERTA,
                     PRO_ACTUALIZACION = DateTime.Now,
                     PRO_ESTADO = producto.PRO_ESTADO,
-                    PRO_REGALO = producto.PRO_REGALO
+                    PRO_REGALO = producto.PRO_REGALO,
+                    PRO_UNIDADREGALO=producto.PRO_UNIDADREGALO,
+                    PRO_UNIDAD_MINIMAREGALO=producto.PRO_UNIDAD_MINIMAREGALO
                 };
                 myDbContext.Entry(_producto).State = EntityState.Modified;
                 await myDbContext.SaveChangesAsync();
@@ -108,7 +110,9 @@ namespace BUGGAFIT_BACK.Catalogos
                     PRO_ACTUALIZACION = DateTime.Now,
                     PRO_FECHACREACION = DateTime.Now,
                     PRO_ESTADO = producto.PRO_ESTADO,
-                    PRO_REGALO = producto.PRO_REGALO
+                    PRO_REGALO = producto.PRO_REGALO,
+                    PRO_UNIDADREGALO=producto.PRO_UNIDADREGALO,
+                    PRO_UNIDAD_MINIMAREGALO=producto.PRO_UNIDAD_MINIMAREGALO
                 };
                 myDbContext.PRODUCTOS.Add(_producto);
                 await myDbContext.SaveChangesAsync();
@@ -188,7 +192,9 @@ namespace BUGGAFIT_BACK.Catalogos
                                             PRO_ACTUALIZACION = p.PRO_ACTUALIZACION,
                                             PRO_FECHACREACION = p.PRO_FECHACREACION,
                                             PRO_ESTADO = p.PRO_ESTADO,
-                                            PRO_REGALO = p.PRO_REGALO
+                                            PRO_REGALO = p.PRO_REGALO,
+                                            PRO_UNIDADREGALO=p.PRO_UNIDADREGALO,
+                                            PRO_UNIDAD_MINIMAREGALO=p.PRO_UNIDAD_MINIMAREGALO
                                         }).OrderBy(x => x.PRO_NOMBRE).ToListAsync();
                 if (_productos == null || !_productos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay Productos.");

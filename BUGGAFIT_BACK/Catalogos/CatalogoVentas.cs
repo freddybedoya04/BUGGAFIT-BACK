@@ -195,7 +195,8 @@ namespace BUGGAFIT_BACK.Catalogos
                     USU_CEDULA = venta.USU_CEDULA,
                     VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
                     VEN_ESTADO = venta.VEN_ESTADO,
-                    TIP_CODIGO = (int)venta.TIP_CODIGO
+                    TIP_CODIGO = (int)venta.TIP_CODIGO,
+                    VEN_TIENE_REGALOSDEMAS=venta.VEN_TIENE_REGALOSDEMAS
                 };
                 myDbContext.VENTAS.Add(_venta);
                 await myDbContext.SaveChangesAsync();
@@ -350,6 +351,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                TIP_NOMBRE = venta.TIPOSENVIOS.TIP_NOMBRE,
                                VEN_ESANULADA = venta.VEN_ESANULADA,
                                VEN_COSTOENVIO=myDbContext.GASTOS.Where(x=>x.VEN_CODIGO==venta.VEN_CODIGO).Select(x=>x.GAS_VALOR).FirstOrDefault(),
+                               VEN_TIENE_REGALOSDEMAS=venta.VEN_TIENE_REGALOSDEMAS
                            })
                      .OrderByDescending(x => x.VEN_FECHAVENTA)
                      .ToListAsync();

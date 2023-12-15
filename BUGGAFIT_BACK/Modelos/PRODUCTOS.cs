@@ -27,5 +27,7 @@ namespace BUGGAFIT_BACK.Modelos
         [ForeignKey("MAR_CODIGO")]
         public virtual MARCAS MARCA { get; set; }
         public bool? PRO_REGALO { get;set; }
+        public int? PRO_UNIDADREGALO { get; set; }
+        public int? PRO_UNIDAD_MINIMAREGALO { get; set; }
     }
 }
