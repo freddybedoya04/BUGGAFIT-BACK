@@ -8,7 +8,7 @@
             public string? CLI_TIPOCLIENTE { get; set; }
             public string? CLI_UBICACION { get; set; }
             public string? CLI_DIRECCION { get; set; }
-            public int? CLI_TELEFONO { get; set; }
+            public string? CLI_TELEFONO { get; set; }
             public string? CLI_CORREO { get; set; }
             public DateTime CLI_FECHACREACION { get; set; }
             public bool CLI_ESTADO { get; set; }
