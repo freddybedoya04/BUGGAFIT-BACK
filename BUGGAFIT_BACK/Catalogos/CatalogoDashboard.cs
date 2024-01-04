@@ -94,6 +94,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosCards.SumaGastos = queryGastos.Sum(x => x.gastosTotales);
                 dashboard.DatosCards.SumaVentas = queryVentas.Sum(x => x.ventasTotales);
                 dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
+                dashboard.DatosCards.UtilidadesBrutas = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - dashboard.DatosCards.SumaCompras;
                 #endregion
 
                 #region datos de las graficas
