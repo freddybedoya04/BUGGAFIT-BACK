@@ -25,6 +25,21 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 DashboardClass dashboard = new();
                 #region Datos de las cards
+                var consulta = await (from v in myDbContext.VENTAS
+                                      join dv in myDbContext.DETALLEVENTAS on v.VEN_CODIGO equals dv.VEN_CODIGO
+                                      join p in myDbContext.PRODUCTOS on dv.PRO_CODIGO equals p.PRO_CODIGO
+                                      where v.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() && v.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && v.VEN_ESTADO == true
+                                           && v.VEN_ESTADOCREDITO == false
+                                           && v.VEN_ESTADOVENTA == true
+                                           && v.VEN_ESANULADA != true
+                                      group new { v, dv, p } by new { v.VEN_CODIGO, v.VEN_PRECIOTOTAL } into grouped
+                                      select new
+                                      {
+                                          CodigodeVenta = grouped.Key.VEN_CODIGO,
+                                          ValorTotaldelaVenta = grouped.Key.VEN_PRECIOTOTAL,
+                                          NumeroTotaleProductosComprados = grouped.Sum(x => x.dv.VED_UNIDADES),
+                                          CostoTotaldelosProductosVendidos = grouped.Sum(x => x.dv.VED_UNIDADES * x.p.PRO_PRECIO_COMPRA)
+                                      }).ToListAsync();
                 // buscamos la info necesaria para las cards
                 var queryGastos = await myDbContext.GASTOS
                     .Where(x => x.GAS_FECHAGASTO >= filtros.FechaInicio.ToLocalTime() && x.GAS_FECHAGASTO <= filtros.FechaFin.ToLocalTime()
@@ -78,7 +93,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosCards.SumaDeudas = deudasCompras + deudasGastos;
                 dashboard.DatosCards.SumaGastos = queryGastos.Sum(x => x.gastosTotales);
                 dashboard.DatosCards.SumaVentas = queryVentas.Sum(x => x.ventasTotales);
-                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - dashboard.DatosCards.SumaCompras;
+                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
                 #endregion
 
                 #region datos de las graficas
