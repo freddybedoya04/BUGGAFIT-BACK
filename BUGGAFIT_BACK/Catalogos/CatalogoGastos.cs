@@ -89,7 +89,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 _gasto.GAS_ESANULADA = true;
                 myDbContext.Entry(_gasto).State = EntityState.Modified;
                 var _transaccion = await myDbContext.TRANSACCIONES
-                    .Where(x => x.TRA_CODIGOENLACE == _gasto.GAS_CODIGO.ToString() && x.TRA_TIPO == TiposTransacciones.GASTO.Nombre)
+                    .Where(x => x.TRA_CODIGOENLACE == _gasto.GAS_CODIGO.ToString() && (x.TRA_TIPO == TiposTransacciones.GASTO.Nombre || x.TRA_TIPO== TiposTransacciones.COSTOENVIO.Nombre))
                     .FirstOrDefaultAsync();
 
                 if (_transaccion == null)
@@ -210,7 +210,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 await myDbContext.SaveChangesAsync();
                 if (!myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == _gasto.TIC_CODIGO).Select(x => x.TIC_NOMBRE).FirstOrDefault().ToLower().Contains("credito"))
                 {
-                    var tipoTransaccion = TiposTransacciones.GASTO;
+                    var tipoTransaccion = TiposTransacciones.COSTOENVIO;
                     await catalogoTransacciones.CrearTrasaccionAsync(new()
                     {
                         TIC_CUENTA = _gasto.TIC_CODIGO,

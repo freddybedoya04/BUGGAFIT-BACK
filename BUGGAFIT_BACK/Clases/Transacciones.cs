@@ -17,6 +17,7 @@
         public int TIC_CODIGO { get; set; }
         public string? TIC_NOMBRE { get; set; }
         public string? USU_NOMBRE { get; set; }
+        public float? GAS_VALOR { get; set; }
 
     }
 
@@ -29,12 +30,14 @@
         public static TiposTransacciones VENTA { get { return new TiposTransacciones("VENTA", false); } }
         public static TiposTransacciones COMPRA { get { return new TiposTransacciones("COMPRA", true); } }
         public static TiposTransacciones GASTO { get { return new TiposTransacciones("GASTO", true); } }
+        public static TiposTransacciones COSTOENVIO { get { return new TiposTransacciones("COSTOENVIO", true); } }
         public static TiposTransacciones ABONO { get { return new TiposTransacciones("ABONO", false); } }
         public static TiposTransacciones MOVIMIENTO { get { return new TiposTransacciones("MOVIMIENTO", false); } }
         public static TiposTransacciones TRANSFERENCIA { get { return new TiposTransacciones("TRANSFERENCIA", false); } }
         public static TiposTransacciones DEVOLUCION_VENTA { get { return new TiposTransacciones("DEVOLUCION_VENTA", true); } }
         public static TiposTransacciones DEVOLUCION_COMPRA { get { return new TiposTransacciones("DEVOLUCION_COMPRA", true); } }
         public static TiposTransacciones DEVOLUCION_GASTO { get { return new TiposTransacciones("DEVOLUCION_GASTO", true); } }
+        public static TiposTransacciones DEVOLUCION_COSTOENVIO { get { return new TiposTransacciones("DEVOLUCION_COSTOENVIO", true); } }
         public static TiposTransacciones DEVOLUCION_ABONO { get { return new TiposTransacciones("DEVOLUCION_ABONO", true); } }
         public static TiposTransacciones DEVOLUCION_TRANSFERENCIA { get { return new TiposTransacciones("DEVOLUCION_TRANSFERENCIA", true); } }
         public static TiposTransacciones GetTipoTransaccion(string tipoTransaccion)
@@ -43,12 +46,14 @@
             {
                 "VENTA" => VENTA,
                 "GASTO" => GASTO,
+                "COSTOENVIO" => COSTOENVIO,
                 "ABONO" => ABONO,
                 "COMPRA" => COMPRA,
                 "TRANSFERENCIA" => TRANSFERENCIA,
                 "DEVOLUCION_ABONO" => DEVOLUCION_ABONO,
                 "DEVOLUCION_COMPRA" => DEVOLUCION_COMPRA,
                 "DEVOLUCION_GASTO" => DEVOLUCION_GASTO,
+                "DEVOLUCION_COSTOENVIO" => DEVOLUCION_COSTOENVIO,
                 "DEVOLUCION_TRANSFERENCIA" => DEVOLUCION_TRANSFERENCIA,
                 "DEVOLUCION_VENTA" => DEVOLUCION_VENTA,
                 _ => TRANSFERENCIA,
@@ -60,6 +65,7 @@
             {
                 "VENTA" => DEVOLUCION_VENTA,
                 "GASTO" => DEVOLUCION_GASTO,
+                "COSTOENVIO"=> DEVOLUCION_COSTOENVIO,
                 "ABONO" => DEVOLUCION_ABONO,
                 "COMPRA" => DEVOLUCION_COMPRA,
                 "TRANSFERENCIA" => DEVOLUCION_TRANSFERENCIA,

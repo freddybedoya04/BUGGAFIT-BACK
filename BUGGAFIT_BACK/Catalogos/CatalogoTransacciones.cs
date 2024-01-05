@@ -283,8 +283,9 @@ namespace BUGGAFIT_BACK.Catalogos
             try
             {
                 var _transacciones = await myDbContext.TRANSACCIONES
-                    .Where(x => x.TRA_FECHACREACION >= filtro.FechaInicio.ToLocalTime() && x.TRA_FECHACREACION <= filtro.FechaFin.ToLocalTime() && x.TRA_ESTADO == true).
-                    Select(x => new Transacciones
+                    .Where(x => x.TRA_FECHACREACION >= filtro.FechaInicio.ToLocalTime() && x.TRA_FECHACREACION <= filtro.FechaFin.ToLocalTime() && x.TRA_ESTADO == true &&
+                    x.TRA_TIPO != TiposTransacciones.COSTOENVIO.Nombre)
+                    .Select(x => new Transacciones
                     {
                         TRA_CODIGO = x.TRA_CODIGO,
                         TIC_CUENTA = x.TIC_CUENTA,
@@ -301,6 +302,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = x.TIC_CODIGO,
                         TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
                         USU_NOMBRE = x.USU_CEDULA_CONFIRMADOR == null ? "" : myDbContext.USUARIOS.Where(u => u.USU_CEDULA == x.USU_CEDULA_CONFIRMADOR).Select(u => u.USU_NOMBRE).FirstOrDefault(),
+                        GAS_VALOR = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.GASTOS.Where(u => u.VEN_CODIGO == Convert.ToInt64(x.TRA_CODIGOENLACE)).Select(u => u.GAS_VALOR).FirstOrDefault() : 0
                     })
                     .OrderByDescending(x => x.TRA_CODIGO)
                     .ToListAsync();
