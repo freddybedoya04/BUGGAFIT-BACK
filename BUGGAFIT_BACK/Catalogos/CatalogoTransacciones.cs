@@ -146,11 +146,11 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-        public async Task<ResponseObject> BorrarTrasaccionPorIdEnlaceAsync(string idEnlace)
+        public async Task<ResponseObject> BorrarTrasaccionPorIdEnlaceAsync(string idEnlace, TiposTransacciones tiposTransacciones)
         {
             try
             {
-                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace).FirstOrDefaultAsync()
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace && x.TRA_TIPO == tiposTransacciones.Nombre).FirstOrDefaultAsync()
                     ?? throw new NullReferenceException($"La transaccion con el codigo de enlace {idEnlace} no existe.");
                 if (_transaccion.TRA_CONFIRMADA == true)
                     throw new Exception($"La transaccion con el codigo {idEnlace} no se puede eliminar. Transaccion Confirmada.");
@@ -176,24 +176,25 @@ namespace BUGGAFIT_BACK.Catalogos
         {
             try
             {
-                var _transaccion = await myDbContext.TRANSACCIONES.FindAsync(Id);
-                if (_transaccion == null)
-                    throw new Exception($"La transaccion con el codigo {Id} no existe.");
-                if (_transaccion.TRA_CONFIRMADA == true)
-                    return ResponseClass.Response(statusCode: 204, message: $"Transaccion ya confirmada Exitosamente.");
+                var transaccionPrincipal = await ConfirmarTransacciones(Id, usurioConfirmador);
+                if (transaccionPrincipal.Item2 is not null && transaccionPrincipal.Item2.TRA_TIPO == TiposTransacciones.VENTA.Nombre)
+                {
 
-                _transaccion.TRA_CONFIRMADA = true;
-                _transaccion.USU_CEDULA_CONFIRMADOR = usurioConfirmador;
-                _transaccion.TRA_FECHACONFIRMACION = DateTime.Now;
-                myDbContext.Entry(_transaccion).State = EntityState.Modified;
-                // cambiar estado del enlace
-                await CentroDeConfirmacionDeEnlaces(tipoTransaccion: TiposTransacciones.GetTipoTransaccion(_transaccion.TRA_TIPO),
-                    idEnlace: Convert.ToInt32(_transaccion.TRA_CODIGOENLACE));
-
-                await AgregarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
-                await myDbContext.SaveChangesAsync();
-
-                return ResponseClass.Response(statusCode: 204, message: $"Transaccion confirmada Exitosamente.");
+                    int idGasto = await (from t in myDbContext.TRANSACCIONES
+                                         join v in myDbContext.VENTAS on t.TRA_CODIGOENLACE equals v.VEN_CODIGO.ToString()
+                                         join g in myDbContext.GASTOS on v.VEN_CODIGO equals g.VEN_CODIGO
+                                         where t.TRA_CODIGO == transaccionPrincipal.Item2.TRA_CODIGO
+                                         select g.GAS_CODIGO).FirstOrDefaultAsync();
+                    int _idTransaccionGasto = await myDbContext.TRANSACCIONES
+                        .Where(x => x.TRA_CODIGOENLACE == idGasto.ToString() && x.TRA_TIPO == TiposTransacciones.COSTOENVIO.Nombre)
+                        .Select(x => x.TRA_CODIGO)
+                        .FirstOrDefaultAsync();
+                    if (_idTransaccionGasto != 0)
+                    {
+                        await ConfirmarTransacciones(_idTransaccionGasto, usurioConfirmador);
+                    }
+                }
+                return transaccionPrincipal.Item1;
             }
             catch (Exception)
             {
@@ -206,22 +207,25 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 foreach (int id in idTransacciones)
                 {
-                    var _transaccion = await myDbContext.TRANSACCIONES.FindAsync(id);
-                    if (_transaccion == null)
-                        continue;
-                    if (_transaccion.TRA_CONFIRMADA == true || _transaccion.TRA_FUEANULADA == true)
-                        continue;
-                    _transaccion.TRA_CONFIRMADA = true;
-                    _transaccion.USU_CEDULA_CONFIRMADOR = usurioConfirmador;
-                    _transaccion.TRA_FECHACONFIRMACION = DateTime.Now;
-                    myDbContext.Entry(_transaccion).State = EntityState.Modified;
-                    await AgregarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
-                    // cambiar estado del enlace
-                    await CentroDeConfirmacionDeEnlaces(tipoTransaccion: TiposTransacciones.GetTipoTransaccion(_transaccion.TRA_TIPO),
-                        idEnlace: Convert.ToInt32(_transaccion.TRA_CODIGOENLACE));
-                    await myDbContext.SaveChangesAsync();
-                }
+                    var transaccionProncipal = await ConfirmarTransacciones(id, usurioConfirmador);
+                    if (transaccionProncipal.Item2 is not null && transaccionProncipal.Item2.TRA_TIPO == TiposTransacciones.VENTA.Nombre)
+                    {
 
+                        int idGasto = await (from t in myDbContext.TRANSACCIONES
+                                             join v in myDbContext.VENTAS on t.TRA_CODIGOENLACE equals v.VEN_CODIGO.ToString()
+                                             join g in myDbContext.GASTOS on v.VEN_CODIGO equals g.VEN_CODIGO
+                                             where t.TRA_CODIGO == transaccionProncipal.Item2.TRA_CODIGO
+                                             select g.GAS_CODIGO).FirstOrDefaultAsync();
+                        int _idTransaccionGasto = await myDbContext.TRANSACCIONES
+                            .Where(x => x.TRA_CODIGOENLACE == idGasto.ToString() && x.TRA_TIPO == TiposTransacciones.COSTOENVIO.Nombre)
+                            .Select(x => x.TRA_CODIGO)
+                            .FirstOrDefaultAsync();
+                        if (_idTransaccionGasto != 0)
+                        {
+                            await ConfirmarTransacciones(_idTransaccionGasto, usurioConfirmador);
+                        }
+                    }
+                }
                 return ResponseClass.Response(statusCode: 204, message: $"Transacciones Confirmadas Exitosamente.");
             }
             catch (Exception)
@@ -302,7 +306,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = x.TIC_CODIGO,
                         TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
                         USU_NOMBRE = x.USU_CEDULA_CONFIRMADOR == null ? "" : myDbContext.USUARIOS.Where(u => u.USU_CEDULA == x.USU_CEDULA_CONFIRMADOR).Select(u => u.USU_NOMBRE).FirstOrDefault(),
-                        GAS_VALOR = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.GASTOS.Where(u => u.VEN_CODIGO == Convert.ToInt64(x.TRA_CODIGOENLACE)).Select(u => u.GAS_VALOR).FirstOrDefault() : 0
+                        GAS_VALOR = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.GASTOS.Where(u => u.VEN_CODIGO == Convert.ToInt64(x.TRA_CODIGOENLACE)).Select(u => u.GAS_VALOR).FirstOrDefault() : 0,
+                        CLI_NOMBRE = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.VENTAS.Where(u => u.VEN_CODIGO == Convert.ToInt32(x.TRA_CODIGOENLACE)).Select(u => u.CLI_NOMBRE).FirstOrDefault() : "",
                     })
                     .OrderByDescending(x => x.TRA_CODIGO)
                     .ToListAsync();
@@ -340,6 +345,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = x.TIC_CODIGO,
                         TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
                         USU_NOMBRE = x.USU_CEDULA_CONFIRMADOR == null ? myDbContext.USUARIOS.Where(u => u.USU_CEDULA == x.USU_CEDULA_CONFIRMADOR).Select(u => u.USU_NOMBRE).FirstOrDefault() : x.USU_CEDULA_CONFIRMADOR,
+                        GAS_VALOR = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.GASTOS.Where(u => u.VEN_CODIGO == Convert.ToInt64(x.TRA_CODIGOENLACE)).Select(u => u.GAS_VALOR).FirstOrDefault() : 0,
+                        CLI_NOMBRE = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.VENTAS.Where(u => u.VEN_CODIGO == Convert.ToInt32(x.TRA_CODIGOENLACE)).Select(u => u.CLI_NOMBRE).FirstOrDefault() : "",
                     })
                     .OrderByDescending(x => x.TRA_CODIGO)
                     .ToListAsync();
@@ -509,6 +516,33 @@ namespace BUGGAFIT_BACK.Catalogos
                 {
                     return;
                 }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private async Task<(ResponseObject, TRANSACCIONES?)> ConfirmarTransacciones(int Id, string usurioConfirmador)
+        {
+            try
+            {
+                var _transaccion = await myDbContext.TRANSACCIONES.FindAsync(Id) ?? throw new Exception($"La transaccion con el codigo {Id} no existe.");
+                if (_transaccion.TRA_CONFIRMADA == true)
+                    return (ResponseClass.Response(statusCode: 204, message: $"Transaccion ya confirmada Exitosamente."), _transaccion);
+
+                _transaccion.TRA_CONFIRMADA = true;
+                _transaccion.USU_CEDULA_CONFIRMADOR = usurioConfirmador;
+                _transaccion.TRA_FECHACONFIRMACION = DateTime.Now;
+                myDbContext.Entry(_transaccion).State = EntityState.Modified;
+                // cambiar estado del enlace
+                await CentroDeConfirmacionDeEnlaces(tipoTransaccion: TiposTransacciones.GetTipoTransaccion(_transaccion.TRA_TIPO),
+                    idEnlace: Convert.ToInt32(_transaccion.TRA_CODIGOENLACE));
+
+                await AgregarDineroCuentas(idCuenta: _transaccion.TIC_CODIGO, cantidadDinero: _transaccion.TRA_VALOR ?? 0);
+                await myDbContext.SaveChangesAsync();
+
+                return (ResponseClass.Response(statusCode: 204, message: $"Transaccion confirmada Exitosamente."), _transaccion);
             }
             catch (Exception)
             {

@@ -106,7 +106,24 @@ namespace BUGGAFIT_BACK.Catalogos
                 venta.VEN_ESTADO = false;
                 myDbContext.Entry(venta).State = EntityState.Modified;
                 await RegresarProductosAlInventario(venta.VEN_CODIGO);
-                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(venta.VEN_CODIGO.ToString());
+                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(venta.VEN_CODIGO.ToString(), TiposTransacciones.VENTA);
+
+                //Borramos tambien la transaccion del gasto de envio
+                var _transaccion = await myDbContext.TRANSACCIONES
+                    .Where(x => x.TRA_CODIGOENLACE == Id.ToString() && x.TRA_TIPO == TiposTransacciones.VENTA.Nombre).FirstOrDefaultAsync();
+                if (_transaccion is not null)
+                {
+                    int idGasto = await (from t in myDbContext.TRANSACCIONES
+                                         join v in myDbContext.VENTAS on t.TRA_CODIGOENLACE equals v.VEN_CODIGO.ToString()
+                                         join g in myDbContext.GASTOS on v.VEN_CODIGO equals g.VEN_CODIGO
+                                         where t.TRA_CODIGO == _transaccion.TRA_CODIGO
+                                         select g.GAS_CODIGO).FirstOrDefaultAsync();
+                    if (idGasto != 0)
+                    {
+                        await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(idGasto.ToString(), TiposTransacciones.COSTOENVIO);
+                    }
+                }
+
 
                 await myDbContext.SaveChangesAsync();
 
@@ -168,7 +185,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-   
+
 
         public async Task<ResponseObject> CrearVentaAsync(Ventas venta)
         {
@@ -196,7 +213,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     VEN_ESTADOVENTA = venta.VEN_ESTADOVENTA,
                     VEN_ESTADO = venta.VEN_ESTADO,
                     TIP_CODIGO = (int)venta.TIP_CODIGO,
-                    VEN_TIENE_REGALOSDEMAS=venta.VEN_TIENE_REGALOSDEMAS
+                    VEN_TIENE_REGALOSDEMAS = venta.VEN_TIENE_REGALOSDEMAS
                 };
                 myDbContext.VENTAS.Add(_venta);
                 await myDbContext.SaveChangesAsync();
@@ -342,7 +359,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                VEN_ESTADO = venta.VEN_ESTADO,
                                CLI_NOMBRE = cliente.CLI_NOMBRE,
                                CLI_TELEFONO = cliente.CLI_TELEFONO, // Agregado el teléfono
-                               CLI_CORREO=cliente.CLI_CORREO,
+                               CLI_CORREO = cliente.CLI_CORREO,
                                CLI_DIRECCION = cliente.CLI_DIRECCION,
                                CLI_TIPOCLIENTE = cliente.CLI_TIPOCLIENTE,
                                CLI_UBICACION = cliente.CLI_UBICACION,
@@ -350,8 +367,8 @@ namespace BUGGAFIT_BACK.Catalogos
                                TIP_CODIGO = venta.TIP_CODIGO,
                                TIP_NOMBRE = venta.TIPOSENVIOS.TIP_NOMBRE,
                                VEN_ESANULADA = venta.VEN_ESANULADA,
-                               VEN_COSTOENVIO=myDbContext.GASTOS.Where(x=>x.VEN_CODIGO==venta.VEN_CODIGO).Select(x=>x.GAS_VALOR).FirstOrDefault(),
-                               VEN_TIENE_REGALOSDEMAS=venta.VEN_TIENE_REGALOSDEMAS
+                               VEN_COSTOENVIO = myDbContext.GASTOS.Where(x => x.VEN_CODIGO == venta.VEN_CODIGO).Select(x => x.GAS_VALOR).FirstOrDefault(),
+                               VEN_TIENE_REGALOSDEMAS = venta.VEN_TIENE_REGALOSDEMAS
                            })
                      .OrderByDescending(x => x.VEN_FECHAVENTA)
                      .ToListAsync();
@@ -487,7 +504,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         detalle.VED_ACTUALIZACION,
                         detalle.VED_ESTADO
                     })
-                    .OrderByDescending(d=>d.VED_ACTUALIZACION)
+                    .OrderByDescending(d => d.VED_ACTUALIZACION)
                     .ToListAsync();
 
                 return ResponseClass.Response(statusCode: 200, data: detallesVentas);
@@ -517,6 +534,21 @@ namespace BUGGAFIT_BACK.Catalogos
                 if (_transaccion != null)
                 {
                     await catalogoTransacciones.AnularTrasaccionesAsync(_transaccion.TRA_CODIGO);
+                    // Buscamos la transaccion de
+                    int idGasto = await (from t in myDbContext.TRANSACCIONES
+                                         join v in myDbContext.VENTAS on t.TRA_CODIGOENLACE equals v.VEN_CODIGO.ToString()
+                                         join g in myDbContext.GASTOS on v.VEN_CODIGO equals g.VEN_CODIGO
+                                         where t.TRA_CODIGO == _transaccion.TRA_CODIGO
+                                         select g.GAS_CODIGO).FirstOrDefaultAsync();
+                    int _idTransaccionGasto = await myDbContext.TRANSACCIONES
+                        .Where(x => x.TRA_CODIGOENLACE == idGasto.ToString() && x.TRA_TIPO == TiposTransacciones.COSTOENVIO.Nombre)
+                        .Select(x => x.TRA_CODIGO)
+                        .FirstOrDefaultAsync();
+                    if (_idTransaccionGasto != 0)
+                    {
+                        await catalogoTransacciones.AnularTrasaccionesAsync(_idTransaccionGasto);
+                    }
+
                 }
 
                 await myDbContext.SaveChangesAsync();
@@ -540,8 +572,8 @@ namespace BUGGAFIT_BACK.Catalogos
                     CAR_VALORABONADO = x.CAR_VALORABONADO,
                     TIC_CODIGO = x.TIC_CODIGO,
                     TIC_NOMBRE = x.TIPOSCUENTAS.TIC_NOMBRE,
-                    CAR_ESTADOCREDITO=x.CAR_ESTADOCREDITO,
-                    CAR_ESANULADA=x.CAR_ESANULADA
+                    CAR_ESTADOCREDITO = x.CAR_ESTADOCREDITO,
+                    CAR_ESANULADA = x.CAR_ESANULADA
                 }).OrderByDescending(x => x.CAR_CODIGO).ToListAsync();
 
 
@@ -571,14 +603,14 @@ namespace BUGGAFIT_BACK.Catalogos
                     CAR_VALORABONADO = cartera.CAR_VALORABONADO,
                     CAR_ESTADO = true,
                     CAR_MOTIVO = "",
-                    CAR_ESTADOCREDITO=Convert.ToInt32(esEfectivo),
+                    CAR_ESTADOCREDITO = Convert.ToInt32(esEfectivo),
                     TIC_CODIGO = cartera.TIC_CODIGO,
-                    USU_CEDULA=cartera.USU_CEDULA,
+                    USU_CEDULA = cartera.USU_CEDULA,
                 };
                 await myDbContext.CARTERAS.AddAsync(_cartera);
                 await myDbContext.SaveChangesAsync();
 
-          
+
                 var tipoTransaccion = TiposTransacciones.ABONO;
                 await catalogoTransacciones.CrearTrasaccionAsync(new()
                 {
@@ -614,7 +646,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {car_codigo} no existe.");
                 abono.CAR_ESTADO = false;
                 myDbContext.Entry(abono).State = EntityState.Modified;
-                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(abono.CAR_CODIGO.ToString());
+                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(abono.CAR_CODIGO.ToString(), TiposTransacciones.ABONO);
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Abono Eliminado Exitosamente.");
@@ -685,7 +717,7 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 throw;
             }
-        } 
+        }
         #endregion
 
     }

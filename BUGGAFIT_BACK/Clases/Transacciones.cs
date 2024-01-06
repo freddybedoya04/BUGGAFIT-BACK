@@ -18,6 +18,7 @@
         public string? TIC_NOMBRE { get; set; }
         public string? USU_NOMBRE { get; set; }
         public float? GAS_VALOR { get; set; }
+        public string? CLI_NOMBRE { get; set; }
 
     }
 

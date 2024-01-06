@@ -289,7 +289,7 @@ namespace BUGGAFIT_BACK.Catalogos
                             producto.PRO_ACTUALIZACION = DateTime.Now;
                         }
                     }
-                    catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(com_codigo.ToString()).Wait();
+                    catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(com_codigo.ToString(), TiposTransacciones.COMPRA).Wait();
                     db.SaveChanges();
                 }
             }

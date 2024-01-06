@@ -67,7 +67,7 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 _gasto.GAS_ESTADO = false;
                 myDbContext.Entry(_gasto).State = EntityState.Modified;
-                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(_gasto.GAS_CODIGO.ToString());
+                await catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(_gasto.GAS_CODIGO.ToString(), TiposTransacciones.GASTO);
 
                 await myDbContext.SaveChangesAsync();
 
