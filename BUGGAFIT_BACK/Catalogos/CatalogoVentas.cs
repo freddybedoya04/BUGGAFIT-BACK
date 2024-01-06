@@ -68,6 +68,14 @@ namespace BUGGAFIT_BACK.Catalogos
                 myDbContext.Entry(venta).State = EntityState.Modified;
 
                 await myDbContext.SaveChangesAsync();
+                // se debe buscar el gasto y cambiarle el estado
+                GASTOS gasto = await myDbContext.GASTOS.Where(x => x.VEN_CODIGO == venta.VEN_CODIGO).FirstOrDefaultAsync();
+                if(gasto != null)
+                {
+                    gasto.GAS_PENDIENTE = false;
+                    myDbContext.Entry(gasto).State = EntityState.Modified;
+                    await myDbContext.SaveChangesAsync();
+                }
             }
             catch (Exception)
             {
@@ -547,6 +555,14 @@ namespace BUGGAFIT_BACK.Catalogos
                     if (_idTransaccionGasto != 0)
                     {
                         await catalogoTransacciones.AnularTrasaccionesAsync(_idTransaccionGasto);
+                        var _gasto = await myDbContext.GASTOS.FindAsync(idGasto);
+                        if (_gasto != null)
+                        {
+                            _gasto.GAS_ESANULADA = true;
+                            myDbContext.Entry(_gasto).State = EntityState.Modified;
+                            await myDbContext.SaveChangesAsync();
+                        }
+
                     }
 
                 }

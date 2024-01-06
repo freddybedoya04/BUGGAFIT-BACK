@@ -202,7 +202,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     TIC_CODIGO = gasto.TIC_CODIGO,
                     GAS_ESTADO = gasto.GAS_ESTADO,
                     USU_CEDULA = gasto.USU_CEDULA,
-                    GAS_PENDIENTE = false,
+                    GAS_PENDIENTE = true,
                     GAS_OBSERVACIONES = gasto.GAS_OBSERVACIONES,
                     VEN_CODIGO = gasto.VEN_CODIGO,
                 };
@@ -217,13 +217,13 @@ namespace BUGGAFIT_BACK.Catalogos
                         TIC_CODIGO = _gasto.TIC_CODIGO,
                         TRA_TIPO = tipoTransaccion.Nombre,
                         TRA_FECHACREACION = DateTime.Now,
-                        TRA_CONFIRMADA = true,
+                        TRA_CONFIRMADA = false,
                         TRA_ESTADO = true,
-                        TRA_FECHACONFIRMACION = DateTime.Now,
+                        TRA_FECHACONFIRMACION = null,
                         TRA_CODIGOENLACE = _gasto.GAS_CODIGO.ToString(),
                         TRA_FUEANULADA = false,
                         TRA_NUMEROTRANSACCIONBANCO = 0,
-                        USU_CEDULA_CONFIRMADOR = _gasto.USU_CEDULA,
+                        USU_CEDULA_CONFIRMADOR = null,
                         TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(_gasto.GAS_VALOR) : gasto.GAS_VALOR,
                     });
                 }
@@ -314,7 +314,8 @@ namespace BUGGAFIT_BACK.Catalogos
                 // Accede a la instancia de MyDBContext a través de ConexionBD 
 
                 // Realiza consultas de Entity Framework aquí
-                gastos = await myDbContext.GASTOS.Where(x => x.GAS_FECHAGASTO >= filtro.FechaInicio.ToLocalTime() && x.GAS_FECHAGASTO <= filtro.FechaFin.ToLocalTime() && x.GAS_ESTADO == true)
+                gastos = await myDbContext.GASTOS.Where(x => x.GAS_FECHAGASTO >= filtro.FechaInicio.ToLocalTime() && x.GAS_FECHAGASTO <= filtro.FechaFin.ToLocalTime() 
+                && x.GAS_ESTADO == true && !x.MOTIVOSGASTOS.MOG_NOMBRE.ToUpper().Contains("ENVIO"))
                     .Select(x => new Gasto
                     {
                         GAS_CODIGO = x.GAS_CODIGO,
@@ -335,7 +336,6 @@ namespace BUGGAFIT_BACK.Catalogos
                     })
                     .OrderByDescending(x => x.GAS_FECHAGASTO)
                     .ToListAsync();
-
                 if (!gastos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay gastos.");
                 return ResponseClass.Response(statusCode: 200, data: gastos);
@@ -364,28 +364,21 @@ namespace BUGGAFIT_BACK.Catalogos
 
                 if (!_motivoGastos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay motivos de gastos.");
-
-                gastos = await myDbContext.GASTOS
+                foreach (var motivo in _motivoGastos)
+                {
+                    motivo.MOG_VALORGASTADO = await myDbContext.GASTOS
                     .Where(x => x.GAS_FECHAGASTO >= filtro.FechaInicio.ToLocalTime()
                         && x.GAS_FECHAGASTO <= filtro.FechaFin.ToLocalTime()
                         && x.GAS_ESTADO == true
                         && x.GAS_PENDIENTE == false
-                        && x.GAS_ESANULADA == false
-                        && _motivoGastos.Select(y => y.MOG_CODIGO).Contains(x.MOG_CODIGO))
-                    .GroupBy(x => x.MOG_CODIGO)
-                    .Select(x => new EstadisticasGastos
-                    {
-                        MOG_CODIGO = x.Key,
-                        MOG_NOMBRE = x.First().MOTIVOSGASTOS.MOG_NOMBRE,
-                        MOG_VALORGASTADO = x.Sum(y => y.GAS_VALOR),
-                    })
-                    .OrderByDescending(x => x.MOG_CODIGO)
-                    .ToListAsync();
-                var result = gastos.Union(_motivoGastos, new EstadisticasGastosComparer()).ToList();
+                        && x.GAS_ESANULADA != true
+                        && x.MOG_CODIGO == motivo.MOG_CODIGO).SumAsync(x => x.GAS_VALOR);
+                }
+                
 
-                if (!result.Any())
-                    return ResponseClass.Response(statusCode: 204, message: "No hay gastos.");
-                return ResponseClass.Response(statusCode: 200, data: result);
+                //if (!result.Any())
+                //    return ResponseClass.Response(statusCode: 204, message: "No hay gastos.");
+                return ResponseClass.Response(statusCode: 200, data: _motivoGastos);
             }
             catch (Exception)
             {
