@@ -39,7 +39,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                           CodigodeVenta = grouped.Key.VEN_CODIGO,
                                           ValorTotaldelaVenta = grouped.Key.VEN_PRECIOTOTAL,
                                           NumeroTotaleProductosComprados = grouped.Sum(x => x.dv.VED_UNIDADES),
-                                          CostoTotaldelosProductosVendidos = grouped.Sum(x => x.dv.VED_UNIDADES * x.p.PRO_PRECIO_COMPRA)
+                                          CostoTotaldelosProductosVendidos = grouped.Sum(x => x.dv.VED_UNIDADES * x.dv.PRO_PRECIO_COMPRA)
                                       }).ToListAsync();
                 // buscamos la info necesaria para las cards
                 var queryGastos = await myDbContext.GASTOS
@@ -94,7 +94,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosCards.SumaDeudas = deudasCompras + deudasGastos;
                 dashboard.DatosCards.SumaGastos = queryGastos.Sum(x => x.gastosTotales);
                 dashboard.DatosCards.SumaVentas = queryVentas.Sum(x => x.ventasTotales);
-                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
+                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
                 dashboard.DatosCards.UtilidadesBrutas = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - dashboard.DatosCards.SumaCompras;
                 #endregion
 

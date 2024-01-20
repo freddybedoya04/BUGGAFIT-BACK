@@ -1,4 +1,5 @@
 ﻿using BUGGAFIT_BACK.Modelos;
+using System.Web.Http.Routing.Constraints;
 
 namespace BUGGAFIT_BACK.Clases
 {
@@ -13,6 +14,7 @@ namespace BUGGAFIT_BACK.Clases
         public float VED_VALORDESCUENTO_UND { get; set; }
         public float VED_PRECIOVENTA_TOTAL { get; set; }
         public DateTime VED_ACTUALIZACION { get; set; }
+        public float? PRO_PRECIO_COMPRA { get; set; }
         public bool VED_ESTADO { get; set; }
 
     }

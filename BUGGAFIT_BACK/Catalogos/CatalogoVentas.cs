@@ -176,6 +176,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         VED_CODIGO = detalle.VED_CODIGO,
                         VEN_CODIGO = detalle.VEN_CODIGO,
                         PRO_CODIGO = detalle.PRO_CODIGO ?? "",
+                        PRO_PRECIO_COMPRA=myDbContext.PRODUCTOS.Where(x=>x.PRO_CODIGO==detalle.PRO_CODIGO).Select(x=>x.PRO_PRECIO_COMPRA).FirstOrDefault(),
                         VED_UNIDADES = detalle.VED_UNIDADES,
                         VED_PRECIOVENTA_UND = detalle.VED_PRECIOVENTA_UND,
                         VED_VALORDESCUENTO_UND = detalle.VED_VALORDESCUENTO_UND,

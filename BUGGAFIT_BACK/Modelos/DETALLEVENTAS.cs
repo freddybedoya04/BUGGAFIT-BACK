@@ -14,6 +14,7 @@ namespace BUGGAFIT_BACK.Modelos
         public int VED_UNIDADES { get; set; }
         public float VED_PRECIOVENTA_UND { get; set; }
         public float VED_VALORDESCUENTO_UND { get; set; }
+        public float? PRO_PRECIO_COMPRA { get; set; }
         public float VED_PRECIOVENTA_TOTAL { get; set; }
         public DateTime VED_ACTUALIZACION { get; set; }
         public bool VED_ESTADO { get; set; }
