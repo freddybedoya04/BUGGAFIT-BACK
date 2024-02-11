@@ -289,7 +289,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 var _transacciones = await myDbContext.TRANSACCIONES
                     .Where(x => x.TRA_FECHACREACION >= filtro.FechaInicio.ToLocalTime() && x.TRA_FECHACREACION <= filtro.FechaFin.ToLocalTime() && x.TRA_ESTADO == true &&
                     x.TRA_TIPO != TiposTransacciones.COSTOENVIO.Nombre)
-                    .Select(x => new Transacciones
+                    .Select( x => new Transacciones
                     {
                         TRA_CODIGO = x.TRA_CODIGO,
                         TIC_CUENTA = x.TIC_CUENTA,
@@ -308,19 +308,50 @@ namespace BUGGAFIT_BACK.Catalogos
                         USU_NOMBRE = x.USU_CEDULA_CONFIRMADOR == null ? "" : myDbContext.USUARIOS.Where(u => u.USU_CEDULA == x.USU_CEDULA_CONFIRMADOR).Select(u => u.USU_NOMBRE).FirstOrDefault(),
                         GAS_VALOR = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.GASTOS.Where(u => u.VEN_CODIGO == Convert.ToInt64(x.TRA_CODIGOENLACE)).Select(u => u.GAS_VALOR).FirstOrDefault() : 0,
                         CLI_NOMBRE = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.VENTAS.Where(u => u.VEN_CODIGO == Convert.ToInt32(x.TRA_CODIGOENLACE)).Select(u => u.CLI_NOMBRE).FirstOrDefault() : "",
+                        TRA_TIPOALERTA = ""
                     })
                     .OrderByDescending(x => x.TRA_CODIGO)
                     .ToListAsync();
+                foreach (Transacciones item in _transacciones)
+                {
+                    if(item.TRA_TIPO== TiposTransacciones.VENTA.Nombre)
+                    {
+                        item.TRA_TIPOALERTA = CalcularTipoAlertaTransaccion(item.TRA_CODIGOENLACE);
+                    }
+                }
                 if (_transacciones == null || !_transacciones.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay transacciones.");
 
                 return ResponseClass.Response(statusCode: 200, data: _transacciones);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
         }
+        public  string CalcularTipoAlertaTransaccion(string codigoEnlace)
+        {
+            try
+            {
+                VENTAS venta =  myDbContext.VENTAS.Where(x => x.VEN_CODIGO == Convert.ToInt64(codigoEnlace)).FirstOrDefault();
+                if (venta == null)
+                    return "";
+                if (venta.VEN_ESANULADA == true)
+                     return "Anulada";
+                
+                if (venta.VEN_TIENE_REGALOSDEMAS == true)
+                    return "Regalos";
+                List<DETALLEVENTAS> detalles = myDbContext.DETALLEVENTAS.Where(x => x.VEN_CODIGO == venta.VEN_CODIGO && x.VED_VALORDESCUENTO_UND > 0 && x.PRODUCTOS.PRO_REGALO != true && x.PRO_CODIGO != "9999").ToList();
+                if (detalles !=null && detalles.Count() > 0)
+                    return "Precios";
+                return "";
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public async Task<ResponseObject> ListarTrasaccionesPorFechaYCuentaAsync(int cuenta, FiltrosDTO filtro)
         {
 
@@ -347,9 +378,17 @@ namespace BUGGAFIT_BACK.Catalogos
                         USU_NOMBRE = x.USU_CEDULA_CONFIRMADOR == null ? myDbContext.USUARIOS.Where(u => u.USU_CEDULA == x.USU_CEDULA_CONFIRMADOR).Select(u => u.USU_NOMBRE).FirstOrDefault() : x.USU_CEDULA_CONFIRMADOR,
                         GAS_VALOR = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.GASTOS.Where(u => u.VEN_CODIGO == Convert.ToInt64(x.TRA_CODIGOENLACE)).Select(u => u.GAS_VALOR).FirstOrDefault() : 0,
                         CLI_NOMBRE = x.TRA_TIPO == TiposTransacciones.VENTA.Nombre ? myDbContext.VENTAS.Where(u => u.VEN_CODIGO == Convert.ToInt32(x.TRA_CODIGOENLACE)).Select(u => u.CLI_NOMBRE).FirstOrDefault() : "",
+                        TRA_TIPOALERTA = ""
                     })
                     .OrderByDescending(x => x.TRA_CODIGO)
                     .ToListAsync();
+                foreach (Transacciones item in _transacciones)
+                {
+                    if (item.TRA_TIPO == TiposTransacciones.VENTA.Nombre)
+                    {
+                        item.TRA_TIPOALERTA = CalcularTipoAlertaTransaccion(item.TRA_CODIGOENLACE);
+                    }
+                }
                 if (_transacciones == null || !_transacciones.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay transacciones.");
 

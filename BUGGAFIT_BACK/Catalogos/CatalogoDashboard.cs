@@ -205,7 +205,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 #endregion
                 return ResponseClass.Response(statusCode: 200, data: dashboard, message: "OK.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }

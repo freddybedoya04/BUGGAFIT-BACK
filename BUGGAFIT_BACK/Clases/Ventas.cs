@@ -30,6 +30,8 @@
         public bool? VEN_ESANULADA { get; set; }
         public float? VEN_COSTOENVIO { get; set; }
         public bool? VEN_TIENE_REGALOSDEMAS { get; set; }
+        public bool? VEN_PRECIOS_MODIFICADOS { get; set; }
+
         public ICollection<DetalleVenta>? DetalleVentas { get; set; }
 
     }

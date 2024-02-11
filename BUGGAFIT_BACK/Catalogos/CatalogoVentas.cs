@@ -377,7 +377,8 @@ namespace BUGGAFIT_BACK.Catalogos
                                TIP_NOMBRE = venta.TIPOSENVIOS.TIP_NOMBRE,
                                VEN_ESANULADA = venta.VEN_ESANULADA,
                                VEN_COSTOENVIO = myDbContext.GASTOS.Where(x => x.VEN_CODIGO == venta.VEN_CODIGO).Select(x => x.GAS_VALOR).FirstOrDefault(),
-                               VEN_TIENE_REGALOSDEMAS = venta.VEN_TIENE_REGALOSDEMAS
+                               VEN_TIENE_REGALOSDEMAS = venta.VEN_TIENE_REGALOSDEMAS,
+                               VEN_PRECIOS_MODIFICADOS =Convert.ToBoolean( venta.DETALLEVENTAS.Where(x =>x.VED_VALORDESCUENTO_UND>0 && x.PRO_CODIGO != "9999" && x.PRODUCTOS.PRO_REGALO != true).Count())
                            })
                      .OrderByDescending(x => x.VEN_FECHAVENTA)
                      .ToListAsync();
