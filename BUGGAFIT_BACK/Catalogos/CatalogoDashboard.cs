@@ -6,6 +6,8 @@ using BUGGAFIT_BACK.Modelos;
 using BUGGAFIT_BACK.Modelos.Entidad;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Newtonsoft;
+using Newtonsoft.Json;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -29,17 +31,29 @@ namespace BUGGAFIT_BACK.Catalogos
                 var consulta = await (from v in myDbContext.VENTAS
                                       join dv in myDbContext.DETALLEVENTAS on v.VEN_CODIGO equals dv.VEN_CODIGO
                                       join p in myDbContext.PRODUCTOS on dv.PRO_CODIGO equals p.PRO_CODIGO
+                                      join g in myDbContext.GASTOS on v.VEN_CODIGO equals g.VEN_CODIGO
+                                      into grouping //Performing LINQ Group Join
+                                      from g in grouping.DefaultIfEmpty()
                                       where v.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() && v.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && v.VEN_ESTADO == true
-                                           && v.VEN_ESTADOCREDITO == false
                                            && v.VEN_ESTADOVENTA == true
                                            && v.VEN_ESANULADA != true
-                                      group new { v, dv, p } by new { v.VEN_CODIGO, v.VEN_PRECIOTOTAL } into grouped
+                                      group new { v, dv, p, g } by new { v.VEN_CODIGO, v.VEN_PRECIOTOTAL, g.GAS_VALOR } into grouped
                                       select new
                                       {
                                           CodigodeVenta = grouped.Key.VEN_CODIGO,
                                           ValorTotaldelaVenta = grouped.Key.VEN_PRECIOTOTAL,
                                           NumeroTotaleProductosComprados = grouped.Sum(x => x.dv.VED_UNIDADES),
-                                          CostoTotaldelosProductosVendidos = grouped.Sum(x => x.dv.VED_UNIDADES * x.dv.PRO_PRECIO_COMPRA)
+                                          CostoTotaldelosProductosVendidos = grouped.Sum(x => x.dv.VED_UNIDADES * x.dv.PRO_PRECIO_COMPRA),
+                                          valorTotalGastos = grouped.Where(x => x.g.GAS_PENDIENTE == false).Sum(x => x.g.GAS_VALOR),
+                                      }).ToListAsync();
+
+                var queryInventario = await (from i in myDbContext.PRODUCTOS
+                                      where i.PRO_ESTADO == true
+                                      select new 
+                                      {
+                                          totalInventario = i.PRO_UNIDADES_DISPONIBLES,
+                                          valorProducto = i.PRO_PRECIO_COMPRA,
+                                          valorTotalDeProductos = i.PRO_PRECIO_COMPRA * i.PRO_UNIDADES_DISPONIBLES,
                                       }).ToListAsync();
                 // buscamos la info necesaria para las cards
                 var queryGastos = await myDbContext.GASTOS
@@ -51,16 +65,16 @@ namespace BUGGAFIT_BACK.Catalogos
                     .Select(x => new
                     {
                         gastosTotales = x.Sum(x => x.GAS_VALOR),
-                        gastosNoPagos = x.Where(x => x.GAS_PENDIENTE == true).Sum(x => x.GAS_VALOR)
+                        gastosNoPagos = x.Where(x => x.GAS_PENDIENTE == true).Sum(x => x.GAS_VALOR),
                     }).ToListAsync();
                 var queryVentas = await myDbContext.VENTAS
                     .Where(x => x.VEN_FECHAVENTA >= filtros.FechaInicio.ToLocalTime() && x.VEN_FECHAVENTA <= filtros.FechaFin.ToLocalTime() && x.VEN_ESTADO == true
-                    && x.VEN_ESTADOCREDITO == false
                     && x.VEN_ESTADOVENTA == true
                     && x.VEN_ESANULADA != true)
                     .GroupBy(x => x.VEN_CODIGO)
                     .Select(x => new
                     {
+                        codigoVenta = x.Key.ToString(),
                         ventasTotales = x.Sum(x => x.VEN_PRECIOTOTAL),
                         ventasACredito = x.Where(x => x.VEN_ESTADOCREDITO == true).Sum(x => x.VEN_PRECIOTOTAL)
                     }).ToListAsync();
@@ -93,9 +107,11 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosCards.SumaCompras = queryCompras.Sum(x => x.comprasTotales);
                 dashboard.DatosCards.SumaDeudas = deudasCompras + deudasGastos;
                 dashboard.DatosCards.SumaGastos = queryGastos.Sum(x => x.gastosTotales);
+                dashboard.DatosCards.Inventario = queryInventario.Sum(x => x.valorTotalDeProductos);
                 dashboard.DatosCards.SumaVentas = queryVentas.Sum(x => x.ventasTotales);
-                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
-                dashboard.DatosCards.UtilidadesBrutas = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - dashboard.DatosCards.SumaCompras;
+                dashboard.DatosCards.SumaVentasCredito = queryVentas.Sum(x => x.ventasACredito);
+                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - (double)consulta.Sum(x => x.valorTotalGastos) - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
+                dashboard.DatosCards.UtilidadesBrutas = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
                 #endregion
 
                 #region datos de las graficas

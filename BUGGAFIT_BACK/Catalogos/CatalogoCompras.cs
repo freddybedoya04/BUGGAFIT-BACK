@@ -47,7 +47,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         COM_ESTADO = x.COM_ESTADO,
                         COM_CREDITO = x.COM_CREDITO,
                         USU_CEDULA = x.USU_CEDULA,
-                        COM_ESANULADA=x.COM_ESANULADA,
+                        COM_ESANULADA = x.COM_ESANULADA,
                         DetalleCompras = db.DETALLECOMPRAS.Where(d => d.COM_CODIGO == x.COM_CODIGO && d.DEC_ESTADO == true).Select(d => new DetalleCompra
                         {
                             COM_CODIGO = d.COM_CODIGO,
@@ -114,11 +114,11 @@ namespace BUGGAFIT_BACK.Catalogos
                 using (var db = dbContext)
                 {
                     COMPRAS compras = new COMPRAS();
-                    bool pendiente = true;
-                    if (db.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == nuevaCompra.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
-                    {
-                        pendiente = false;
-                    }
+                    //bool pendiente = true;
+                    //if (db.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == nuevaCompra.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
+                    //{
+                    //    pendiente = false;
+                    //}
                     //compras.COM_CODIGO = nuevaCompra.COM_CODIGO;
                     compras.COM_FECHACREACION = DateTime.Now;
                     compras.COM_FECHACOMPRA = nuevaCompra.COM_FECHACOMPRA.ToLocalTime();
@@ -128,7 +128,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     compras.COM_FECHAACTUALIZACION = DateTime.Now;
                     compras.COM_ENBODEGA = nuevaCompra.COM_ENBODEGA;
                     compras.COM_ESTADO = true;
-                    compras.COM_CREDITO = pendiente;
+                    compras.COM_CREDITO = nuevaCompra.COM_CREDITO;
                     compras.USU_CEDULA = nuevaCompra.USU_CEDULA;
 
                     db.COMPRAS.Add(compras);
@@ -158,24 +158,24 @@ namespace BUGGAFIT_BACK.Catalogos
                         }
                     }
 
-                        var tipoTransaccion = TiposTransacciones.COMPRA;
+                    var tipoTransaccion = TiposTransacciones.COMPRA;
 
-                        catalogoTransacciones.CrearTrasaccionAsync(new()
-                        {
-                            TIC_CUENTA = compras.TIC_CODIGO,
-                            TIC_CODIGO = compras.TIC_CODIGO,
-                            TRA_TIPO = tipoTransaccion.Nombre,
-                            TRA_FECHACREACION = DateTime.Now,
-                            TRA_CONFIRMADA = false,
-                            TRA_ESTADO = true,
-                            TRA_FECHACONFIRMACION = null,
-                            TRA_CODIGOENLACE = compras.COM_CODIGO.ToString(),
-                            TRA_FUEANULADA = false,
-                            TRA_NUMEROTRANSACCIONBANCO = 0,
-                            USU_CEDULA_CONFIRMADOR = null,
-                            TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(compras.COM_VALORCOMPRA) : compras.COM_VALORCOMPRA,
-                        }).Wait();
-                    
+                    catalogoTransacciones.CrearTrasaccionAsync(new()
+                    {
+                        TIC_CUENTA = compras.TIC_CODIGO,
+                        TIC_CODIGO = compras.TIC_CODIGO,
+                        TRA_TIPO = tipoTransaccion.Nombre,
+                        TRA_FECHACREACION = DateTime.Now,
+                        TRA_CONFIRMADA = false,
+                        TRA_ESTADO = true,
+                        TRA_FECHACONFIRMACION = null,
+                        TRA_CODIGOENLACE = compras.COM_CODIGO.ToString(),
+                        TRA_FUEANULADA = false,
+                        TRA_NUMEROTRANSACCIONBANCO = 0,
+                        USU_CEDULA_CONFIRMADOR = null,
+                        TRA_VALOR = tipoTransaccion.EsRetiroDeDinero ? -(compras.COM_VALORCOMPRA) : compras.COM_VALORCOMPRA,
+                    }).Wait();
+
                     db.SaveChanges();
                 }
             }
@@ -203,7 +203,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     CompraAnterior.COM_FECHAACTUALIZACION = DateTime.Now;
                     CompraAnterior.COM_ENBODEGA = nuevaCompra.COM_ENBODEGA;
                     CompraAnterior.COM_ESTADO = nuevaCompra.COM_ESTADO;
-                    CompraAnterior.COM_CREDITO = CompraAnterior.COM_CREDITO;//no se actualiza
+                    CompraAnterior.COM_CREDITO = nuevaCompra.COM_CREDITO;
                     CompraAnterior.USU_CEDULA = nuevaCompra.USU_CEDULA;
                     db.SaveChanges();
 
@@ -269,10 +269,25 @@ namespace BUGGAFIT_BACK.Catalogos
             {
                 using (var db = dbContext)
                 {
-                    COMPRAS Compra = db.COMPRAS.Where(x => x.COM_CODIGO == com_codigo).FirstOrDefault();
-                    Compra.COM_ESTADO = false;
-                    Compra.COM_FECHAACTUALIZACION = DateTime.Now;
-                    db.SaveChanges();
+                    COMPRAS Compra = db.COMPRAS.Where(x => x.COM_CODIGO == com_codigo).FirstOrDefault()
+                        ?? throw new Exception($"No Compras con el codigo de enlace {com_codigo}."); ;
+
+                    TRANSACCIONES _transaccion = catalogoTransacciones.ListarTrasaccionPorIDEnlaceAsync(com_codigo.ToString(), TiposTransacciones.COMPRA).Result
+                        ?? throw new Exception($"No hay Transacciones con el codigo de enlace {com_codigo}.");
+                    if (_transaccion.TRA_CONFIRMADA)
+                    {
+                        catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(com_codigo.ToString()).Wait();
+                        Compra.COM_ESANULADA = true;
+                        Compra.COM_FECHAACTUALIZACION = DateTime.Now;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(com_codigo.ToString(), TiposTransacciones.COMPRA).Wait();
+                        Compra.COM_ESTADO = false;
+                        Compra.COM_FECHAACTUALIZACION = DateTime.Now;
+                        db.SaveChanges();
+                    }
                     List<DETALLECOMPRAS> detalles = db.DETALLECOMPRAS.Where(x => x.COM_CODIGO == com_codigo && x.DEC_ESTADO == true).ToList();
 
                     foreach (DETALLECOMPRAS item in detalles)
@@ -289,13 +304,11 @@ namespace BUGGAFIT_BACK.Catalogos
                             producto.PRO_ACTUALIZACION = DateTime.Now;
                         }
                     }
-                    catalogoTransacciones.BorrarTrasaccionPorIdEnlaceAsync(com_codigo.ToString(), TiposTransacciones.COMPRA).Wait();
                     db.SaveChanges();
                 }
             }
             catch (Exception)
             {
-
                 throw;
             }
 
@@ -343,10 +356,9 @@ namespace BUGGAFIT_BACK.Catalogos
                 var _compra = dbContext.COMPRAS.Find(id);
                 if (_compra == null)
                     return;
-
-                _compra.COM_CREDITO = false;
-                dbContext.Entry(_compra).State = EntityState.Modified;
-                dbContext.SaveChanges();
+                //_compra.COM_CREDITO = false;
+                //dbContext.Entry(_compra).State = EntityState.Modified;
+                //dbContext.SaveChanges();
                 return;
             }
             catch (Exception)

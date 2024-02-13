@@ -427,6 +427,20 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
+
+        public async Task<TRANSACCIONES?> ListarTrasaccionPorIDEnlaceAsync(string idEnlace, TiposTransacciones tipoTransaccione)
+        {
+            try
+            {
+                return await myDbContext.TRANSACCIONES.Where(x => x.TRA_ESTADO == true
+                    && x.TRA_CODIGOENLACE == idEnlace
+                    && x.TRA_TIPO == tipoTransaccione.Nombre).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         public async Task<ResponseObject> CrearTrasaccionEntreCuentasAsync(TransaccionEntreCuentas transaccion)
         {
             try

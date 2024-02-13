@@ -20,12 +20,14 @@
     public class DatosCards
     {
         public double SumaVentas { get; set; } = 0;
+        public double SumaVentasCredito { get; set; } = 0;
         public double SumaGastos { get; set; } = 0;
         public double SumaCompras { get; set; } = 0;
         public double SumaCreditos { get; set; } = 0;
         public double SumaDeudas { get; set; } = 0;
         public double Utilidades { get; set; } = 0;
         public double UtilidadesBrutas { get; set; } = 0;
+        public double Inventario { get; set; } = 0;
 
     }
     public class DatosGraficas

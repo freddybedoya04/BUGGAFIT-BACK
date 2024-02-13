@@ -70,7 +70,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 await myDbContext.SaveChangesAsync();
                 // se debe buscar el gasto y cambiarle el estado
                 GASTOS gasto = await myDbContext.GASTOS.Where(x => x.VEN_CODIGO == venta.VEN_CODIGO).FirstOrDefaultAsync();
-                if(gasto != null)
+                if (gasto != null)
                 {
                     gasto.GAS_PENDIENTE = false;
                     myDbContext.Entry(gasto).State = EntityState.Modified;
@@ -176,7 +176,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         VED_CODIGO = detalle.VED_CODIGO,
                         VEN_CODIGO = detalle.VEN_CODIGO,
                         PRO_CODIGO = detalle.PRO_CODIGO ?? "",
-                        PRO_PRECIO_COMPRA=myDbContext.PRODUCTOS.Where(x=>x.PRO_CODIGO==detalle.PRO_CODIGO).Select(x=>x.PRO_PRECIO_COMPRA).FirstOrDefault(),
+                        PRO_PRECIO_COMPRA = myDbContext.PRODUCTOS.Where(x => x.PRO_CODIGO == detalle.PRO_CODIGO).Select(x => x.PRO_PRECIO_COMPRA).FirstOrDefault(),
                         VED_UNIDADES = detalle.VED_UNIDADES,
                         VED_PRECIOVENTA_UND = detalle.VED_PRECIOVENTA_UND,
                         VED_VALORDESCUENTO_UND = detalle.VED_VALORDESCUENTO_UND,
@@ -378,7 +378,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                VEN_ESANULADA = venta.VEN_ESANULADA,
                                VEN_COSTOENVIO = myDbContext.GASTOS.Where(x => x.VEN_CODIGO == venta.VEN_CODIGO).Select(x => x.GAS_VALOR).FirstOrDefault(),
                                VEN_TIENE_REGALOSDEMAS = venta.VEN_TIENE_REGALOSDEMAS,
-                               VEN_PRECIOS_MODIFICADOS =Convert.ToBoolean( venta.DETALLEVENTAS.Where(x =>x.VED_VALORDESCUENTO_UND>0 && x.PRO_CODIGO != "9999" && x.PRODUCTOS.PRO_REGALO != true).Count())
+                               VEN_PRECIOS_MODIFICADOS = Convert.ToBoolean(venta.DETALLEVENTAS.Where(x => x.VED_VALORDESCUENTO_UND > 0 && x.PRO_CODIGO != "9999" && x.PRODUCTOS.PRO_REGALO != true).Count())
                            })
                      .OrderByDescending(x => x.VEN_FECHAVENTA)
                      .ToListAsync();
@@ -608,10 +608,10 @@ namespace BUGGAFIT_BACK.Catalogos
             {
 
                 bool esEfectivo = false;
-                if (myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == cartera.TIC_CODIGO).FirstOrDefault().TIC_NOMBRE.ToLower().Contains("efectivo") == true)
-                {
-                    esEfectivo = true;
-                }
+                TIPOSCUENTAS cuenta = myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == cartera.TIC_CODIGO).FirstOrDefault() 
+                    ?? throw new NullReferenceException($"ERror. No existe cuenta con el codigo {cartera.TIC_CODIGO}.");
+
+                esEfectivo = cuenta.TIC_NOMBRE.ToLower().Contains("efectivo") == true;
                 CARTERAS _cartera = new()
                 {
                     CAR_FECHACREACION = DateTime.Now,

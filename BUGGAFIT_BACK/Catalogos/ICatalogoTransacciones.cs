@@ -1,6 +1,7 @@
 ﻿using BUGGAFIT_BACK.Clases;
 using BUGGAFIT_BACK.DTOs;
 using BUGGAFIT_BACK.DTOs.Response;
+using BUGGAFIT_BACK.Modelos;
 
 namespace BUGGAFIT_BACK.Catalogos
 {
@@ -21,6 +22,7 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> BorrarTrasaccionPorIdEnlaceAsync(string idEnlace, TiposTransacciones tiposTransacciones);
         Task<ResponseObject> AnularTrasaccionesPorIdEnlaceAsync(string idEnlace);
         Task<ResponseObject> ListarTrasaccionPorIDEnlaceAsync(string idEnlace);
+        Task<TRANSACCIONES> ListarTrasaccionPorIDEnlaceAsync(string idEnlace, TiposTransacciones tipoTransaccione);
 
     }
 }
