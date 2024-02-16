@@ -110,7 +110,8 @@ namespace BUGGAFIT_BACK.Catalogos
                 dashboard.DatosCards.Inventario = queryInventario.Sum(x => x.valorTotalDeProductos);
                 dashboard.DatosCards.SumaVentas = queryVentas.Sum(x => x.ventasTotales);
                 dashboard.DatosCards.SumaVentasCredito = queryVentas.Sum(x => x.ventasACredito);
-                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - (double)consulta.Sum(x => x.valorTotalGastos) - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
+                //dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - (double)consulta.Sum(x => x.valorTotalGastos) - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
+                dashboard.DatosCards.Utilidades = dashboard.DatosCards.SumaVentas - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
                 dashboard.DatosCards.UtilidadesBrutas = dashboard.DatosCards.SumaVentas - dashboard.DatosCards.SumaGastos - (double)consulta.Sum(x => x.CostoTotaldelosProductosVendidos);
                 #endregion
 
