@@ -428,6 +428,8 @@ namespace BUGGAFIT_BACK.Catalogos
                         continue;
 
                     _producto.PRO_UNIDADES_DISPONIBLES -= detalle.VED_UNIDADES; //Retiramos las unidades del inventario
+                    if (_producto.PRO_UNIDADES_DISPONIBLES < 0)
+                        throw new Exception("La venta excede la cantidad maxima de productos disponibles.");
                     myDbContext.Entry(_producto).State = EntityState.Modified;
 
                     await myDbContext.SaveChangesAsync();
@@ -435,6 +437,7 @@ namespace BUGGAFIT_BACK.Catalogos
             }
             catch (Exception)
             {
+                await RegresarProductosAlInventario(codigoVenta);
                 throw;
             }
         }
@@ -608,7 +611,7 @@ namespace BUGGAFIT_BACK.Catalogos
             {
 
                 bool esEfectivo = false;
-                TIPOSCUENTAS cuenta = myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == cartera.TIC_CODIGO).FirstOrDefault() 
+                TIPOSCUENTAS cuenta = myDbContext.TIPOSCUENTAS.Where(x => x.TIC_CODIGO == cartera.TIC_CODIGO).FirstOrDefault()
                     ?? throw new NullReferenceException($"ERror. No existe cuenta con el codigo {cartera.TIC_CODIGO}.");
 
                 esEfectivo = cuenta.TIC_NOMBRE.ToLower().Contains("efectivo") == true;
