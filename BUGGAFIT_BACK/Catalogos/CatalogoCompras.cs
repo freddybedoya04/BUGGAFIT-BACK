@@ -135,6 +135,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     db.SaveChanges();
 
                     //crear detalles
+                    
                     foreach (DetalleCompra item in nuevaCompra.DetalleCompras)
                     {
                         DETALLECOMPRAS Detalle = new DETALLECOMPRAS();
@@ -148,14 +149,17 @@ namespace BUGGAFIT_BACK.Catalogos
                         Detalle.DEC_ESTADO = true;
 
                         db.DETALLECOMPRAS.Add(Detalle);
-
-                        //ACTUALIZAR PRODUCTOS
-                        PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
-                        if (producto != null)
+                        //LOGICA PARA ACTUALIZAR PRODUCTOS SI ES QUE LA COMPRA ESTA EN BODEGA
+                        if (nuevaCompra.COM_ENBODEGA == true)
                         {
-                            producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + item.DEC_UNIDADES;
-                            producto.PRO_ACTUALIZACION = DateTime.Now;
+                            PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
+                            if (producto != null)
+                            {
+                                producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + item.DEC_UNIDADES;
+                                producto.PRO_ACTUALIZACION = DateTime.Now;
+                            }
                         }
+
                     }
 
                     var tipoTransaccion = TiposTransacciones.COMPRA;
@@ -195,7 +199,7 @@ namespace BUGGAFIT_BACK.Catalogos
                 using (var db = dbContext)
                 {
                     COMPRAS CompraAnterior = db.COMPRAS.Where(x => x.COM_CODIGO == nuevaCompra.COM_CODIGO).FirstOrDefault();
-                    //compras.COM_CODIGO = nuevaCompra.COM_CODIGO;
+                    bool EstabaEnBodega = CompraAnterior.COM_ENBODEGA;
                     CompraAnterior.COM_FECHACOMPRA = nuevaCompra.COM_FECHACOMPRA.ToLocalTime();
                     CompraAnterior.COM_VALORCOMPRA = nuevaCompra.COM_VALORCOMPRA;
                     CompraAnterior.COM_PROVEEDOR = nuevaCompra.COM_PROVEEDOR;
@@ -206,52 +210,26 @@ namespace BUGGAFIT_BACK.Catalogos
                     CompraAnterior.COM_CREDITO = nuevaCompra.COM_CREDITO;
                     CompraAnterior.USU_CEDULA = nuevaCompra.USU_CEDULA;
                     db.SaveChanges();
-
-                    foreach (DetalleCompra item in nuevaCompra.DetalleCompras)
+                    //si estaba no estaba en bodega y va a pasar a estar en bodega debe ingresar la mercacia en el inventario
+                    if(EstabaEnBodega==false && nuevaCompra.COM_ENBODEGA == true)
                     {
-                        DETALLECOMPRAS Detalle = db.DETALLECOMPRAS.Where(x => x.DEC_CODIGO == item.DEC_CODIGO).FirstOrDefault();
-                        int diferencia = 0;
-                        if (Detalle != null)
+                        foreach (DetalleCompra item in nuevaCompra.DetalleCompras)
                         {
-                            Detalle.PRO_CODIGO = item.PRO_CODIGO;
-                            diferencia = item.DEC_UNIDADES - Detalle.DEC_UNIDADES;
-                            Detalle.DEC_UNIDADES = item.DEC_UNIDADES;
-                            Detalle.DEC_PRECIOCOMPRA_PRODUCTO = item.DEC_PRECIOCOMPRA_PRODUCTO;
-                            Detalle.DEC_PRECIOTOTAL = item.DEC_PRECIOTOTAL;
-                            Detalle.DEC_FECHACREACION = DateTime.Now;
-                            Detalle.DEC_FECHAACTUALIZACION = DateTime.Now;
-                            Detalle.DEC_ESTADO = item.DEC_ESTADO;
-                        }
-                        else
-                        {
-                            Detalle = new DETALLECOMPRAS();
-                            Detalle.COM_CODIGO = nuevaCompra.COM_CODIGO;
-                            Detalle.PRO_CODIGO = item.PRO_CODIGO;
-                            Detalle.DEC_UNIDADES = item.DEC_UNIDADES;
-                            Detalle.DEC_PRECIOCOMPRA_PRODUCTO = item.DEC_PRECIOCOMPRA_PRODUCTO;
-                            Detalle.DEC_PRECIOTOTAL = item.DEC_PRECIOTOTAL;
-                            Detalle.DEC_FECHACREACION = DateTime.Now;
-                            Detalle.DEC_FECHAACTUALIZACION = DateTime.Now;
-                            Detalle.DEC_ESTADO = true;
-                            diferencia = item.DEC_UNIDADES;
-                            db.DETALLECOMPRAS.Add(Detalle);
-                        }
-
-
-
-
-                        //ACTUALIZAR PRODUCTOS
-                        PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
-                        if (producto != null)
-                        {
-                            producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
-                            if (item.DEC_ESTADO == false)
+                            DETALLECOMPRAS Detalle = db.DETALLECOMPRAS.Where(x => x.DEC_CODIGO == item.DEC_CODIGO).FirstOrDefault();
+                            int diferencia = 0;
+                            if (Detalle != null)
                             {
-                                producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES - item.DEC_UNIDADES;
+                                //ACTUALIZAR PRODUCTOS
+                                PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
+                                if (producto != null)
+                                {
+                                    producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + item.DEC_UNIDADES;
+                                    producto.PRO_ACTUALIZACION = DateTime.Now;
+                                }
                             }
-                            producto.PRO_ACTUALIZACION = DateTime.Now;
                         }
                     }
+
                     db.SaveChanges();
                 }
             }
@@ -288,20 +266,24 @@ namespace BUGGAFIT_BACK.Catalogos
                         Compra.COM_FECHAACTUALIZACION = DateTime.Now;
                         db.SaveChanges();
                     }
-                    List<DETALLECOMPRAS> detalles = db.DETALLECOMPRAS.Where(x => x.COM_CODIGO == com_codigo && x.DEC_ESTADO == true).ToList();
-
-                    foreach (DETALLECOMPRAS item in detalles)
+                    //solo se devuelven los productos si ya ha sido ingresado a inventario
+                    if (Compra.COM_ENBODEGA == true)
                     {
-                        int diferencia = -item.DEC_UNIDADES;
-                        item.DEC_ESTADO = false;
-                        item.DEC_FECHAACTUALIZACION = DateTime.Now;
+                        List<DETALLECOMPRAS> detalles = db.DETALLECOMPRAS.Where(x => x.COM_CODIGO == com_codigo && x.DEC_ESTADO == true).ToList();
 
-                        //ACTUALIZAR PRODUCTOS
-                        PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
-                        if (producto != null)
+                        foreach (DETALLECOMPRAS item in detalles)
                         {
-                            producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
-                            producto.PRO_ACTUALIZACION = DateTime.Now;
+                            int diferencia = -item.DEC_UNIDADES;
+                            item.DEC_ESTADO = false;
+                            item.DEC_FECHAACTUALIZACION = DateTime.Now;
+
+                            //ACTUALIZAR PRODUCTOS
+                            PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
+                            if (producto != null)
+                            {
+                                producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
+                                producto.PRO_ACTUALIZACION = DateTime.Now;
+                            }
                         }
                     }
                     db.SaveChanges();
@@ -324,20 +306,24 @@ namespace BUGGAFIT_BACK.Catalogos
                     Compra.COM_ESANULADA = true;
                     Compra.COM_FECHAACTUALIZACION = DateTime.Now;
                     db.SaveChanges();
-                    List<DETALLECOMPRAS> detalles = db.DETALLECOMPRAS.Where(x => x.COM_CODIGO == com_codigo && x.DEC_ESTADO == true).ToList();
-
-                    foreach (DETALLECOMPRAS item in detalles)
+                    //solo se quitan unidades si ha estado en inventario
+                    if (Compra.COM_ENBODEGA == true)
                     {
-                        int diferencia = -item.DEC_UNIDADES;
-                        item.DEC_ESTADO = false;
-                        item.DEC_FECHAACTUALIZACION = DateTime.Now;
+                        List<DETALLECOMPRAS> detalles = db.DETALLECOMPRAS.Where(x => x.COM_CODIGO == com_codigo && x.DEC_ESTADO == true).ToList();
 
-                        //ACTUALIZAR PRODUCTOS
-                        PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
-                        if (producto != null)
+                        foreach (DETALLECOMPRAS item in detalles)
                         {
-                            producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
-                            producto.PRO_ACTUALIZACION = DateTime.Now;
+                            int diferencia = -item.DEC_UNIDADES;
+                            item.DEC_ESTADO = false;
+                            item.DEC_FECHAACTUALIZACION = DateTime.Now;
+
+                            //ACTUALIZAR PRODUCTOS
+                            PRODUCTOS producto = db.PRODUCTOS.Where(x => x.PRO_CODIGO == item.PRO_CODIGO).FirstOrDefault();
+                            if (producto != null)
+                            {
+                                producto.PRO_UNIDADES_DISPONIBLES = producto.PRO_UNIDADES_DISPONIBLES + diferencia;
+                                producto.PRO_ACTUALIZACION = DateTime.Now;
+                            }
                         }
                     }
                     catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(com_codigo.ToString()).Wait();

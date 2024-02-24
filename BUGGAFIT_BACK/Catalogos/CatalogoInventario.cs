@@ -195,7 +195,7 @@ namespace BUGGAFIT_BACK.Catalogos
                                             PRO_REGALO = p.PRO_REGALO,
                                             PRO_UNIDADREGALO=p.PRO_UNIDADREGALO,
                                             PRO_UNIDAD_MINIMAREGALO=p.PRO_UNIDAD_MINIMAREGALO
-                                        }).OrderBy(x => x.PRO_NOMBRE).ToListAsync();
+                                        }).OrderBy(x => x.PRO_NOMBRE).OrderBy(X =>X.PRO_MARCA).ToListAsync();
                 if (_productos == null || !_productos.Any())
                     return ResponseClass.Response(statusCode: 204, message: "No hay Productos.");
 
