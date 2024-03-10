@@ -71,5 +71,24 @@ namespace BUGGAFIT_BACK.Catalogos
             }
 
         }
+
+        public async Task<ResponseObject> ActualizarMotivoGastoAsync(MotivoGasto motivo)
+        {
+            try
+            {
+                var _motivo = await myDbContext.MOTIVOSGASTOS.FindAsync(motivo.MOG_CODIGO);
+                if (_motivo == null)
+                    return ResponseClass.Response(statusCode: 400, message: $"el motivo con el codigo {motivo.MOG_CODIGO} no existe.");
+                _motivo.MOG_NOMBRE = motivo.MOG_NOMBRE;
+                myDbContext.Entry(_motivo).State = EntityState.Modified;
+                await myDbContext.SaveChangesAsync();
+
+                return ResponseClass.Response(statusCode: 201, message: $"MOTIVO Actualizado Exitosamente.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

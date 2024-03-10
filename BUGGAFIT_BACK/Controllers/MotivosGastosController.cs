@@ -46,6 +46,18 @@ namespace BUGGAFIT_BACK.Controllers
                 return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
             }
         }
+        [HttpPut("PutMotivoGasto")]
+        public async Task<ActionResult<ResponseObject>> PutMotivoGasto(MotivoGasto motivo)
+        {
+            try
+            {
+                return Ok(await catalogo.ActualizarMotivoGastoAsync(motivo));
+            }
+            catch (Exception ex)
+            {
+                return Problem(statusCode: 500, title: $"Error al intentar procesar la peticion.", detail: $"{ex.Message} Inner Exception: {ex.InnerException?.Message}");
+            }
+        }
 
         [HttpDelete("DeleteMotivoGasto/{id}")]
         public async Task<ActionResult<ResponseObject>> DeleteMotivoGasto(int id)

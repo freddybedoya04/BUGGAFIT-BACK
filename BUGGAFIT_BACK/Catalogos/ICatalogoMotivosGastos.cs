@@ -8,5 +8,6 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> ListarMotivoGastoAsync();
         Task<ResponseObject> CrearMotivoGastoAsync(MotivoGasto motivo);
         Task<ResponseObject> BorrarMotivoGastoAsync(int id);
+        Task<ResponseObject> ActualizarMotivoGastoAsync(MotivoGasto motivo);
     }
 }
