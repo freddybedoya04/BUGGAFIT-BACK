@@ -687,7 +687,7 @@ namespace BUGGAFIT_BACK.Catalogos
                     return ResponseClass.Response(statusCode: 400, message: $"El abono con el codigo {car_codigo} no existe.");
                 abono.CAR_ESANULADA = true;
                 myDbContext.Entry(abono).State = EntityState.Modified;
-                await catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(abono.CAR_CODIGO.ToString());
+                await catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(abono.CAR_CODIGO.ToString(), TiposTransacciones.ABONO);
                 await myDbContext.SaveChangesAsync();
 
                 return ResponseClass.Response(statusCode: 204, message: $"Abono Anulado Exitosamente.");

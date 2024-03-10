@@ -254,7 +254,7 @@ namespace BUGGAFIT_BACK.Catalogos
                         ?? throw new Exception($"No hay Transacciones con el codigo de enlace {com_codigo}.");
                     if (_transaccion.TRA_CONFIRMADA)
                     {
-                        catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(com_codigo.ToString()).Wait();
+                        catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(com_codigo.ToString(),TiposTransacciones.COMPRA).Wait();
                         Compra.COM_ESANULADA = true;
                         Compra.COM_FECHAACTUALIZACION = DateTime.Now;
                         db.SaveChanges();
@@ -326,7 +326,7 @@ namespace BUGGAFIT_BACK.Catalogos
                             }
                         }
                     }
-                    catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(com_codigo.ToString()).Wait();
+                    catalogoTransacciones.AnularTrasaccionesPorIdEnlaceAsync(com_codigo.ToString(), TiposTransacciones.COMPRA).Wait();
                     db.SaveChanges();
                 }
             }

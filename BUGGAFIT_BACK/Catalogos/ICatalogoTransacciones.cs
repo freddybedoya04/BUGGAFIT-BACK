@@ -20,7 +20,7 @@ namespace BUGGAFIT_BACK.Catalogos
         Task<ResponseObject> BorrarTrasaccionAsync(int Id);
         Task<ResponseObject> ListarTrasaccionPorIDAsync(int Id);
         Task<ResponseObject> BorrarTrasaccionPorIdEnlaceAsync(string idEnlace, TiposTransacciones tiposTransacciones);
-        Task<ResponseObject> AnularTrasaccionesPorIdEnlaceAsync(string idEnlace);
+        Task<ResponseObject> AnularTrasaccionesPorIdEnlaceAsync(string idEnlace, TiposTransacciones tiposTransacciones);
         Task<ResponseObject> ListarTrasaccionPorIDEnlaceAsync(string idEnlace);
         Task<TRANSACCIONES> ListarTrasaccionPorIDEnlaceAsync(string idEnlace, TiposTransacciones tipoTransaccione);
 

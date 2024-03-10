@@ -88,11 +88,11 @@ namespace BUGGAFIT_BACK.Catalogos
                 throw;
             }
         }
-        public async Task<ResponseObject> AnularTrasaccionesPorIdEnlaceAsync(string idEnlace)
+        public async Task<ResponseObject> AnularTrasaccionesPorIdEnlaceAsync(string idEnlace, TiposTransacciones transacciones)
         {
             try
             {
-                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace).FirstOrDefaultAsync()
+                var _transaccion = await myDbContext.TRANSACCIONES.Where(x => x.TRA_CODIGOENLACE == idEnlace && x.TRA_TIPO==transacciones.Nombre).FirstOrDefaultAsync()
                     ?? throw new NullReferenceException($"La transaccion con el codigo de enlace {idEnlace} no existe.");
                 _transaccion.TRA_FUEANULADA = false;
                 myDbContext.Entry(_transaccion).State = EntityState.Modified;
